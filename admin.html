@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — QHHT & Astroloji</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, getDocs, updateDoc, deleteDoc, collection, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const app = initializeApp({
+      apiKey: "AIzaSyBsAZj0Swtn77HvsGxpsgispuluvIEIcvU",
+      authDomain: "meryemaksoy1-45ce5.firebaseapp.com",
+      projectId: "meryemaksoy1-45ce5",
+      storageBucket: "meryemaksoy1-45ce5.firebasestorage.app",
+      messagingSenderId: "212318615377",
+      appId: "1:212318615377:web:b28387f101a4c42ad34570"
+    });
+    const db = getFirestore(app);
+
+    /* ── SESSION ── */
+    const isLoggedIn = () => sessionStorage.getItem('adm') === '1';
+    document.addEventListener('DOMContentLoaded', () => {
+      isLoggedIn() ? showAdmin() : showLogin();
+    });
+    function showAdmin() {
+      document.getElementById('loginWrap').style.display = 'none';
+      document.getElementById('app').style.display = 'grid';
+      loadAll();
+    }
+    function showLogin() {
+      document.getElementById('loginWrap').style.display = 'flex';
+      document.getElementById('app').style.display = 'none';
+    }
+
+    /* ── LOGIN ── */
+    window._login = async function() {
+      const u = document.getElementById('lu').value.trim();
+      const p = document.getElementById('lp').value;
+      const errEl = document.getElementById('lerr');
+      const btn   = document.getElementById('lbtn');
+      errEl.textContent = ''; btn.disabled = true; btn.textContent = '…';
+      try {
+        const snap = await getDoc(doc(db, 'adminCredentials', 'login'));
+        if (!snap.exists()) { errEl.textContent = 'adminCredentials/login belgesi bulunamadı.'; return; }
+        const c = snap.data();
+        if (c.username === u && c.password === p) {
+          sessionStorage.setItem('adm', '1'); showAdmin();
+        } else { errEl.textContent = 'Kullanıcı adı veya şifre hatalı.'; }
+      } catch(e) { errEl.textContent = e.message; }
+      finally { btn.disabled = false; btn.textContent = 'Giriş Yap'; }
+    };
+    window._logout = () => { sessionStorage.removeItem('adm'); showLogin(); };
+
+    /* ── CLOUDINARY ── */
+    window._upload = async function(file) {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', 'ml_default');
+      const r = await fetch('https://api.cloudinary.com/v1_1/dognk1md5/image/upload', { method:'POST', body:fd });
+      const d = await r.json();
+      if (d.secure_url) return d.secure_url;
+      throw new Error(d.error?.message || 'Upload başarısız');
+    };
+
+    window._uploadImg = async function(inputId, previewId, fieldId, btn) {
+      const file = document.getElementById(inputId).files[0];
+      if (!file) return;
+      btn.textContent = '…'; btn.disabled = true;
+      try {
+        const url = await window._upload(file);
+        document.getElementById(fieldId).value = url;
+        const p = document.getElementById(previewId);
+        p.src = url; p.style.display = 'block';
+        toast('Görsel yüklendi');
+      } catch(e) { toast(e.message, true); }
+      finally { btn.textContent = 'Yükle'; btn.disabled = false; }
+    };
+
+    /* ── LOAD ALL ── */
+    async function loadAll() { loadSiteContent(); loadReviews(); loadAppointments(); }
+
+    /* ── SİTE İÇERİĞİ ── */
+    const SC_FIELDS = ['navLogo','heroBg','heroEyebrow','heroTitle','heroSubtitle',
+      'aboutName','aboutTitle','profilePhoto','aboutQuote','aboutText1','aboutText2',
+      'stat1Number','stat1Label','stat2Number','stat2Label','stat3Number','stat3Label',
+      'instagramUrl','instagramHandle','youtubeUrl','youtubeHandle',
+      'igPost1Url','igPost1Label','igPost2Url','igPost2Label','igPost3Url','igPost3Label',
+      'igPost4Url','igPost4Label','igPost5Url','igPost5Label','igPost6Url','igPost6Label',
+      'ytVideo1Url','ytVideo1Label','ytVideo2Url','ytVideo2Label',
+      'ytVideo3Url','ytVideo3Label','ytVideo4Url','ytVideo4Label',
+      'email','whatsapp','location','footerCopy'];
+
+    // Sitedeki varsayılan değerler
+    const DEFAULTS = {
+      navLogo:         'QHHT & Astroloji',
+      heroEyebrow:     'QHHT & Astroloji',
+      heroTitle:       'Ruhsal Yolculuğunu Keşfet',
+      heroSubtitle:    'QHHT Seansları ve Astrolojik Danışmanlık ile Bilinçaltına Yolculuk — Kendi hakikatinizi, evrensel bağlantınızı ve ruhsal amacınızı keşfedin.',
+      aboutName:       'QHHT Uzmanı & Astrolog',
+      aboutTitle:      'İstanbul, Türkiye',
+      aboutQuote:      '"Her bilinç biriciktir; yıldız haritanız sizin ruhsal parmak izinizdir."',
+      aboutText1:      'Hayatımın en zorlu dönemlerinde bilinçaltının şifa gücüyle tanıştım. On yılı aşkın süredir QHHT seansları ve astrolojik danışmanlık ile insanların ruhsal yolculuklarına eşlik ediyorum.',
+      aboutText2:      'Dolores Cannon metodolojisini derinlemesine öğrenerek QHHT Level II sertifikasını tamamladım. Batı ve Vedik astroloji geleneklerini harmanlayan bütüncül bir yaklaşımla çalışıyorum.',
+      stat1Number:     '500+', stat1Label:  'QHHT Seansı',
+      stat2Number:     '1200+', stat2Label: 'Harita Analizi',
+      stat3Number:     '10+',  stat3Label:  'Yıl Deneyim',
+      email:           'info@elifyildiz.com',
+      whatsapp:        '0533 415 49 82',
+      location:        'İstanbul, Türkiye (Online seanslar dünya geneli)',
+      footerCopy:      '© 2025 Tüm hakları saklıdır. ✦ QHHT & Astroloji',
+      instagramHandle: '', instagramUrl: '',
+      youtubeHandle:   '', youtubeUrl:   '',
+      igPost1Url:'', igPost1Label:'Ay & Burçlar',
+      igPost2Url:'', igPost2Label:'QHHT Deneyimi',
+      igPost3Url:'', igPost3Label:'Doğum Haritası',
+      igPost4Url:'', igPost4Label:'Günlük Enerji',
+      igPost5Url:'', igPost5Label:'Karmik Dersler',
+      igPost6Url:'', igPost6Label:'Gezegen Transiti',
+      ytVideo1Url:'', ytVideo1Label:'QHHT Nedir? Detaylı Anlatım',
+      ytVideo2Url:'', ytVideo2Label:'Doğum Haritası Nasıl Okunur?',
+      ytVideo3Url:'', ytVideo3Label:'Kuzey Düğüm & Ruh Amacı',
+      ytVideo4Url:'', ytVideo4Label:'Bilinçaltı Şifası Üzerine',
+      heroBg: '', profilePhoto: '',
+    };
+
+    async function loadSiteContent() {
+      const statusEl = document.getElementById('loadStatus');
+
+      // 1. Önce default değerleri alanlar boşken göster
+      SC_FIELDS.forEach(f => {
+        const el = document.getElementById('sc_'+f);
+        if (el && DEFAULTS[f] !== undefined) el.value = DEFAULTS[f];
+      });
+
+      // 2. Firestore'dan çek
+      try {
+        const snap = await getDoc(doc(db, 'siteContent', 'main'));
+        const d = snap.exists() ? snap.data() : {};
+
+        // 3. Firestore'da değer varsa default'un üzerine yaz
+        SC_FIELDS.forEach(f => {
+          const el = document.getElementById('sc_'+f);
+          if (el && d[f] !== undefined && d[f] !== null && d[f] !== '') {
+            el.value = d[f];
+          }
+        });
+
+        // Görsel önizlemeleri
+        if (d.heroBg && d.heroBg.trim()) {
+          const p = document.getElementById('prev_heroBg');
+          if (p) { p.src = d.heroBg; p.style.display = 'block'; }
+        }
+        if (d.profilePhoto && d.profilePhoto.trim()) {
+          const p = document.getElementById('prev_pp');
+          if (p) { p.src = d.profilePhoto; p.style.display = 'block'; }
+        }
+
+        if (statusEl) {
+          statusEl.textContent = snap.exists()
+            ? '✓ Firestore\'dan yüklendi — ' + new Date().toLocaleTimeString('tr-TR')
+            : '⚠ Firestore\'da kayıt yok, varsayılanlar yüklendi';
+          statusEl.style.color = snap.exists() ? '#38a169' : '#d69e2e';
+        }
+      } catch(e) {
+        if (statusEl) {
+          statusEl.textContent = '✕ Yükleme hatası: ' + e.message;
+          statusEl.style.color = '#e53e3e';
+        }
+        console.warn('loadSiteContent error:', e);
+      }
+    }
+
+    window._saveSite = async function(btnId) {
+      const btn = document.getElementById(btnId || 'saveSiteBtn');
+      btn.textContent = '…'; btn.disabled = true;
+      try {
+        const data = {};
+        SC_FIELDS.forEach(f => { const el = document.getElementById('sc_'+f); if(el) data[f] = el.value.trim(); });
+        await setDoc(doc(db, 'siteContent', 'main'), { ...data, updatedAt: serverTimestamp() }, { merge: true });
+        toast('✦ Kaydedildi');
+      } catch(e) { toast(e.message, true); }
+      finally { btn.textContent = 'Kaydet'; btn.disabled = false; }
+    };
+
+    /* ── YORUMLAR ── */
+    async function loadReviews() {
+      const list = document.getElementById('reviewList');
+      list.innerHTML = '<p class="empty">Yükleniyor…</p>';
+      try {
+        const snap = await getDocs(query(collection(db,'reviews'), orderBy('createdAt','desc')));
+        if (snap.empty) { list.innerHTML = '<p class="empty">Henüz yorum yok.</p>'; return; }
+        list.innerHTML = '';
+        snap.forEach(d => {
+          const r = d.data();
+          const dt = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('tr-TR') : '—';
+          const card = document.createElement('div');
+          card.className = 'dcard ' + (r.approved ? 'ok' : 'wait');
+          card.innerHTML = `
+            <div class="dcard-top">
+              <div class="dcard-name">${r.name} <span class="pill ${r.approved?'pill-g':'pill-y'}">${r.approved?'Onaylı':'Bekliyor'}</span></div>
+              <div class="dcard-meta">${r.service} · ${'★'.repeat(r.stars||5)} · ${dt}</div>
+            </div>
+            <p class="dcard-body">"${r.text}"</p>
+            <div class="dcard-actions">
+              ${!r.approved ? `<button class="abtn abtn-g" onclick="approveR('${d.id}',this)">✓ Onayla</button>` : `<button class="abtn abtn-gray" onclick="unapproveR('${d.id}',this)">↩ Geri Al</button>`}
+              <button class="abtn abtn-r" onclick="deleteR('${d.id}',this)">✕ Sil</button>
+            </div>`;
+          list.appendChild(card);
+        });
+      } catch(e) { list.innerHTML = `<p class="empty">${e.message}</p>`; }
+    }
+    window.approveR   = async (id,btn) => { btn.disabled=true; await updateDoc(doc(db,'reviews',id),{approved:true});  loadReviews(); toast('Onaylandı'); };
+    window.unapproveR = async (id,btn) => { btn.disabled=true; await updateDoc(doc(db,'reviews',id),{approved:false}); loadReviews(); toast('Onay kaldırıldı'); };
+    window.deleteR    = async (id,btn) => { if(!confirm('Silinsin mi?'))return; btn.disabled=true; await deleteDoc(doc(db,'reviews',id)); loadReviews(); toast('Silindi'); };
+
+    /* ── RANDEVULAR ── */
+    async function loadAppointments() {
+      const list = document.getElementById('apptList');
+      list.innerHTML = '<p class="empty">Yükleniyor…</p>';
+      try {
+        const snap = await getDocs(query(collection(db,'appointments'), orderBy('createdAt','desc')));
+        if (snap.empty) { list.innerHTML = '<p class="empty">Henüz randevu yok.</p>'; return; }
+        list.innerHTML = '';
+        snap.forEach(d => {
+          const a = d.data();
+          const dt = a.createdAt?.toDate ? a.createdAt.toDate().toLocaleString('tr-TR') : '—';
+          const card = document.createElement('div');
+          card.className = 'dcard ' + (a.status==='read' ? 'ok' : 'wait');
+          card.innerHTML = `
+            <div class="dcard-top">
+              <div class="dcard-name">${a.firstName||''} ${a.lastName||''} <span class="pill ${a.status==='read'?'pill-g':'pill-y'}">${a.status==='read'?'Okundu':'Yeni'}</span></div>
+              <div class="dcard-meta">${a.email||''} · ${dt}</div>
+            </div>
+            <p class="dcard-body"><strong>${a.service||'—'}</strong> — ${a.message||''}</p>
+            <div class="dcard-actions">
+              ${a.status!=='read' ? `<button class="abtn abtn-g" onclick="markRead('${d.id}',this)">✓ Okundu</button>` : ''}
+              <button class="abtn abtn-r" onclick="deleteA('${d.id}',this)">✕ Sil</button>
+            </div>`;
+          list.appendChild(card);
+        });
+      } catch(e) { list.innerHTML = `<p class="empty">${e.message}</p>`; }
+    }
+    window.markRead = async (id,btn) => { btn.disabled=true; await updateDoc(doc(db,'appointments',id),{status:'read'}); loadAppointments(); toast('Okundu işaretlendi'); };
+    window.deleteA  = async (id,btn) => { if(!confirm('Silinsin mi?'))return; btn.disabled=true; await deleteDoc(doc(db,'appointments',id)); loadAppointments(); toast('Silindi'); };
+
+    /* ── TOAST ── */
+    window.toast = function(msg, err=false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = 'toast show' + (err?' err':'');
+      clearTimeout(t._t); t._t = setTimeout(() => t.className='toast', 3000);
+    };
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold: #8a6a1a; --gold2: #c9a84c;
+      --bg: #f2efe9; --sb: #1a1628; --sb2: #231e35;
+      --text: #2c2535; --muted: #8a8599; --border: rgba(138,106,26,.14);
+      --r: 7px; --font: 'Jost',sans-serif; --serif: 'Cormorant Garamond',serif;
+    }
+    html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text); font-size: 15px; }
+
+    /* LOGIN */
+    #loginWrap { position:fixed;inset:0;background:linear-gradient(135deg,#f0ece4,#ddd6ca);display:flex;align-items:center;justify-content:center;z-index:99; }
+    .lcard { background:#fff;border:1px solid var(--border);border-radius:12px;padding:32px 28px;width:320px;box-shadow:0 12px 40px rgba(0,0,0,.10); }
+    .lcard h1 { font-family:var(--serif);font-size:1.5rem;font-weight:400;text-align:center;margin-bottom:3px; }
+    .lcard h1 span { color:var(--gold); }
+    .lcard .sub { font-size:.7rem;color:var(--muted);text-align:center;margin-bottom:22px;letter-spacing:.05em; }
+    .lf { margin-bottom:10px; }
+    .lf label { display:block;font-size:.62rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:4px; }
+    .lf input { width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-family:var(--font);outline:none;background:#faf8f5;transition:border-color .2s; }
+    .lf input:focus { border-color:var(--gold);background:#fff; }
+    .btn-login { width:100%;margin-top:8px;padding:10px;background:linear-gradient(135deg,#9e7b22,#8a6a1a);color:#fff;border:none;border-radius:40px;font-family:var(--font);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:opacity .2s; }
+    .btn-login:hover { opacity:.88; }
+    .btn-login:disabled { opacity:.5;cursor:not-allowed; }
+    #lerr { font-size:.72rem;color:#e53e3e;min-height:16px;margin-top:8px;text-align:center; }
+
+    /* LAYOUT */
+    #app { display:none;grid-template-columns:200px 1fr;min-height:100vh; }
+
+    /* SIDEBAR */
+    .sb { background:var(--sb);color:#c8c2db;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto; }
+    .sb-brand { padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.05); }
+    .sb-brand .logo { font-family:var(--serif);font-size:1.1rem;font-weight:400;color:#fff;line-height:1.2; }
+    .sb-brand .logo em { color:var(--gold2);font-style:normal; }
+    .sb-brand .tag { font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-top:2px; }
+    .sb-nav { padding:10px 8px 4px; }
+    .sb-label { font-size:.56rem;font-weight:500;letter-spacing:.25em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:0 8px;margin-bottom:3px;margin-top:8px; }
+    .nb { display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:5px;cursor:pointer;font-size:.84rem;font-weight:300;color:rgba(255,255,255,.5);transition:all .18s;border:none;background:none;width:100%;text-align:left; }
+    .nb .ic { font-size:.85rem;width:16px;text-align:center;flex-shrink:0;line-height:1; }
+    .nb:hover { background:rgba(255,255,255,.06);color:rgba(255,255,255,.82); }
+    .nb.on { background:rgba(201,168,76,.14);color:var(--gold2);font-weight:400; }
+    .sb-foot { margin-top:auto;padding:12px 8px;border-top:1px solid rgba(255,255,255,.05); }
+    .btn-out { display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:5px;cursor:pointer;font-size:.74rem;color:rgba(255,255,255,.3);background:none;border:none;width:100%;transition:all .18s; }
+    .btn-out:hover { color:#f08080;background:rgba(240,128,128,.08); }
+
+    /* MAIN */
+    .main { display:flex;flex-direction:column;overflow-y:auto; }
+    .topbar { background:#fff;border-bottom:1px solid var(--border);padding:0 20px;height:48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;gap:12px; }
+    .tb-title { font-size:.9rem;font-weight:500;color:var(--text); }
+    .tb-badge { font-size:.62rem;background:rgba(138,106,26,.08);color:var(--gold);padding:3px 9px;border-radius:20px;border:1px solid var(--border);white-space:nowrap; }
+    .content { padding:16px 20px;flex:1; }
+
+    /* PANELS */
+    .panel { display:none; }
+    .panel.on { display:block; }
+
+    /* COLLAPSIBLE CARD */
+    .card { background:#fff;border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px; }
+    .ch { padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none; }
+    .ch h3 { font-size:.88rem;font-weight:500;letter-spacing:.03em;color:var(--text);display:flex;align-items:center;gap:7px; }
+    .ch .arr { font-size:.65rem;color:var(--muted);transition:transform .18s; }
+    .card.cl .arr { transform:rotate(-90deg); }
+    .card.cl .cb { display:none; }
+    .cb { padding:12px 14px; }
+
+    /* FIELDS */
+    .fg { margin-bottom:9px; }
+    .fg label { display:block;font-size:.72rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:4px; }
+    .fg input,.fg textarea,.fg select { width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:5px;font-size:.92rem;font-family:var(--font);color:var(--text);background:#faf8f5;outline:none;transition:border-color .2s; }
+    .fg input:focus,.fg textarea:focus { border-color:var(--gold);background:#fff; }
+    .fg textarea { min-height:58px;resize:vertical; }
+    .g2 { display:grid;grid-template-columns:1fr 1fr;gap:9px; }
+    .g3 { display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px; }
+
+    /* IMAGE UPLOAD */
+    .irow { display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap; }
+    .iprev { width:56px;height:56px;object-fit:cover;border-radius:5px;border:1px solid var(--border);display:none;background:#e6dfd4;flex-shrink:0; }
+    .iprev.circ { border-radius:50%; }
+    .iprev.wide { width:88px;height:48px; }
+    .fpick { font-size:.72rem;color:var(--muted);flex:1;min-width:0; }
+    .btn-up { padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:20px;font-size:.68rem;cursor:pointer;white-space:nowrap;transition:opacity .2s; }
+    .btn-up:disabled { opacity:.4;cursor:not-allowed; }
+
+    /* SAVE */
+    .btn-save { padding:8px 24px;background:linear-gradient(135deg,#9e7b22,#8a6a1a);color:#fff;border:none;border-radius:40px;font-family:var(--font);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;margin-top:4px;transition:opacity .2s; }
+    .btn-save:hover { opacity:.88; }
+    .btn-save:disabled { opacity:.5;cursor:not-allowed; }
+
+    /* DATA CARDS */
+    .dcard { background:#faf8f5;border:1px solid var(--border);border-left:3px solid;border-radius:var(--r);padding:10px 12px;margin-bottom:8px; }
+    .dcard.ok   { border-left-color:#38a169; }
+    .dcard.wait { border-left-color:#d69e2e; }
+    .dcard-top { display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;flex-wrap:wrap;gap:3px; }
+    .dcard-name { font-size:.92rem;font-weight:500; }
+    .dcard-meta { font-size:.78rem;color:var(--muted); }
+    .dcard-body { font-size:.86rem;color:#555;line-height:1.6;font-style:italic;margin:6px 0 10px; }
+    .dcard-actions { display:flex;gap:6px;flex-wrap:wrap; }
+    .pill { display:inline-block;font-size:.56rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:20px;margin-left:5px; }
+    .pill-g { background:#c6f6d5;color:#276749; }
+    .pill-y { background:#fefcbf;color:#975a16; }
+    .abtn { padding:5px 13px;border:none;border-radius:20px;font-size:.78rem;cursor:pointer;transition:opacity .18s; }
+    .abtn:disabled { opacity:.4;cursor:not-allowed; }
+    .abtn-g    { background:#38a169;color:#fff; }
+    .abtn-gray { background:#718096;color:#fff; }
+    .abtn-r    { background:#e53e3e;color:#fff; }
+    .abtn:hover:not(:disabled) { opacity:.8; }
+    .empty { color:var(--muted);font-style:italic;text-align:center;padding:24px;font-size:.82rem; }
+    .load-status { font-size:.75rem;padding:6px 10px;border-radius:5px;background:rgba(0,0,0,.03);border:1px solid var(--border);margin-bottom:12px;display:block; }
+
+    /* TOAST */
+    .toast { position:fixed;bottom:20px;right:20px;background:#1a1628;color:#f0ece4;padding:9px 18px;border-radius:6px;font-size:.76rem;z-index:999;opacity:0;transform:translateY(8px);transition:all .22s;pointer-events:none; }
+    .toast.show { opacity:1;transform:none; }
+    .toast.err  { background:#c53030; }
+
+    @media(max-width:640px) {
+      #app { grid-template-columns:1fr; }
+      .sb  { display:none; }
+      .g2,.g3 { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginWrap">
+  <div class="lcard">
+    <h1>✦ <span>Admin</span></h1>
+    <p class="sub">QHHT & Astroloji Yönetim Paneli</p>
+    <div class="lf"><label>Kullanıcı Adı</label><input id="lu" type="text" placeholder="admin" /></div>
+    <div class="lf"><label>Şifre</label><input id="lp" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter')_login()" /></div>
+    <button class="btn-login" id="lbtn" onclick="_login()">Giriş Yap</button>
+    <div id="lerr"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sb">
+    <div class="sb-brand">
+      <div class="logo">QHHT <em>✦</em> Astroloji</div>
+      <div class="tag">Yönetim Paneli</div>
+    </div>
+
+    <div class="sb-nav">
+      <div class="sb-label">İçerik</div>
+      <button class="nb on"  data-p="hero"      onclick="go('hero')">     <span class="ic">🌟</span>Hero & Arkaplan</button>
+      <button class="nb"     data-p="hakkimda"  onclick="go('hakkimda')"> <span class="ic">👤</span>Hakkımda</button>
+      <button class="nb"     data-p="iletisim"  onclick="go('iletisim')"> <span class="ic">📬</span>İletişim</button>
+      <button class="nb"     data-p="sosyal"    onclick="go('sosyal')">   <span class="ic">📱</span>Sosyal Medya</button>
+      <button class="nb"     data-p="genel"     onclick="go('genel')">    <span class="ic">⚙️</span>Genel</button>
+
+      <div class="sb-label" style="margin-top:12px">Gelen Kutusu</div>
+      <button class="nb"     data-p="yorumlar"  onclick="go('yorumlar')">  <span class="ic">💬</span>Yorumlar</button>
+      <button class="nb"     data-p="randevular" onclick="go('randevular')"><span class="ic">📅</span>Randevular</button>
+    </div>
+
+    <div class="sb-foot">
+      <button class="btn-out" onclick="_logout()">↩ Çıkış Yap</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <span class="tb-title" id="tbTitle">Hero & Arkaplan</span>
+      <span class="tb-badge" id="tbBadge">Site İçeriği</span>
+    </div>
+
+    <div class="content">
+      <span class="load-status" id="loadStatus" style="color:var(--muted)">Yükleniyor…</span>
+
+      <!-- HERO -->
+      <div class="panel on" id="p_hero">
+        <div class="card">
+          <div class="ch" onclick="tog(this)"><h3><span>🖼</span>Arka Plan Görseli</h3><span class="arr">▾</span></div>
+          <div class="cb">
+            <div class="irow">
+              <img id="prev_heroBg" class="iprev wide" alt="" />
+              <input type="file" id="f_heroBg" accept="image/*" class="fpick" />
+              <button class="btn-up" onclick="_uploadImg('f_heroBg','prev_heroBg','sc_heroBg',this)">Yükle</button>
+            </div>
+            <div class="fg"><label>URL</label><input type="text" id="sc_heroBg" placeholder="https://..." /></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch" onclick="tog(this)"><h3><span>✏️</span>Hero Metinleri</h3><span class="arr">▾</span></div>
+          <div class="cb">
+            <div class="fg"><label>Üst Etiket</label><input type="text" id="sc_heroEyebrow" placeholder="QHHT & Astroloji" /></div>
+            <div class="fg"><label>Başlık (HTML destekli)</label><textarea id="sc_heroTitle" placeholder="Ruhsal Yolculuğunu Keşfet"></textarea></div>
+            <div class="fg"><label>Alt Başlık</label><textarea id="sc_heroSubtitle"></textarea></div>
+          </div>
+        </div>
+        <button class="btn-save" id="saveSiteBtn" onclick="_saveSite('saveSiteBtn')">✦ Kaydet</button>
+      </div>
+
+      <!-- HAKKIMDA -->
+      <div class="panel" id="p_hakkimda">
+        <div class="card">
+          <div class="ch" onclick="tog(this)"><h3><span>📷</span>Profil Fotoğrafı</h3><span class="arr">▾</span></div>
+          <div class="cb">
+            <div class="irow">
+              <img id="prev_pp" class="iprev circ" alt="" />
+              <input type="file" id="f_pp" accept="image/*" class="fpick" />
+              <button class="btn-up" onclick="_uploadImg('f_pp','prev_pp','sc_profilePhoto',this)">Cloudinary'ye Yükle</button>
+            </div>
+            <div class="fg"><label>Fotoğraf URL</label><input type="text" id="sc_profilePhoto" placeholder="https://res.cloudinary.com/..." /></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch" onclick="tog(this)"><h3><span>👤</span>Profil Bilgileri</h3><span class="arr">▾</span></div>
+          <div class="cb">
+            <div class="g2">
+              <div class="fg"><label>İsim / Unvan</label><input type="text" id="sc_aboutName" /></div>
+              <div class="fg"><label>Konum</label><input type="text" id="sc_aboutTitle" /></div>
+            </div>
+            <div class="fg"><label>Alıntı</label><textarea id="sc_aboutQuote"></textarea></div>
+            <div class="fg"><label>1. Paragraf (HTML)</label><textarea id="sc_aboutText1"></textarea></div>
+            <div class="fg"><label>2. Paragraf (HTML)</label><textarea id="sc_aboutText2"></textarea></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch" onclick="tog(this)"><h3><span>📊</span>İstatistikler</h3><span class="arr">▾</span></div>
+          <div class="cb">
+            <div class="g3">
+              <div>
+                <div class="fg"><label>1. Sayı</label><input type="text" id="sc_stat1Number" placeholder="500+" /></div>
+                <div class="fg"><label>1. Etiket</label><input type="text" id="sc_stat1Label" placeholder="QHHT Seansı" /></div>
+              </div>
+              <div>
+                <div class="fg"><label>2. Sayı</label><input type="text" id="sc_stat2Number" placeholder="1200+" /></div>
+                <div class="fg"><label>2. Etiket</label><input type="text" id="sc_stat2Label" placeholder="Harita Analizi" /></div>
+              </div>
+              <div>
+                <div class="fg"><label>3. Sayı</label><input type="text" id="sc_stat3Number" placeholder="10+" /></div>
+                <div class="fg"><label>3. Etiket</label><input type="text" id="sc_stat3Label" placeholder="Yıl Deneyim" /></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-save" id="saveAboutBtn" onclick="_saveSite('saveAboutBtn')">✦ Kaydet</button>
+      </div>
+
+      <!-- İLETİŞİM -->
+      <div class="panel" id="p_iletisim">
+        <div class="card">
+          <div class="ch" onclick="tog(this)"><h3><span>📬</span>İletişim Bilgileri</h3><span class="arr">▾</span></div>
+          <div class="cb">
+            <div class="g2">
+              <div class="fg"><label>E-posta</label><input type="email" id="sc_email" /></div>
+              <div class="fg"><label>WhatsApp</label><input type="text" id="sc_whatsapp" /></div>
+            </div>
+            <div class="fg"><label>Konum</label><input type="text" id="sc_location" /></div>
+          </div>
+        </div>
+        <button class="btn-save" id="saveContactBtn" onclick="_saveSite('saveContactBtn')">✦ Kaydet</button>
+      </div>
+
+      <!-- SOSYAL -->
+      <div class="panel" id="p_sosyal">
+        <div class="card">
+          <div class="ch" onclick="tog(this)"><h3><span>📸</span>Instagram — Profil</h3><span class="arr">▾</span></div>
+          <div class="cb">
+            <div class="g2">
+              <div class="fg"><label>Kullanıcı Adı</label><input type="text" id="sc_instagramHandle" placeholder="kullanici_adi" /></div>
+              <div class="fg"><label>Profil URL</label><input type="url" id="sc_instagramUrl" placeholder="https://instagram.com/kullanici_adi" /></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch" onclick="tog(this)"><h3><span>🖼️</span>Instagram — Gönderi Linkleri</h3><span class="arr">▾</span></div>
+          <div class="cb">
+            <p style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">Her gönderi için Instagram'daki URL'yi ve etiket metnini girin.</p>
+            <div style="display:grid;gap:6px;">
+              <div class="g2"><div class="fg"><label>Gönderi 1 — URL</label><input type="url" id="sc_igPost1Url" placeholder="https://instagram.com/p/..." /></div><div class="fg"><label>Gönderi 1 — Etiket</label><input type="text" id="sc_igPost1Label" placeholder="Ay & Burçlar" /></div></div>
+              <div class="g2"><div class="fg"><label>Gönderi 2 — URL</label><input type="url" id="sc_igPost2Url" placeholder="https://instagram.com/p/..." /></div><div class="fg"><label>Gönderi 2 — Etiket</label><input type="text" id="sc_igPost2Label" placeholder="QHHT Deneyimi" /></div></div>
+              <div class="g2"><div class="fg"><label>Gönderi 3 — URL</label><input type="url" id="sc_igPost3Url" placeholder="https://instagram.com/p/..." /></div><div class="fg"><label>Gönderi 3 — Etiket</label><input type="text" id="sc_igPost3Label" placeholder="Doğum Haritası" /></div></div>
+              <div class="g2"><div class="fg"><label>Gönderi 4 — URL</label><input type="url" id="sc_igPost4Url" placeholder="https://instagram.com/p/..." /></div><div class="fg"><label>Gönderi 4 — Etiket</label><input type="text" id="sc_igPost4Label" placeholder="Günlük Enerji" /></div></div>
+              <div class="g2"><div class="fg"><label>Gönderi 5 — URL</label><input type="url" id="sc_igPost5Url" placeholder="https://instagram.com/p/..." /></div><div class="fg"><label>Gönderi 5 — Etiket</label><input type="text" id="sc_igPost5Label" placeholder="Karmik Dersler" /></div></div>
+              <div class="g2"><div class="fg"><label>Gönderi 6 — URL</label><input type="url" id="sc_igPost6Url" placeholder="https://instagram.com/p/..." /></div><div class="fg"><label>Gönderi 6 — Etiket</label><input type="text" id="sc_igPost6Label" placeholder="Gezegen Transiti" /></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch" onclick="tog(this)"><h3><span>▶️</span>YouTube — Kanal</h3><span class="arr">▾</span></div>
+          <div class="cb">
+            <div class="g2">
+              <div class="fg"><label>Kanal Adı</label><input type="text" id="sc_youtubeHandle" /></div>
+              <div class="fg"><label>Kanal URL</label><input type="url" id="sc_youtubeUrl" placeholder="https://youtube.com/@kanal" /></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch" onclick="tog(this)"><h3><span>🎬</span>YouTube — Video Linkleri</h3><span class="arr">▾</span></div>
+          <div class="cb">
+            <p style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">Her video için YouTube URL'sini (youtube.com/watch?v=... veya youtu.be/...) ve başlığı girin.</p>
+            <div style="display:grid;gap:6px;">
+              <div class="fg"><label>Video 1 — URL</label><input type="url" id="sc_ytVideo1Url" placeholder="https://youtube.com/watch?v=..." /></div>
+              <div class="fg"><label>Video 2 — URL</label><input type="url" id="sc_ytVideo2Url" placeholder="https://youtube.com/watch?v=..." /></div>
+              <div class="fg"><label>Video 3 — URL</label><input type="url" id="sc_ytVideo3Url" placeholder="https://youtube.com/watch?v=..." /></div>
+              <div class="fg"><label>Video 4 — URL</label><input type="url" id="sc_ytVideo4Url" placeholder="https://youtube.com/watch?v=..." /></div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-save" id="saveSosyalBtn" onclick="_saveSite('saveSosyalBtn')">✦ Kaydet</button>
+      </div>
+
+      <!-- GENEL -->
+      <div class="panel" id="p_genel">
+        <div class="card">
+          <div class="ch" onclick="tog(this)"><h3><span>⚙️</span>Navigasyon & Footer</h3><span class="arr">▾</span></div>
+          <div class="cb">
+            <div class="fg"><label>Logo Metni</label><input type="text" id="sc_navLogo" /></div>
+            <div class="fg"><label>Footer Telif</label><input type="text" id="sc_footerCopy" /></div>
+          </div>
+        </div>
+        <button class="btn-save" id="saveGenelBtn" onclick="_saveSite('saveGenelBtn')">✦ Kaydet</button>
+      </div>
+
+      <!-- YORUMLAR -->
+      <div class="panel" id="p_yorumlar">
+        <div class="card">
+          <div class="ch" onclick="tog(this)"><h3><span>💬</span>Yorumlar</h3><span class="arr">▾</span></div>
+          <div class="cb">
+            <p style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">Onayladığınız yorumlar sitede görünür.</p>
+            <div id="reviewList"><p class="empty">Yükleniyor…</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RANDEVULAR -->
+      <div class="panel" id="p_randevular">
+        <div class="card">
+          <div class="ch" onclick="tog(this)"><h3><span>📅</span>Randevu Talepleri</h3><span class="arr">▾</span></div>
+          <div class="cb">
+            <p style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">Siteden gelen tüm randevu talepleri.</p>
+            <div id="apptList"><p class="empty">Yükleniyor…</p></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const PAGES = {
+    hero:       ['Hero & Arkaplan',  'Site İçeriği'],
+    hakkimda:   ['Hakkımda',         'Site İçeriği'],
+    iletisim:   ['İletişim',          'Site İçeriği'],
+    sosyal:     ['Sosyal Medya',      'Site İçeriği'],
+    genel:      ['Genel Ayarlar',     'Site İçeriği'],
+    yorumlar:   ['Yorumlar',          'Gelen Kutusu'],
+    randevular: ['Randevular',        'Gelen Kutusu'],
+  };
+
+  function go(key) {
+    document.querySelectorAll('.nb').forEach(b => b.classList.toggle('on', b.dataset.p === key));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+    document.getElementById('p_' + key).classList.add('on');
+    const [title, badge] = PAGES[key];
+    document.getElementById('tbTitle').textContent = title;
+    document.getElementById('tbBadge').textContent = badge;
+  }
+
+  function tog(head) {
+    head.closest('.card').classList.toggle('cl');
+  }
+</script>
+
+</body>
+</html>
