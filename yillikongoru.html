@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yıllık Öngörü | QHHT & Astroloji</title>
+  <meta name="description" content="Solar dönüş haritası ve güncel transit analiziyle önünüzdeki 12 ayın önemli dönemleri ve fırsatları." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root{--navy-deep:#f0ece4;--gold:#8a6a1a;--gold-light:#9e7b22;--purple-glow:#7c5cbf;--white:#2c2535;--white-dim:rgba(44,37,53,0.65);--font-serif:'Cormorant Garamond',Georgia,serif;--font-sans:'Jost',sans-serif;--transition:all 0.4s cubic-bezier(0.25,0.8,0.25,1);--glow-gold:0 0 20px rgba(138,106,26,0.2),0 0 40px rgba(138,106,26,0.1);--radius-lg:16px;--radius-md:10px;--max-width:1200px;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:#e6e0d6;}::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--gold),var(--purple-glow));border-radius:3px;}
+    body{font-family:var(--font-sans);background:var(--navy-deep);color:var(--white);line-height:1.7;overflow-x:hidden;animation:fadeIn .8s ease forwards;}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .galaxy-overlay{position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 30%,rgba(255,200,100,0.06) 0%,transparent 70%),radial-gradient(ellipse 60% 80% at 80% 70%,rgba(200,185,165,0.1) 0%,transparent 70%);pointer-events:none;z-index:0;}
+    nav,main,footer{position:relative;z-index:1;}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:flex;align-items:center;justify-content:space-between;transition:var(--transition);}
+    nav.scrolled{background:rgba(240,236,228,.95);backdrop-filter:blur(20px);padding:14px 40px;border-bottom:1px solid rgba(184,146,46,.15);}
+    .nav-logo{font-family:var(--font-serif);font-size:1.5rem;font-weight:400;color:var(--white);text-decoration:none;display:flex;align-items:center;gap:10px;}
+    .nav-back{font-family:var(--font-sans);font-size:.78rem;font-weight:300;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);text-decoration:none;display:flex;align-items:center;gap:8px;transition:gap .3s;}
+    .nav-back:hover{gap:14px;}
+    .nav-cta{font-family:var(--font-sans);font-size:.78rem;font-weight:400;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);padding:8px 22px;border-radius:40px;text-decoration:none;transition:var(--transition);}
+    .nav-cta:hover{background:var(--gold);color:#faf8f5;}
+    section{padding:90px 40px;position:relative;}
+    .container{max-width:var(--max-width);margin:0 auto;width:100%;}
+    .section-label{font-family:var(--font-sans);font-size:.72rem;font-weight:400;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:block;}
+    .section-title{font-family:var(--font-serif);font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:300;line-height:1.2;color:var(--white);margin-bottom:20px;}
+    .section-title span{color:var(--gold-light);font-style:italic;}
+    .divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:24px 0;}
+    /* HERO */
+    .page-hero{min-height:68vh;display:flex;align-items:flex-end;padding:140px 40px 80px;position:relative;overflow:hidden;background:linear-gradient(160deg,rgba(240,230,200,0.6) 0%,rgba(235,228,212,0.8) 50%,rgba(245,240,228,0.9) 100%);}
+    .page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 85% 30%,rgba(240,180,40,0.07) 0%,transparent 60%),radial-gradient(ellipse 50% 60% at 15% 70%,rgba(201,168,76,0.1) 0%,transparent 60%);}
+    .sun-deco{position:absolute;right:7%;top:50%;transform:translateY(-50%);width:360px;height:360px;opacity:.1;animation:rotateSun 40s linear infinite;}
+    @keyframes rotateSun{from{transform:translateY(-50%) rotate(0deg)}to{transform:translateY(-50%) rotate(360deg)}}
+    .hero-content-wrap{position:relative;z-index:2;max-width:var(--max-width);margin:0 auto;width:100%;}
+    .hero-breadcrumb{display:flex;align-items:center;gap:10px;font-family:var(--font-sans);font-size:.72rem;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:var(--white-dim);margin-bottom:28px;}
+    .hero-breadcrumb a{color:var(--gold);text-decoration:none;}
+    .hero-breadcrumb span{color:rgba(44,37,53,.3);}
+    .page-hero-eyebrow{display:inline-flex;align-items:center;gap:12px;font-family:var(--font-sans);font-size:.72rem;font-weight:300;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
+    .page-hero-eyebrow::before{content:'';display:block;width:30px;height:1px;background:var(--gold);opacity:.6;}
+    .page-hero-title{font-family:var(--font-serif);font-size:clamp(3rem,7vw,6rem);font-weight:300;line-height:1.0;color:var(--white);margin-bottom:24px;}
+    .page-hero-title em{font-style:italic;color:var(--gold-light);}
+    .page-hero-sub{font-family:var(--font-sans);font-size:1rem;font-weight:300;color:var(--white-dim);line-height:1.8;max-width:560px;margin-bottom:44px;}
+    .hero-meta{display:flex;gap:28px;flex-wrap:wrap;}
+    .hero-meta-item{display:flex;align-items:center;gap:10px;font-family:var(--font-sans);font-size:.78rem;font-weight:300;color:var(--white-dim);}
+    .hero-meta-icon{width:34px;height:34px;border-radius:50%;background:rgba(160,120,40,.1);border:1px solid rgba(160,120,40,.2);display:flex;align-items:center;justify-content:center;font-size:.9rem;}
+    /* MONTHS GRID */
+    .months-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:50px;}
+    .month-card{background:linear-gradient(160deg,rgba(232,226,216,.8),rgba(245,241,234,.95));border:1px solid rgba(138,106,26,.1);border-radius:var(--radius-md);padding:22px 20px;transition:var(--transition);text-align:center;}
+    .month-card:hover{border-color:rgba(138,106,26,.35);transform:translateY(-5px);box-shadow:0 16px 40px rgba(0,0,0,.06);}
+    .month-name{font-family:var(--font-serif);font-size:1rem;font-weight:400;color:var(--white);margin-bottom:8px;}
+    .month-planet{font-size:1.4rem;margin-bottom:8px;display:block;}
+    .month-theme{font-family:var(--font-sans);font-size:.75rem;font-weight:300;color:var(--white-dim);line-height:1.5;}
+    .month-highlight{display:inline-block;margin-top:8px;font-family:var(--font-sans);font-size:.62rem;font-weight:400;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);background:rgba(138,106,26,.08);border:1px solid rgba(138,106,26,.2);padding:3px 9px;border-radius:20px;}
+    /* CARD GRIDS */
+    .card-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:50px;}
+    .info-card{background:linear-gradient(160deg,rgba(232,226,216,.8),rgba(245,241,234,.95));border:1px solid rgba(138,106,26,.12);border-radius:var(--radius-lg);padding:36px 28px;transition:var(--transition);position:relative;overflow:hidden;}
+    .info-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);transform:scaleX(0);transition:transform .4s;}
+    .info-card:hover{transform:translateY(-6px);border-color:rgba(138,106,26,.3);box-shadow:0 20px 50px rgba(0,0,0,.05);}
+    .info-card:hover::before{transform:scaleX(1);}
+    .card-icon{font-size:2rem;margin-bottom:16px;display:block;}
+    .card-title{font-family:var(--font-serif);font-size:1.2rem;font-weight:400;color:var(--white);margin-bottom:10px;}
+    .card-desc{font-family:var(--font-sans);font-size:.84rem;font-weight:300;color:var(--white-dim);line-height:1.75;}
+    /* TWO COL */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
+    .text-block{display:flex;flex-direction:column;gap:28px;}
+    .big-text{font-family:var(--font-serif);font-size:1.2rem;font-weight:300;color:var(--white-dim);line-height:1.9;}
+    .big-text strong{color:var(--gold-light);font-weight:400;}
+    .quote-block{border-left:2px solid var(--gold);padding:20px 24px;background:rgba(138,106,26,.05);border-radius:0 var(--radius-md) var(--radius-md) 0;font-family:var(--font-serif);font-size:1.25rem;font-style:italic;color:var(--gold);line-height:1.7;}
+    .sticky-list{display:flex;flex-direction:column;gap:14px;position:sticky;top:100px;}
+    .sticky-item{display:flex;align-items:flex-start;gap:16px;padding:20px 22px;background:linear-gradient(135deg,rgba(232,226,216,.8),rgba(245,241,234,.95));border:1px solid rgba(138,106,26,.12);border-radius:var(--radius-md);transition:var(--transition);}
+    .sticky-item:hover{border-color:rgba(138,106,26,.3);}
+    .sticky-num{font-family:var(--font-serif);font-size:1.6rem;font-weight:300;color:rgba(138,106,26,.25);line-height:1;min-width:32px;}
+    .sticky-title{font-family:var(--font-serif);font-size:1rem;font-weight:400;color:var(--white);margin-bottom:4px;}
+    .sticky-desc{font-family:var(--font-sans);font-size:.78rem;font-weight:300;color:var(--white-dim);line-height:1.6;}
+    /* ACCORDION */
+    .accordion-list{max-width:780px;display:flex;flex-direction:column;gap:12px;}
+    .accordion-item{border:1px solid rgba(138,106,26,.12);border-radius:var(--radius-lg);overflow:hidden;transition:var(--transition);}
+    .accordion-item.active{border-color:rgba(138,106,26,.3);}
+    .accordion-trigger{width:100%;background:linear-gradient(135deg,rgba(232,226,216,.7),rgba(245,241,234,.9));border:none;padding:20px 26px;display:flex;align-items:center;justify-content:space-between;gap:16px;cursor:pointer;text-align:left;transition:var(--transition);}
+    .accordion-trigger:hover{background:rgba(138,106,26,.07);}
+    .accordion-question{font-family:var(--font-serif);font-size:1.05rem;font-weight:400;color:var(--white);}
+    .accordion-icon{width:30px;height:30px;border-radius:50%;border:1px solid rgba(138,106,26,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--gold);font-size:1.1rem;transition:transform .3s;}
+    .accordion-item.active .accordion-icon{transform:rotate(45deg);}
+    .accordion-panel{max-height:0;overflow:hidden;transition:max-height .4s ease;background:rgba(245,241,234,.8);}
+    .accordion-panel.open{max-height:300px;}
+    .accordion-answer{font-family:var(--font-sans);font-size:.88rem;font-weight:300;color:var(--white-dim);line-height:1.8;padding:20px 26px;}
+    /* CTA */
+    #cta-randevu{padding:100px 40px;text-align:center;background:linear-gradient(135deg,rgba(240,228,200,.6),rgba(235,225,210,.8),rgba(245,240,228,.9));position:relative;overflow:hidden;}
+    #cta-randevu::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(138,106,26,.06) 0%,transparent 70%);}
+    .cta-inner{position:relative;z-index:1;max-width:680px;margin:0 auto;}
+    .cta-symbol{font-size:3.5rem;opacity:.3;display:block;margin-bottom:24px;animation:pulse 4s ease-in-out infinite;}
+    @keyframes pulse{0%,100%{opacity:.25;transform:scale(1)}50%{opacity:.45;transform:scale(1.05)}}
+    .cta-title{font-family:var(--font-serif);font-size:clamp(2rem,4vw,3.2rem);font-weight:300;color:var(--white);line-height:1.2;margin-bottom:20px;}
+    .cta-title em{color:var(--gold-light);font-style:italic;}
+    .cta-desc{font-family:var(--font-sans);font-size:1rem;font-weight:300;color:var(--white-dim);line-height:1.8;margin-bottom:44px;}
+    .cta-buttons{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;}
+    .btn-primary{font-family:var(--font-sans);font-size:.82rem;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--navy-deep);background:linear-gradient(135deg,#9e7b22,#8a6a1a);border:none;padding:16px 40px;border-radius:50px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:var(--transition);box-shadow:0 4px 24px rgba(138,106,26,.25);}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:var(--glow-gold);}
+    .btn-secondary{font-family:var(--font-sans);font-size:.82rem;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--white);background:transparent;border:1px solid rgba(44,37,53,.2);padding:16px 40px;border-radius:50px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:var(--transition);}
+    .btn-secondary:hover{border-color:var(--gold);color:var(--gold);}
+    footer{background:rgba(232,226,216,.95);border-top:1px solid rgba(138,106,26,.15);padding:40px;}
+    .footer-inner{max-width:var(--max-width);margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;}
+    .footer-logo{font-family:var(--font-serif);font-size:1.4rem;font-weight:400;color:var(--white);text-decoration:none;}
+    .footer-logo span{color:var(--gold);}
+    .footer-copy{font-family:var(--font-sans);font-size:.78rem;font-weight:300;color:rgba(44,37,53,.4);}
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;}
+    .reveal.visible{opacity:1;transform:translateY(0);}
+    @media(max-width:1024px){.card-grid-3{grid-template-columns:repeat(2,1fr)}.two-col{grid-template-columns:1fr}.sticky-list{position:static}.months-grid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:768px){section{padding:70px 20px}nav{padding:16px 20px}.page-hero{padding:110px 20px 60px}.sun-deco{display:none}.card-grid-3{grid-template-columns:1fr}.months-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:480px){.months-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="galaxy-overlay" aria-hidden="true"></div>
+<nav id="navbar">
+  <a href="index.html" class="nav-logo"><span>✦</span> QHHT & Astroloji</a>
+  <a href="index.html" class="nav-back">← Ana Sayfa</a>
+  <a href="index.html#iletisim" class="nav-cta">Randevu Al</a>
+</nav>
+<main>
+  <header class="page-hero">
+    <svg class="sun-deco" viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="180" cy="180" r="170" stroke="#8a6a1a" stroke-width="1"/>
+      <circle cx="180" cy="180" r="140" stroke="#8a6a1a" stroke-width=".5" stroke-dasharray="4 6"/>
+      <circle cx="180" cy="180" r="100" stroke="#8a6a1a" stroke-width=".7"/>
+      <circle cx="180" cy="180" r="50" stroke="#8a6a1a" stroke-width=".5" stroke-dasharray="2 4"/>
+      <circle cx="180" cy="180" r="20" stroke="#8a6a1a" stroke-width="1" fill="none"/>
+      <!-- Sun rays -->
+      <line x1="180" y1="10" x2="180" y2="50" stroke="#8a6a1a" stroke-width="1.5"/>
+      <line x1="180" y1="310" x2="180" y2="350" stroke="#8a6a1a" stroke-width="1.5"/>
+      <line x1="10" y1="180" x2="50" y2="180" stroke="#8a6a1a" stroke-width="1.5"/>
+      <line x1="310" y1="180" x2="350" y2="180" stroke="#8a6a1a" stroke-width="1.5"/>
+      <line x1="47" y1="47" x2="75" y2="75" stroke="#8a6a1a" stroke-width="1"/>
+      <line x1="285" y1="285" x2="313" y2="313" stroke="#8a6a1a" stroke-width="1"/>
+      <line x1="313" y1="47" x2="285" y2="75" stroke="#8a6a1a" stroke-width="1"/>
+      <line x1="75" y1="285" x2="47" y2="313" stroke="#8a6a1a" stroke-width="1"/>
+      <!-- 12 month dots -->
+      <circle cx="180" cy="42" r="5" fill="#8a6a1a" opacity=".6"/>
+      <circle cx="267" cy="75" r="4" fill="#8a6a1a" opacity=".4"/>
+      <circle cx="318" cy="162" r="5" fill="#8a6a1a" opacity=".6"/>
+      <circle cx="285" cy="257" r="4" fill="#8a6a1a" opacity=".4"/>
+      <circle cx="180" cy="318" r="5" fill="#8a6a1a" opacity=".6"/>
+      <circle cx="75" cy="257" r="4" fill="#8a6a1a" opacity=".4"/>
+      <circle cx="42" cy="162" r="5" fill="#8a6a1a" opacity=".6"/>
+      <circle cx="95" cy="75" r="4" fill="#8a6a1a" opacity=".4"/>
+      <text x="178" y="188" fill="#8a6a1a" font-size="18" text-anchor="middle">☀</text>
+    </svg>
+    <div class="hero-content-wrap">
+      <div class="hero-breadcrumb">
+        <a href="index.html">Ana Sayfa</a><span>/</span>
+        <a href="index.html#astroloji">Hizmetler</a><span>/</span>
+        <span style="color:var(--gold)">Yıllık Öngörü</span>
+      </div>
+      <div class="page-hero-eyebrow">Astroloji Hizmetleri</div>
+      <h1 class="page-hero-title">Yıllık<br><em>Öngörü Analizi</em></h1>
+      <p class="page-hero-sub">Önünüzdeki 12 ay için gökyüzünün size sunduğu haritayı birlikte okuyalım. Fırsatları, zorlayıcı dönemleri ve büyüme pencerelerini önceden görmek, hayatınızı bilinçle yönlendirmenizi sağlar.</p>
+      <div class="hero-meta">
+        <div class="hero-meta-item"><div class="hero-meta-icon">⏱</div><span>60 Dakika Seans</span></div>
+        <div class="hero-meta-item"><div class="hero-meta-icon">📅</div><span>12 Aylık Analiz</span></div>
+        <div class="hero-meta-item"><div class="hero-meta-icon">🌐</div><span>Online / Yüz Yüze</span></div>
+        <div class="hero-meta-item"><div class="hero-meta-icon">📄</div><span>Yazılı Rapor Dahil</span></div>
+      </div>
+    </div>
+  </header>
+
+  <section style="background:linear-gradient(180deg,transparent 0%,rgba(240,225,190,.2) 50%,transparent 100%)">
+    <div class="container">
+      <div class="reveal">
+        <span class="section-label">Analiz Yöntemleri</span>
+        <h2 class="section-title">İki Güçlü Araç, <span>Bir Bütünsel Bakış</span></h2>
+        <div class="divider"></div>
+        <p style="font-family:var(--font-sans);font-size:1rem;font-weight:300;color:var(--white-dim);line-height:1.8;max-width:640px;">Yıllık öngörü analizi iki tamamlayıcı yöntemi birleştirerek size önünüzdeki dönemin kapsamlı haritasını sunar.</p>
+      </div>
+      <div class="card-grid-3">
+        <div class="info-card reveal"><span class="card-icon">☀️</span><h3 class="card-title">Solar Dönüş Haritası</h3><p class="card-desc">Her yıl Güneş tam doğum derecenize döndüğünde yeni bir yıllık harita oluşur. Bu harita o yılın temasını, fırsatlarını ve zorluklarını gösterir.</p></div>
+        <div class="info-card reveal"><span class="card-icon">🔭</span><h3 class="card-title">Transit Analizler</h3><p class="card-desc">Jüpiter, Satürn, Uranüs ve Plüton'un doğum haritanızdaki gezegenlere yaptığı geçişler; hangi alanda, hangi dönemde baskı veya fırsat olduğunu gösterir.</p></div>
+        <div class="info-card reveal"><span class="card-icon">🌕</span><h3 class="card-title">Progresyon Haritası</h3><p class="card-desc">Doğum haritanızın zamanla nasıl evrildiğini gösteren progresif harita, iç dünyamızdaki dönüşüm dönemlerini ortaya çıkarır.</p></div>
+        <div class="info-card reveal"><span class="card-icon">📊</span><h3 class="card-title">Aylık Önemli Dönemler</h3><p class="card-desc">Ay tutulmaları, Güneş tutulmaları ve önemli gezegen geçişlerinin size özel etkisi; hangi ayların kritik olduğu belirlenir.</p></div>
+        <div class="info-card reveal"><span class="card-icon">💼</span><h3 class="card-title">Kariyer & Mali Pencereler</h3><p class="card-desc">Jüpiter transitleri ve 2./10. ev aktivasyonları ile hangi dönemlerde kariyer atılımı ve maddi büyüme için zemin hazır olduğu okunur.</p></div>
+        <div class="info-card reveal"><span class="card-icon">❤️</span><h3 class="card-title">İlişki & Duygusal Dönemler</h3><p class="card-desc">Venüs ve Ay progresyonları ile 7. ev transitleri; ilişkilerde önemli gelişmelerin hangi dönemlerde yoğunlaşacağını gösterir.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="reveal" style="margin-bottom:50px;">
+        <span class="section-label">Örnek Yıl Haritası</span>
+        <h2 class="section-title">12 Ay <span>Nasıl Görünür?</span></h2>
+        <div class="divider"></div>
+        <p style="font-family:var(--font-sans);font-size:.95rem;font-weight:300;color:var(--white-dim);line-height:1.8;max-width:560px;">Her ay farklı bir enerji ve tema taşır. Aşağıda tipik bir yıllık öngörü analizinin aylık tema örneklerini görebilirsiniz.</p>
+      </div>
+      <div class="months-grid reveal">
+        <div class="month-card"><span class="month-planet">🌱</span><p class="month-name">Ocak — Mart</p><p class="month-theme">Yeni başlangıçlar, niyet belirleme, kişisel kimlik dönemleri</p><span class="month-highlight">Yeni Başlangıç</span></div>
+        <div class="month-card"><span class="month-planet">💰</span><p class="month-name">Nisan — Mayıs</p><p class="month-theme">Mali fırsatlar, değer sistemi yeniden yapılanması</p><span class="month-highlight">Maddi Alan</span></div>
+        <div class="month-card"><span class="month-planet">🗣️</span><p class="month-name">Haziran</p><p class="month-theme">İletişim, sözleşmeler, kısa yolculuklar, ağ genişlemesi</p><span class="month-highlight">İletişim</span></div>
+        <div class="month-card"><span class="month-planet">🏡</span><p class="month-name">Temmuz — Ağustos</p><p class="month-theme">Aile, ev, duygusal zemin, köklere dönüş</p><span class="month-highlight">Aile & Kökler</span></div>
+        <div class="month-card"><span class="month-planet">✨</span><p class="month-name">Eylül</p><p class="month-theme">Yaratıcılık, aşk, çocuklar, kendini ifade etme</p><span class="month-highlight">Yaratıcılık</span></div>
+        <div class="month-card"><span class="month-planet">⚖️</span><p class="month-name">Ekim — Kasım</p><p class="month-theme">Ortaklıklar, sözleşmeler, ilişkide denge arayışı</p><span class="month-highlight">İlişkiler</span></div>
+        <div class="month-card"><span class="month-planet">🔮</span><p class="month-name">Aralık</p><p class="month-theme">Dönüşüm, bırakma, derinleşme, yeniden doğuş hazırlığı</p><span class="month-highlight">Dönüşüm</span></div>
+        <div class="month-card"><span class="month-planet">🌙</span><p class="month-name">Tutulmalar</p><p class="month-theme">Ay ve Güneş tutulmalarının size özel etki noktaları</p><span class="month-highlight">Kritik Dönüm</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:linear-gradient(180deg,transparent,rgba(240,225,190,.15),transparent)">
+    <div class="container">
+      <div class="two-col">
+        <div class="text-block">
+          <div class="reveal">
+            <span class="section-label">Neden Önemli?</span>
+            <h2 class="section-title">Gökyüzünü <span>Önceden Okumak</span></h2>
+            <div class="divider"></div>
+          </div>
+          <p class="big-text reveal">Astroloji bir kader haritası değil, <strong>fırsat ve enerji haritasıdır.</strong> Önünüzdeki dönemin enerjisini önceden bilmek; hangi konuya ne zaman odaklanacağınızı, hangi dönemlerde beklemenin, hangilerinde ilerlemenin daha doğru olduğunu görmenizi sağlar.</p>
+          <blockquote class="quote-block reveal">"Rüzgarı değiştiremezsiniz; ama yelkeninizi ayarlayabilirsiniz."</blockquote>
+          <p class="big-text reveal">Solar dönüş ve transit analizini bir arada sunduğumuzda <strong>hem yılın genel teması</strong> hem de <strong>kritik ay dönüm noktaları</strong> netlik kazanır. Büyük adımlarınız için en elverişli dönemleri birlikte belirleriz.</p>
+        </div>
+        <div class="sticky-list reveal">
+          <p style="font-family:var(--font-sans);font-size:.72rem;font-weight:400;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Analizde İncelenenler</p>
+          <div class="sticky-item"><div class="sticky-num">01</div><div><p class="sticky-title">Solar Dönüş Haritası</p><p class="sticky-desc">Doğum gününüzdeki gökyüzünün yıllık teması</p></div></div>
+          <div class="sticky-item"><div class="sticky-num">02</div><div><p class="sticky-title">Dış Gezegen Transitleri</p><p class="sticky-desc">Jüpiter, Satürn, Uranüs, Neptün, Plüton geçişleri</p></div></div>
+          <div class="sticky-item"><div class="sticky-num">03</div><div><p class="sticky-title">Ay & Güneş Tutulmaları</p><p class="sticky-desc">Yıl içindeki dönüm noktası tutulmalarının etkisi</p></div></div>
+          <div class="sticky-item"><div class="sticky-num">04</div><div><p class="sticky-title">Retrograde Dönemleri</p><p class="sticky-desc">Merkür, Venüs, Mars retrogradlarının etki zamanlaması</p></div></div>
+          <div class="sticky-item"><div class="sticky-num">05</div><div><p class="sticky-title">Progresif Ay Hareketi</p><p class="sticky-desc">İç dünyanızdaki duygu ve motivasyon döngüleri</p></div></div>
+          <div class="sticky-item"><div class="sticky-num">06</div><div><p class="sticky-title">Aylık Önemli Günler</p><p class="sticky-desc">Öne çıkan tarihler ve kritik karar dönemleri</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="reveal" style="margin-bottom:40px;">
+        <span class="section-label">Merak Edilenler</span>
+        <h2 class="section-title">Sık Sorulan <span>Sorular</span></h2>
+        <div class="divider"></div>
+      </div>
+      <div class="accordion-list reveal">
+        <div class="accordion-item"><button class="accordion-trigger" aria-expanded="false"><span class="accordion-question">Doğum haritası analizinden farkı nedir?</span><span class="accordion-icon">+</span></button><div class="accordion-panel"><p class="accordion-answer">Doğum haritası analizi kalıcı kişilik yapınızı ve yaşam temalarınızı incelerken, yıllık öngörü önünüzdeki 12 ayın dinamik enerji haritasına odaklanır. İkisi tamamlayıcıdır; doğum haritası temel yetenek ve eğilimleri, yıllık öngörü ise zamanlamayı ortaya koyar.</p></div></div>
+        <div class="accordion-item"><button class="accordion-trigger" aria-expanded="false"><span class="accordion-question">Yılın herhangi bir döneminde analiz yaptırabilir miyim?</span><span class="accordion-icon">+</span></button><div class="accordion-panel"><p class="accordion-answer">Evet. Her ne zaman gelirseniz gelin, bulunduğunuz andan itibaren önümüzdeki 12 aylık dönem analiz edilir. Doğum gününüz etrafında yapılması solar dönüş için ideal olsa da her dönemde transit analizi yapılabilir.</p></div></div>
+        <div class="accordion-item"><button class="accordion-trigger" aria-expanded="false"><span class="accordion-question">Bu analiz belirli bir kararı (iş değişikliği, taşınma vb.) için kullanılabilir mi?</span><span class="accordion-icon">+</span></button><div class="accordion-panel"><p class="accordion-answer">Kesinlikle. Önemli kararlar öncesinde en uygun zamanlamanın belirlenmesi, yıllık öngörü analizinin en yaygın kullanım alanlarından biridir. Seans başında karar veya konunuzu paylaşırsanız analizi buna göre özelleştirebiliriz.</p></div></div>
+        <div class="accordion-item"><button class="accordion-trigger" aria-expanded="false"><span class="accordion-question">Yıllık öngörüde kesin tarihler verilir mi?</span><span class="accordion-icon">+</span></button><div class="accordion-panel"><p class="accordion-answer">Kesin tarih değil, enerji dönemleri ve hassas haftalar belirlenir. Astroloji zamanlamayı yönlendirir; ancak nihai seçimler her zaman sizin iradenizle şekillenir. Öngörü, sizi hazırlamak ve bilinçlendirmek içindir.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cta-randevu">
+    <div class="cta-inner">
+      <span class="cta-symbol">🔭</span>
+      <h2 class="cta-title">Önünüzdeki <em>12 Ayı</em><br>Birlikte Okuyalım</h2>
+      <p class="cta-desc">Doğum tarihiniz, saatiniz ve şehrinizle randevu alın. Yılınızın haritasını çizelim.</p>
+      <div class="cta-buttons">
+        <a href="index.html#iletisim" class="btn-primary">✦ Randevu Al</a>
+        <a href="index.html#astroloji" class="btn-secondary">Diğer Hizmetler →</a>
+      </div>
+    </div>
+  </section>
+</main>
+<footer><div class="footer-inner"><a href="index.html" class="footer-logo">QHHT <span>✦</span> Astroloji</a><p class="footer-copy">© 2025 Tüm hakları saklıdır. ✦ QHHT & Astroloji</p></div></footer>
+<script>
+  const navbar=document.getElementById('navbar');
+  window.addEventListener('scroll',()=>navbar.classList.toggle('scrolled',window.scrollY>50));
+  const revealEls=document.querySelectorAll('.reveal');
+  const observer=new IntersectionObserver((entries)=>{entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*80);observer.unobserve(e.target);}});},{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+  revealEls.forEach(el=>observer.observe(el));
+  document.querySelectorAll('.accordion-trigger').forEach(btn=>{btn.addEventListener('click',()=>{const item=btn.closest('.accordion-item');const panel=item.querySelector('.accordion-panel');const isOpen=item.classList.contains('active');document.querySelectorAll('.accordion-item.active').forEach(o=>{o.classList.remove('active');o.querySelector('.accordion-panel').classList.remove('open');o.querySelector('.accordion-trigger').setAttribute('aria-expanded',false);});if(!isOpen){item.classList.add('active');panel.classList.add('open');btn.setAttribute('aria-expanded',true);}});});
+</script>
+</body>
+</html>

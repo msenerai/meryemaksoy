@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Astroloji Hizmetleri | QHHT & Astroloji</title>
+  <meta name="description" content="Doğum haritası analizi, sinastri, yıllık öngörü, karmik astroloji ve meslek göstergeleri hizmetleri hakkında detaylı bilgi."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --navy-deep:#f0ece4;--navy-mid:#ede8df;--navy-light:#e6e0d6;
+      --gold:#8a6a1a;--gold-light:#9e7b22;--gold-pale:#b8922e;
+      --purple-glow:#7c5cbf;
+      --white:#2c2535;--white-dim:rgba(44,37,53,0.65);
+      --font-serif:'Cormorant Garamond',Georgia,serif;
+      --font-sans:'Jost',sans-serif;
+      --transition:all 0.4s cubic-bezier(0.25,0.8,0.25,1);
+      --radius-lg:16px;--radius-md:10px;--max-width:1100px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:var(--font-sans);background:var(--navy-deep);color:var(--white);line-height:1.7;overflow-x:hidden;animation:fadeIn 0.8s ease forwards;}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 40px;display:flex;align-items:center;justify-content:space-between;background:rgba(240,236,228,0.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(184,146,46,0.15);}
+    .nav-logo{font-family:var(--font-serif);font-size:1.4rem;font-weight:400;color:var(--white);text-decoration:none;display:flex;align-items:center;gap:8px;}
+    .nav-back{font-family:var(--font-sans);font-size:0.78rem;font-weight:400;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid rgba(138,106,26,0.3);padding:8px 20px;border-radius:40px;transition:var(--transition);}
+    .nav-back:hover{background:rgba(138,106,26,0.08);border-color:var(--gold);}
+
+    .page-hero{min-height:44vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:140px 40px 80px;background:linear-gradient(160deg,#ede8df 0%,#e0d9cf 50%,#ede8df 100%);position:relative;overflow:hidden;}
+    .page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(180,160,200,0.12) 0%,transparent 70%);pointer-events:none;}
+    .page-hero-eyebrow{font-family:var(--font-sans);font-size:0.7rem;font-weight:300;letter-spacing:0.4em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:16px;}
+    .page-hero-title{font-family:var(--font-serif);font-size:clamp(2.8rem,6vw,5rem);font-weight:300;line-height:1.1;color:var(--white);margin-bottom:20px;}
+    .page-hero-title span{color:var(--gold-light);font-style:italic;}
+    .page-hero-sub{font-family:var(--font-sans);font-size:1rem;font-weight:300;color:var(--white-dim);max-width:580px;margin:0 auto;line-height:1.8;}
+    .hero-deco{position:absolute;font-size:14rem;opacity:0.04;font-family:var(--font-serif);color:var(--gold);pointer-events:none;user-select:none;right:-60px;bottom:-60px;line-height:1;}
+
+    main{max-width:var(--max-width);margin:0 auto;padding:80px 24px 100px;}
+    .section-label{font-family:var(--font-sans);font-size:0.7rem;font-weight:400;letter-spacing:0.35em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:12px;}
+    .section-title{font-family:var(--font-serif);font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:300;line-height:1.2;color:var(--white);margin-bottom:16px;}
+    .section-title span{color:var(--gold-light);font-style:italic;}
+    .divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:24px 0;}
+
+    /* INTRO */
+    .intro-text{font-family:var(--font-serif);font-size:1.2rem;font-weight:300;color:var(--white-dim);line-height:1.95;max-width:720px;margin-bottom:60px;}
+    .intro-text strong{color:var(--gold-light);font-weight:400;}
+
+    /* SERVICE CARDS — detaylı versiyon */
+    .service-detail{display:flex;flex-direction:column;gap:40px;margin-bottom:80px;}
+    .service-block{display:grid;grid-template-columns:300px 1fr;gap:0;background:linear-gradient(145deg,rgba(232,226,216,0.8),rgba(245,241,234,0.95));border:1px solid rgba(124,92,191,0.12);border-radius:var(--radius-lg);overflow:hidden;transition:var(--transition);}
+    .service-block:hover{border-color:rgba(124,92,191,0.3);box-shadow:0 20px 60px rgba(0,0,0,0.05);}
+    .service-block-left{padding:40px 32px;background:linear-gradient(160deg,rgba(220,213,202,0.6),rgba(235,228,218,0.8));display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid rgba(124,92,191,0.1);}
+    .service-block-icon{font-size:3.5rem;margin-bottom:16px;display:block;}
+    .service-block-title{font-family:var(--font-serif);font-size:1.6rem;font-weight:400;color:var(--white);margin-bottom:10px;}
+    .service-block-tag{display:inline-block;font-family:var(--font-sans);font-size:0.68rem;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:var(--purple-glow);border:1px solid rgba(124,92,191,0.3);padding:5px 14px;border-radius:20px;margin-bottom:20px;}
+    .service-block-price{font-family:var(--font-serif);font-size:1rem;font-weight:300;color:var(--gold);font-style:italic;}
+    .service-block-right{padding:40px 36px;display:flex;flex-direction:column;gap:20px;}
+    .service-block-desc{font-family:var(--font-serif);font-size:1.1rem;font-weight:300;color:var(--white-dim);line-height:1.9;}
+    .service-block-includes{display:flex;flex-direction:column;gap:10px;}
+    .service-includes-label{font-family:var(--font-sans);font-size:0.7rem;font-weight:400;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);}
+    .includes-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+    .includes-list li{display:flex;align-items:flex-start;gap:10px;font-family:var(--font-sans);font-size:0.82rem;font-weight:300;color:var(--white-dim);line-height:1.6;}
+    .includes-list li::before{content:'✦';color:var(--gold);font-size:0.65rem;margin-top:4px;flex-shrink:0;}
+    .service-block-cta{margin-top:8px;}
+    .btn-sm{font-family:var(--font-sans);font-size:0.75rem;font-weight:400;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(138,106,26,0.3);padding:9px 22px;border-radius:40px;text-decoration:none;transition:var(--transition);display:inline-flex;align-items:center;gap:8px;}
+    .btn-sm:hover{background:rgba(138,106,26,0.08);border-color:var(--gold);}
+
+    /* NASIL ÇALIŞIR */
+    .how-section{margin-bottom:80px;}
+    .how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:40px;}
+    .how-card{padding:28px 22px;background:linear-gradient(145deg,rgba(230,224,214,0.7),rgba(245,241,234,0.9));border:1px solid rgba(138,106,26,0.12);border-radius:var(--radius-lg);text-align:center;transition:var(--transition);}
+    .how-card:hover{transform:translateY(-5px);border-color:rgba(138,106,26,0.3);}
+    .how-num{font-family:var(--font-serif);font-size:2.5rem;font-weight:300;color:rgba(138,106,26,0.2);line-height:1;margin-bottom:12px;}
+    .how-icon{font-size:1.8rem;margin-bottom:10px;display:block;}
+    .how-title{font-family:var(--font-serif);font-size:1.05rem;font-weight:400;color:var(--white);margin-bottom:8px;}
+    .how-desc{font-family:var(--font-sans);font-size:0.8rem;font-weight:300;color:var(--white-dim);line-height:1.7;}
+
+    /* APPROACH */
+    .approach-section{margin-bottom:80px;display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;}
+    .approach-text p{font-family:var(--font-serif);font-size:1.15rem;font-weight:300;color:var(--white-dim);line-height:1.95;margin-bottom:20px;}
+    .approach-text strong{color:var(--gold-light);font-weight:400;}
+    .approach-quote{border-left:2px solid var(--gold);padding:22px 28px;background:rgba(138,106,26,0.06);border-radius:0 var(--radius-md) var(--radius-md) 0;font-family:var(--font-serif);font-size:1.25rem;font-style:italic;color:var(--gold);line-height:1.7;}
+    .approach-visual{background:linear-gradient(145deg,rgba(220,213,202,0.6),rgba(235,228,218,0.8));border:1px solid rgba(138,106,26,0.15);border-radius:var(--radius-lg);padding:40px;display:flex;flex-direction:column;gap:20px;}
+    .approach-item{display:flex;gap:16px;align-items:flex-start;}
+    .approach-icon{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(138,106,26,0.15),rgba(138,106,26,0.08));display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;border:1px solid rgba(138,106,26,0.15);}
+    .approach-label{font-family:var(--font-sans);font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+    .approach-val{font-family:var(--font-sans);font-size:0.85rem;font-weight:300;color:var(--white-dim);line-height:1.6;}
+
+    /* CTA */
+    .page-cta{text-align:center;padding:70px 40px;background:linear-gradient(135deg,rgba(220,213,202,0.6),rgba(235,228,218,0.8));border:1px solid rgba(138,106,26,0.15);border-radius:var(--radius-lg);}
+    .page-cta-title{font-family:var(--font-serif);font-size:clamp(1.8rem,3vw,2.4rem);font-weight:300;color:var(--white);margin-bottom:16px;}
+    .page-cta-title span{color:var(--gold-light);font-style:italic;}
+    .page-cta p{font-family:var(--font-sans);font-size:0.95rem;font-weight:300;color:var(--white-dim);margin-bottom:32px;}
+    .btn-primary{font-family:var(--font-sans);font-size:0.82rem;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:#faf8f5;background:linear-gradient(135deg,var(--gold-light),var(--gold));border:none;padding:16px 42px;border-radius:50px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:var(--transition);box-shadow:0 4px 24px rgba(138,106,26,0.25);}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(138,106,26,0.35);}
+
+    footer{background:rgba(232,226,216,0.95);border-top:1px solid rgba(138,106,26,0.12);padding:40px;text-align:center;}
+    footer p{font-family:var(--font-sans);font-size:0.78rem;font-weight:300;color:rgba(44,37,53,0.45);}
+
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity 0.7s ease,transform 0.7s ease;}
+    .reveal.visible{opacity:1;transform:translateY(0);}
+
+    @media(max-width:900px){
+      .service-block{grid-template-columns:1fr;}
+      .service-block-left{border-right:none;border-bottom:1px solid rgba(124,92,191,0.1);}
+      .approach-section{grid-template-columns:1fr;}
+      .how-grid{grid-template-columns:repeat(2,1fr);}
+    }
+    @media(max-width:600px){
+      nav{padding:14px 20px;}
+      .page-hero{padding:120px 20px 60px;}
+      main{padding:50px 16px 80px;}
+      .how-grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">✦ QHHT & Astroloji</a>
+  <a href="index.html" class="nav-back">← Ana Sayfa</a>
+</nav>
+
+<div class="page-hero">
+  <div>
+    <span class="page-hero-eyebrow">Hizmetler</span>
+    <h1 class="page-hero-title">Astroloji <span>Hizmetleri</span></h1>
+    <p class="page-hero-sub">Gökyüzünün kadim diliyle kendi haritanızı okuyun; güçlü yanlarınızı, karmik derslerinizi ve yaşam amacınızı keşfedin.</p>
+  </div>
+  <span class="hero-deco">☿</span>
+</div>
+
+<main>
+
+  <!-- GİRİŞ -->
+  <div class="reveal">
+    <span class="section-label">Yaklaşım</span>
+    <h2 class="section-title">Gökyüzü Sizin <span>Haritanızdır</span></h2>
+    <div class="divider"></div>
+    <p class="intro-text">Astroloji, gezegenlerin pozisyonlarını ve döngülerini inceleyerek <strong>kişinin potansiyelini, zorluklarını ve yaşam amacını</strong> ortaya koyar. Ben Batı astrolojisi, Vedik astroloji ve karmik astroloji geleneklerini harmanlayarak her danışana özgün, derinlemesine bir analiz sunuyorum. Harita, size ne yapmanız gerektiğini söylemez — <strong>kim olduğunuzu hatırlatır.</strong></p>
+  </div>
+
+  <!-- HİZMET KARTLARI -->
+  <div class="service-detail">
+
+    <!-- 1. Doğum Haritası -->
+    <div class="service-block reveal">
+      <div class="service-block-left">
+        <div>
+          <span class="service-block-icon">🌟</span>
+          <h2 class="service-block-title">Doğum Haritası Analizi</h2>
+          <span class="service-block-tag">90 Dakika</span>
+        </div>
+        <p class="service-block-price">Temel hizmet · Online & Yüz yüze</p>
+      </div>
+      <div class="service-block-right">
+        <p class="service-block-desc">Doğduğunuz an yıldız gökyüzünün aldığı bu benzersiz fotoğraf, ruhunuzun bu yaşama getirdiği her şeyi barındırır. Güçlü gezegenleriniz, karanlık noktalarınız ve parlak yetenkleriniz bu haritada saklıdır.</p>
+        <div class="service-block-includes">
+          <span class="service-includes-label">Kapsam</span>
+          <ul class="includes-list">
+            <li>Gezegen konumları ve açıları detaylı analiz (Güneş, Ay, Yükselen ve tüm gezegenler)</li>
+            <li>Güçlü yanlar, engeller ve kariyer potansiyeli</li>
+            <li>İlişki örüntüleri ve duygusal yapı</li>
+            <li>Önemli yaşam dönemleri ve temalar</li>
+            <li>Kapsamlı yazılı rapor (8–12 sayfa) PDF olarak teslim</li>
+            <li>Seans sonrası 2 hafta e-posta desteği</li>
+          </ul>
+        </div>
+        <div class="service-block-cta">
+          <a href="dogumharitasianalizi.html" class="btn-sm">Detaylı Bilgi →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Sinastri -->
+    <div class="service-block reveal">
+      <div class="service-block-left">
+        <div>
+          <span class="service-block-icon">💞</span>
+          <h2 class="service-block-title">İlişki Uyumu — Sinastri</h2>
+          <span class="service-block-tag">75 Dakika</span>
+        </div>
+        <p class="service-block-price">Çift analizi · Online & Yüz yüze</p>
+      </div>
+      <div class="service-block-right">
+        <p class="service-block-desc">İki kişinin doğum haritasının birbirine bindirilerek incelendiği sinastri analizi, enerjetik uyumu, mevcut gerilimleri ve ilişkinin büyüme potansiyelini ortaya koyar.</p>
+        <div class="service-block-includes">
+          <span class="service-includes-label">Kapsam</span>
+          <ul class="includes-list">
+            <li>İki haritanın çakıştırılması — sinastri analizi</li>
+            <li>Kompozit (ortak) harita okuma</li>
+            <li>Uyum noktaları ve gerilim odakları</li>
+            <li>Karmik bağ ve ruhsal sözleşme işaretleri</li>
+            <li>Sağlıklı ilişki dinamikleri için öneriler</li>
+            <li>İkinci kişi için sadece doğum tarihi ve yeri yeterli</li>
+          </ul>
+        </div>
+        <div class="service-block-cta">
+          <a href="sinastri.html" class="btn-sm">Detaylı Bilgi →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Yıllık Öngörü -->
+    <div class="service-block reveal">
+      <div class="service-block-left">
+        <div>
+          <span class="service-block-icon">🔭</span>
+          <h2 class="service-block-title">Yıllık Öngörü</h2>
+          <span class="service-block-tag">60 Dakika</span>
+        </div>
+        <p class="service-block-price">Dönemsel analiz · Online & Yüz yüze</p>
+      </div>
+      <div class="service-block-right">
+        <p class="service-block-desc">Solar dönüş haritası ve güncel gezegen transitleriyle önünüzdeki 12 ayın önemli dönemleri, fırsatları ve dikkat gerektiren noktaları detaylı biçimde aktarılır. Yılı bilinçli geçirmek için rehber niteliğinde.</p>
+        <div class="service-block-includes">
+          <span class="service-includes-label">Kapsam</span>
+          <ul class="includes-list">
+            <li>Solar dönüş (güneş dönüşü) haritası analizi</li>
+            <li>Yıl boyu önemli transit dönemleri</li>
+            <li>Kariyer, ilişki, sağlık ve maddi alan öngörüleri</li>
+            <li>En güçlü ve en dikkatli olunması gereken aylar</li>
+            <li>Özet takvim PDF olarak teslim</li>
+          </ul>
+        </div>
+        <div class="service-block-cta">
+          <a href="yillikongoru.html" class="btn-sm">Detaylı Bilgi →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Karmik Astroloji -->
+    <div class="service-block reveal">
+      <div class="service-block-left">
+        <div>
+          <span class="service-block-icon">♾️</span>
+          <h2 class="service-block-title">Karmik Astroloji</h2>
+          <span class="service-block-tag">90 Dakika</span>
+        </div>
+        <p class="service-block-price">Ruh amacı analizi · Online & Yüz yüze</p>
+      </div>
+      <div class="service-block-right">
+        <p class="service-block-desc">Kuzey ve Güney Düğüm, Chiron ve diğer karmik noktalar üzerinden ruhun bu yaşamdaki amacı, geçmiş yaşam örüntüleri ve tamamlanmayı bekleyen dersler derinlemesine incelenir.</p>
+        <div class="service-block-includes">
+          <span class="service-includes-label">Kapsam</span>
+          <ul class="includes-list">
+            <li>Kuzey & Güney Düğüm analizi — ruhsal yön</li>
+            <li>Chiron: yaralanma ve iyileşme noktaları</li>
+            <li>Karanlık Ay Lilith ve geçmiş yaşam izleri</li>
+            <li>Tekrar eden örüntüler ve karmik dersler</li>
+            <li>Bu yaşam için pratik ruhsal rehberlik</li>
+            <li>QHHT deneyimleriyle karşılaştırma imkânı</li>
+          </ul>
+        </div>
+        <div class="service-block-cta">
+          <a href="karmikastroloji.html" class="btn-sm">Detaylı Bilgi →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Meslek Göstergeleri -->
+    <div class="service-block reveal">
+      <div class="service-block-left">
+        <div>
+          <span class="service-block-icon">🧭</span>
+          <h2 class="service-block-title">Meslek Göstergeleri</h2>
+          <span class="service-block-tag">60 Dakika</span>
+        </div>
+        <p class="service-block-price">Kariyer analizi · Online & Yüz yüze</p>
+      </div>
+      <div class="service-block-right">
+        <p class="service-block-desc">10. ev, Midheaven (MC), Saturn ve güçlü gezegen açıları aracılığıyla ruhunuzun hangi mesleki alanlarda parlamak için geldiği, kariyer yolunuzdaki fırsatlar ile engeller analiz edilir.</p>
+        <div class="service-block-includes">
+          <span class="service-includes-label">Kapsam</span>
+          <ul class="includes-list">
+            <li>10. ev ve MC (Midheaven) derinlemesine analizi</li>
+            <li>Saturn: kariyer sorumluluğu ve başarı dönemleri</li>
+            <li>2. ve 8. ev: maddi akış ve kaynak yönetimi</li>
+            <li>En güçlü meslek alanları ve öneriler</li>
+            <li>Kariyer geçişi için uygun dönemler</li>
+          </ul>
+        </div>
+        <div class="service-block-cta">
+          <a href="meslekgostergeleri.html" class="btn-sm">Detaylı Bilgi →</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- NASIL ÇALIŞIR -->
+  <div class="how-section reveal">
+    <span class="section-label">Süreç</span>
+    <h2 class="section-title">Seans <span>Nasıl İşler?</span></h2>
+    <div class="divider"></div>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-num">01</div>
+        <span class="how-icon">📅</span>
+        <h3 class="how-title">Randevu</h3>
+        <p class="how-desc">Form veya WhatsApp üzerinden ulaşın. Size uygun tarih ve platformda (online/yüz yüze) seans planlanır.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">02</div>
+        <span class="how-icon">📋</span>
+        <h3 class="how-title">Doğum Bilgileri</h3>
+        <p class="how-desc">Doğum tarih, saat ve şehir bilgilerinizi paylaşırsınız. Harita ön analizle hazırlanır.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">03</div>
+        <span class="how-icon">🔭</span>
+        <h3 class="how-title">Seans</h3>
+        <p class="how-desc">Haritanız interaktif biçimde detaylı açıklanır; sorularınıza yer verilir. Seans kaydedilir.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">04</div>
+        <span class="how-icon">📄</span>
+        <h3 class="how-title">Rapor</h3>
+        <p class="how-desc">Seans sonrası yazılı rapor ve seans kaydı teslim edilir. Seans sonrası soru desteği verilir.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- YAKLAŞIM -->
+  <div class="approach-section reveal">
+    <div class="approach-text">
+      <span class="section-label">Benim Yaklaşımım</span>
+      <h2 class="section-title">Astroloji <span>Kader Değildir</span></h2>
+      <div class="divider"></div>
+      <p>Astroloji, yazılmış bir kader değil; elinizdeki <strong>potansiyelin haritasıdır.</strong> Gezegenler size ne yapacağınızı söylemez; hangi enerjilerle çalıştığınızı ve bu enerjileri nasıl bilinçli kullanabileceğinizi gösterir.</p>
+      <p>Her analiz sırasında sadece teknik bilgi aktarmam. <strong>Danışanın kendi içgörüsünü</strong> bulmak için sorular sorar, derinleştiririm. Harita bir ayna; ben ise size o aynayı tutuyorum.</p>
+      <blockquote class="approach-quote">"Yıldızlar eğilir, ama zorunlu kılmaz." — Orta Çağ astroloji geleneği</blockquote>
+    </div>
+    <div class="approach-visual">
+      <div class="approach-item">
+        <div class="approach-icon">🌍</div>
+        <div>
+          <p class="approach-label">Sistem</p>
+          <p class="approach-val">Batı astrolojisi temel alınır; gerektiğinde Vedik astroloji ile desteklenir.</p>
+        </div>
+      </div>
+      <div class="approach-item">
+        <div class="approach-icon">⏱️</div>
+        <div>
+          <p class="approach-label">Seans Süresi</p>
+          <p class="approach-val">Hizmet tipine göre 60–90 dakika. Sorularınıza yeterli zaman ayrılır.</p>
+        </div>
+      </div>
+      <div class="approach-item">
+        <div class="approach-icon">💻</div>
+        <div>
+          <p class="approach-label">Format</p>
+          <p class="approach-val">Zoom, Google Meet veya yüz yüze (İstanbul). Seans kaydı teslim edilir.</p>
+        </div>
+      </div>
+      <div class="approach-item">
+        <div class="approach-icon">📝</div>
+        <div>
+          <p class="approach-label">Rapor</p>
+          <p class="approach-val">Seçilen hizmete göre 6–12 sayfa yazılı analiz raporu PDF olarak gönderilir.</p>
+        </div>
+      </div>
+      <div class="approach-item">
+        <div class="approach-icon">💬</div>
+        <div>
+          <p class="approach-label">Destek</p>
+          <p class="approach-val">Seans sonrası 2 hafta e-posta üzerinden soru desteği dahildir.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="page-cta reveal">
+    <h2 class="page-cta-title">Haritanızı <span>Okuyalım</span></h2>
+    <p>Doğum saatiniz ve yerinizle birlikte bana ulaşın; size en uygun hizmet için görüşelim.</p>
+    <a href="index.html#iletisim" class="btn-primary">✦ Randevu Al</a>
+  </div>
+
+</main>
+
+<footer>
+  <p>© 2025 Tüm hakları saklıdır. ✦ QHHT & Astroloji</p>
+</footer>
+
+<script>
+  const revealEls=document.querySelectorAll('.reveal');
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach((e,i)=>{
+      if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*80);obs.unobserve(e.target);}
+    });
+  },{threshold:0.08});
+  revealEls.forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

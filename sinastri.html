@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>İlişki Uyumu — Sinastri | QHHT & Astroloji</title>
+  <meta name="description" content="İki kişi arasındaki enerjetik uyum ve gerilim noktaları sinastri ve kompozit harita ile incelenir." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy-deep:#f0ece4;--navy-mid:#ede8df;--navy-light:#e6e0d6;
+      --gold:#8a6a1a;--gold-light:#9e7b22;--gold-pale:#b8922e;
+      --purple-glow:#7c5cbf;
+      --white:#2c2535;--white-dim:rgba(44,37,53,0.65);
+      --font-serif:'Cormorant Garamond',Georgia,serif;
+      --font-sans:'Jost',sans-serif;
+      --transition:all 0.4s cubic-bezier(0.25,0.8,0.25,1);
+      --glow-gold:0 0 20px rgba(138,106,26,0.2),0 0 40px rgba(138,106,26,0.1);
+      --radius-lg:16px;--radius-md:10px;--max-width:1200px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    ::-webkit-scrollbar{width:6px;}
+    ::-webkit-scrollbar-track{background:var(--navy-light);}
+    ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--gold),var(--purple-glow));border-radius:3px;}
+    body{font-family:var(--font-sans);background:var(--navy-deep);color:var(--white);line-height:1.7;overflow-x:hidden;animation:fadeIn .8s ease forwards;}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .galaxy-overlay{position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 30%,rgba(200,160,200,0.1) 0%,transparent 70%),radial-gradient(ellipse 60% 80% at 80% 70%,rgba(200,185,165,0.1) 0%,transparent 70%);pointer-events:none;z-index:0;}
+    nav,main,footer{position:relative;z-index:1;}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:flex;align-items:center;justify-content:space-between;transition:var(--transition);}
+    nav.scrolled{background:rgba(240,236,228,0.95);backdrop-filter:blur(20px);padding:14px 40px;border-bottom:1px solid rgba(184,146,46,0.15);}
+    .nav-logo{font-family:var(--font-serif);font-size:1.5rem;font-weight:400;color:var(--white);text-decoration:none;display:flex;align-items:center;gap:10px;}
+    .nav-back{font-family:var(--font-sans);font-size:0.78rem;font-weight:300;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);text-decoration:none;display:flex;align-items:center;gap:8px;transition:gap .3s;}
+    .nav-back:hover{gap:14px;}
+    .nav-cta{font-family:var(--font-sans);font-size:0.78rem;font-weight:400;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);padding:8px 22px;border-radius:40px;text-decoration:none;transition:var(--transition);}
+    .nav-cta:hover{background:var(--gold);color:#faf8f5;box-shadow:var(--glow-gold);}
+    section{padding:90px 40px;position:relative;}
+    .container{max-width:var(--max-width);margin:0 auto;width:100%;}
+    .section-label{font-family:var(--font-sans);font-size:.72rem;font-weight:400;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:block;}
+    .section-title{font-family:var(--font-serif);font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:300;line-height:1.2;color:var(--white);margin-bottom:20px;}
+    .section-title span{color:var(--gold-light);font-style:italic;}
+    .divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:24px 0;}
+    /* HERO */
+    .page-hero{min-height:68vh;display:flex;align-items:flex-end;padding:140px 40px 80px;position:relative;overflow:hidden;background:linear-gradient(160deg,rgba(230,215,225,0.6) 0%,rgba(235,225,215,0.8) 50%,rgba(245,240,230,0.9) 100%);}
+    .page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 85% 30%,rgba(180,80,180,0.07) 0%,transparent 60%),radial-gradient(ellipse 50% 60% at 15% 70%,rgba(201,168,76,0.1) 0%,transparent 60%);}
+    .hearts-deco{position:absolute;right:8%;top:50%;transform:translateY(-50%);width:360px;height:360px;opacity:.1;animation:floatDeco 8s ease-in-out infinite;}
+    @keyframes floatDeco{0%,100%{transform:translateY(-50%) scale(1)}50%{transform:translateY(-55%) scale(1.04)}}
+    .hero-content-wrap{position:relative;z-index:2;max-width:var(--max-width);margin:0 auto;width:100%;}
+    .hero-breadcrumb{display:flex;align-items:center;gap:10px;font-family:var(--font-sans);font-size:.72rem;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:var(--white-dim);margin-bottom:28px;}
+    .hero-breadcrumb a{color:var(--gold);text-decoration:none;}
+    .hero-breadcrumb span{color:rgba(44,37,53,.3);}
+    .page-hero-eyebrow{display:inline-flex;align-items:center;gap:12px;font-family:var(--font-sans);font-size:.72rem;font-weight:300;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
+    .page-hero-eyebrow::before{content:'';display:block;width:30px;height:1px;background:var(--gold);opacity:.6;}
+    .page-hero-title{font-family:var(--font-serif);font-size:clamp(3rem,7vw,6rem);font-weight:300;line-height:1.0;color:var(--white);margin-bottom:24px;}
+    .page-hero-title em{font-style:italic;color:var(--gold-light);}
+    .page-hero-sub{font-family:var(--font-sans);font-size:1rem;font-weight:300;color:var(--white-dim);line-height:1.8;max-width:560px;margin-bottom:44px;}
+    .hero-meta{display:flex;gap:28px;flex-wrap:wrap;}
+    .hero-meta-item{display:flex;align-items:center;gap:10px;font-family:var(--font-sans);font-size:.78rem;font-weight:300;color:var(--white-dim);}
+    .hero-meta-icon{width:34px;height:34px;border-radius:50%;background:rgba(160,120,40,.1);border:1px solid rgba(160,120,40,.2);display:flex;align-items:center;justify-content:center;font-size:.9rem;}
+    /* KART GRID */
+    .card-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:50px;}
+    .card-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:50px;}
+    .info-card{background:linear-gradient(160deg,rgba(232,226,216,.8),rgba(245,241,234,.95));border:1px solid rgba(138,106,26,.12);border-radius:var(--radius-lg);padding:36px 28px;transition:var(--transition);position:relative;overflow:hidden;}
+    .info-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);transform:scaleX(0);transition:transform .4s;}
+    .info-card:hover{transform:translateY(-6px);border-color:rgba(138,106,26,.3);box-shadow:0 20px 50px rgba(0,0,0,.05);}
+    .info-card:hover::before{transform:scaleX(1);}
+    .card-icon{font-size:2rem;margin-bottom:16px;display:block;}
+    .card-title{font-family:var(--font-serif);font-size:1.2rem;font-weight:400;color:var(--white);margin-bottom:10px;}
+    .card-desc{font-family:var(--font-sans);font-size:.84rem;font-weight:300;color:var(--white-dim);line-height:1.75;}
+    /* TWO COL */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
+    .text-block{display:flex;flex-direction:column;gap:28px;}
+    .big-text{font-family:var(--font-serif);font-size:1.2rem;font-weight:300;color:var(--white-dim);line-height:1.9;}
+    .big-text strong{color:var(--gold-light);font-weight:400;}
+    .quote-block{border-left:2px solid var(--gold);padding:20px 24px;background:rgba(138,106,26,.05);border-radius:0 var(--radius-md) var(--radius-md) 0;font-family:var(--font-serif);font-size:1.25rem;font-style:italic;color:var(--gold);line-height:1.7;}
+    /* STICKY LIST */
+    .sticky-list{display:flex;flex-direction:column;gap:14px;position:sticky;top:100px;}
+    .sticky-item{display:flex;align-items:flex-start;gap:16px;padding:20px 22px;background:linear-gradient(135deg,rgba(232,226,216,.8),rgba(245,241,234,.95));border:1px solid rgba(138,106,26,.12);border-radius:var(--radius-md);transition:var(--transition);}
+    .sticky-item:hover{border-color:rgba(138,106,26,.3);}
+    .sticky-num{font-family:var(--font-serif);font-size:1.6rem;font-weight:300;color:rgba(138,106,26,.25);line-height:1;min-width:32px;}
+    .sticky-title{font-family:var(--font-serif);font-size:1rem;font-weight:400;color:var(--white);margin-bottom:4px;}
+    .sticky-desc{font-family:var(--font-sans);font-size:.78rem;font-weight:300;color:var(--white-dim);line-height:1.6;}
+    /* STEPS */
+    .steps-row{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:50px;}
+    .step{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;}
+    .step-dot{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--purple-glow));display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 0 28px rgba(138,106,26,.3);position:relative;z-index:1;transition:var(--transition);}
+    .step:hover .step-dot{transform:scale(1.1);}
+    .step-num{font-family:var(--font-sans);font-size:.65rem;font-weight:400;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);}
+    .step-title{font-family:var(--font-serif);font-size:1.1rem;font-weight:400;color:var(--white);}
+    .step-desc{font-family:var(--font-sans);font-size:.82rem;font-weight:300;color:var(--white-dim);line-height:1.7;}
+    /* ACCORDION */
+    .accordion-list{max-width:780px;display:flex;flex-direction:column;gap:12px;}
+    .accordion-item{border:1px solid rgba(138,106,26,.12);border-radius:var(--radius-lg);overflow:hidden;transition:var(--transition);}
+    .accordion-item.active{border-color:rgba(138,106,26,.3);}
+    .accordion-trigger{width:100%;background:linear-gradient(135deg,rgba(232,226,216,.7),rgba(245,241,234,.9));border:none;padding:20px 26px;display:flex;align-items:center;justify-content:space-between;gap:16px;cursor:pointer;text-align:left;transition:var(--transition);}
+    .accordion-trigger:hover{background:rgba(138,106,26,.07);}
+    .accordion-question{font-family:var(--font-serif);font-size:1.05rem;font-weight:400;color:var(--white);}
+    .accordion-icon{width:30px;height:30px;border-radius:50%;border:1px solid rgba(138,106,26,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--gold);font-size:1.1rem;transition:transform .3s;}
+    .accordion-item.active .accordion-icon{transform:rotate(45deg);}
+    .accordion-panel{max-height:0;overflow:hidden;transition:max-height .4s ease;background:rgba(245,241,234,.8);}
+    .accordion-panel.open{max-height:300px;}
+    .accordion-answer{font-family:var(--font-sans);font-size:.88rem;font-weight:300;color:var(--white-dim);line-height:1.8;padding:20px 26px;}
+    /* CTA */
+    #cta-randevu{padding:100px 40px;text-align:center;background:linear-gradient(135deg,rgba(225,210,220,.6),rgba(235,225,215,.8),rgba(245,240,230,.9));position:relative;overflow:hidden;}
+    #cta-randevu::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(138,106,26,.06) 0%,transparent 70%);}
+    .cta-inner{position:relative;z-index:1;max-width:680px;margin:0 auto;}
+    .cta-symbol{font-size:3.5rem;opacity:.3;display:block;margin-bottom:24px;animation:pulse 4s ease-in-out infinite;}
+    @keyframes pulse{0%,100%{opacity:.25;transform:scale(1)}50%{opacity:.45;transform:scale(1.05)}}
+    .cta-title{font-family:var(--font-serif);font-size:clamp(2rem,4vw,3.2rem);font-weight:300;color:var(--white);line-height:1.2;margin-bottom:20px;}
+    .cta-title em{color:var(--gold-light);font-style:italic;}
+    .cta-desc{font-family:var(--font-sans);font-size:1rem;font-weight:300;color:var(--white-dim);line-height:1.8;margin-bottom:44px;}
+    .cta-buttons{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;}
+    .btn-primary{font-family:var(--font-sans);font-size:.82rem;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--navy-deep);background:linear-gradient(135deg,var(--gold-light),var(--gold));border:none;padding:16px 40px;border-radius:50px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:var(--transition);box-shadow:0 4px 24px rgba(138,106,26,.25);}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:var(--glow-gold),0 8px 40px rgba(138,106,26,.35);}
+    .btn-secondary{font-family:var(--font-sans);font-size:.82rem;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--white);background:transparent;border:1px solid rgba(44,37,53,.2);padding:16px 40px;border-radius:50px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:var(--transition);}
+    .btn-secondary:hover{border-color:var(--gold);color:var(--gold);}
+    /* FOOTER */
+    footer{background:rgba(232,226,216,.95);border-top:1px solid rgba(138,106,26,.15);padding:40px;}
+    .footer-inner{max-width:var(--max-width);margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;}
+    .footer-logo{font-family:var(--font-serif);font-size:1.4rem;font-weight:400;color:var(--white);text-decoration:none;}
+    .footer-logo span{color:var(--gold);}
+    .footer-copy{font-family:var(--font-sans);font-size:.78rem;font-weight:300;color:rgba(44,37,53,.4);}
+    /* REVEAL */
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;}
+    .reveal.visible{opacity:1;transform:translateY(0);}
+    @media(max-width:1024px){.card-grid-3{grid-template-columns:repeat(2,1fr)}.two-col{grid-template-columns:1fr}.sticky-list{position:static}.steps-row{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:768px){section{padding:70px 20px}nav{padding:16px 20px}.page-hero{padding:110px 20px 60px}.hearts-deco{display:none}.card-grid-3,.card-grid-2{grid-template-columns:1fr}.steps-row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="galaxy-overlay" aria-hidden="true"></div>
+<nav id="navbar">
+  <a href="index.html" class="nav-logo"><span>✦</span> QHHT & Astroloji</a>
+  <a href="index.html" class="nav-back">← Ana Sayfa</a>
+  <a href="index.html#iletisim" class="nav-cta">Randevu Al</a>
+</nav>
+<main>
+
+  <header class="page-hero">
+    <svg class="hearts-deco" viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="180" cy="180" r="170" stroke="#8a6a1a" stroke-width="1"/>
+      <circle cx="180" cy="180" r="130" stroke="#8a6a1a" stroke-width=".5" stroke-dasharray="4 6"/>
+      <circle cx="120" cy="150" r="60" stroke="#8a6a1a" stroke-width=".7" fill="none"/>
+      <circle cx="240" cy="150" r="60" stroke="#7c5cbf" stroke-width=".7" fill="none"/>
+      <ellipse cx="180" cy="200" rx="80" ry="50" stroke="#8a6a1a" stroke-width=".5" stroke-dasharray="3 5"/>
+      <line x1="120" y1="150" x2="240" y2="150" stroke="#8a6a1a" stroke-width=".5" opacity=".5"/>
+      <text x="108" y="158" fill="#8a6a1a" font-size="16" text-anchor="middle">☀</text>
+      <text x="252" y="158" fill="#7c5cbf" font-size="16" text-anchor="middle">☽</text>
+      <text x="180" y="198" fill="#8a6a1a" font-size="12" text-anchor="middle">✦</text>
+      <text x="180" y="32" fill="#8a6a1a" font-size="13" text-anchor="middle">♀</text>
+      <text x="320" y="120" fill="#8a6a1a" font-size="13" text-anchor="middle">♂</text>
+      <text x="40" y="120" fill="#8a6a1a" font-size="13" text-anchor="middle">♃</text>
+      <text x="180" y="338" fill="#8a6a1a" font-size="13" text-anchor="middle">♄</text>
+    </svg>
+    <div class="hero-content-wrap">
+      <div class="hero-breadcrumb">
+        <a href="index.html">Ana Sayfa</a><span>/</span>
+        <a href="index.html#astroloji">Hizmetler</a><span>/</span>
+        <span style="color:var(--gold)">İlişki Uyumu — Sinastri</span>
+      </div>
+      <div class="page-hero-eyebrow">Astroloji Hizmetleri</div>
+      <h1 class="page-hero-title">İlişki Uyumu<br><em>Sinastri Analizi</em></h1>
+      <p class="page-hero-sub">İki ruhun gökyüzündeki dansı; çekim, gerilim ve dönüşümün haritası. İlişkinizdeki dinamikleri, karmik bağları ve büyüme alanlarını birlikte keşfedelim.</p>
+      <div class="hero-meta">
+        <div class="hero-meta-item"><div class="hero-meta-icon">⏱</div><span>75 Dakika Seans</span></div>
+        <div class="hero-meta-item"><div class="hero-meta-icon">📄</div><span>Yazılı Rapor Dahil</span></div>
+        <div class="hero-meta-item"><div class="hero-meta-icon">🌐</div><span>Online / Yüz Yüze</span></div>
+        <div class="hero-meta-item"><div class="hero-meta-icon">👥</div><span>İki Harita + Kompozit</span></div>
+      </div>
+    </div>
+  </header>
+
+  <section style="background:linear-gradient(180deg,transparent 0%,rgba(225,210,220,.25) 50%,transparent 100%)">
+    <div class="container">
+      <div class="reveal">
+        <span class="section-label">Seans Kapsamı</span>
+        <h2 class="section-title">Sinastride <span>Ne Görürsünüz?</span></h2>
+        <div class="divider"></div>
+        <p style="font-family:var(--font-sans);font-size:1rem;font-weight:300;color:var(--white-dim);line-height:1.8;max-width:640px;">Sinastri yalnızca "uyumlu muyuz?" sorusunun ötesinde; neden birbirinizi seçtiğinizi, hangi alanların çatıştığını ve ilişkinin ruhsal amacını derinlemesine ortaya koyar.</p>
+      </div>
+      <div class="card-grid-3">
+        <div class="info-card reveal"><span class="card-icon">💫</span><h3 class="card-title">Çekim & Bağlanma Noktaları</h3><p class="card-desc">Venüs-Mars açıları ve 5./7. ev bağlantıları; çekimin kaynağını, romantik potansiyeli ve fiziksel uyumu ortaya koyar.</p></div>
+        <div class="info-card reveal"><span class="card-icon">⚡</span><h3 class="card-title">Gerilim & Büyüme Alanları</h3><p class="card-desc">Zorlayıcı açılar (kare, karşıt) hem sürtüşmenin hem de en derin dönüşümün kapısıdır. Bunları anlamak ilişkiyi dönüştürür.</p></div>
+        <div class="info-card reveal"><span class="card-icon">♾️</span><h3 class="card-title">Karmik Bağ</h3><p class="card-desc">Düğüm eksenlerinin karşılıklı teması, Şeytan üçgenleri ve Chiron açıları geçmiş yaşam bağlantılarını işaret eder.</p></div>
+        <div class="info-card reveal"><span class="card-icon">🏡</span><h3 class="card-title">Ev Aktivasyonları</h3><p class="card-desc">Partnerinizin gezegenleri sizin hangi evinizi aktive ediyor? Bu, ilişkinin hayatınızın hangi alanını uyandırdığını gösterir.</p></div>
+        <div class="info-card reveal"><span class="card-icon">🌀</span><h3 class="card-title">Kompozit Harita</h3><p class="card-desc">İki kişi bir araya gelince doğan üçüncü varlık — ilişkinin kendi ruhu, amacı ve potansiyeli ayrıca incelenir.</p></div>
+        <div class="info-card reveal"><span class="card-icon">🌱</span><h3 class="card-title">Sağlıklı Dinamikler İçin Rehberlik</h3><p class="card-desc">Yalnızca tanımlamakla kalmaz; bu dinamiklerle nasıl çalışabileceğinize dair pratik, yapıcı öneriler de sunulur.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="two-col">
+        <div class="text-block">
+          <div class="reveal">
+            <span class="section-label">Analiz Yöntemi</span>
+            <h2 class="section-title">Üç Katmanlı <span>Bir Okuma</span></h2>
+            <div class="divider"></div>
+          </div>
+          <p class="big-text reveal">Sinastri analizi üç ayrı haritanın bütünsel okumasıdır: <strong>kişisel haritanız</strong>, <strong>partnerinizin haritası</strong> ve bu iki haritanın birleşiminden doğan <strong>kompozit harita.</strong></p>
+          <blockquote class="quote-block reveal">"İki ruh birbirini seçtiğinde, gökyüzü bu seçimin şifrelerini çoktan yazmış olur."</blockquote>
+          <p class="big-text reveal">Pek çok ilişki analizi yalnızca Güneş burcu uyumuna bakar. Oysa gerçek uyum ve gerilim <strong>Ay-Ay, Venüs-Mars, Satürn-Ay</strong> gibi derin gezegen temaslarında saklıdır. Bu seansta tüm bu katmanlar açığa çıkar.</p>
+        </div>
+        <div class="sticky-list reveal">
+          <p style="font-family:var(--font-sans);font-size:.72rem;font-weight:400;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Analizde İncelenenler</p>
+          <div class="sticky-item"><div class="sticky-num">01</div><div><p class="sticky-title">Kişisel Sinastri Haritası</p><p class="sticky-desc">İki haritanın üst üste bindirilmesiyle oluşan açı ilişkileri</p></div></div>
+          <div class="sticky-item"><div class="sticky-num">02</div><div><p class="sticky-title">Kompozit Harita</p><p class="sticky-desc">İlişkinin kendi kimliği, amacı ve zorlukları</p></div></div>
+          <div class="sticky-item"><div class="sticky-num">03</div><div><p class="sticky-title">Venüs & Mars Açıları</p><p class="sticky-desc">Romantik çekim, uyum ve arzunun haritası</p></div></div>
+          <div class="sticky-item"><div class="sticky-num">04</div><div><p class="sticky-title">Satürn & Düğüm Teması</p><p class="sticky-desc">Karmik yükümlülükler ve ruhsal büyüme baskısı</p></div></div>
+          <div class="sticky-item"><div class="sticky-num">05</div><div><p class="sticky-title">Ev Aktivasyonları</p><p class="sticky-desc">Partnerinizin gezegenleri hayatınızın hangi alanlarını uyandırıyor</p></div></div>
+          <div class="sticky-item"><div class="sticky-num">06</div><div><p class="sticky-title">İletişim & Ay Uyumu</p><p class="sticky-desc">Duygusal bağ, güven zemini ve iletişim kalıpları</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:linear-gradient(180deg,transparent 0%,rgba(225,210,220,.2) 50%,transparent 100%)">
+    <div class="container">
+      <div class="reveal" style="text-align:center;">
+        <span class="section-label">Seans Akışı</span>
+        <h2 class="section-title">Seans <span>Nasıl İlerler?</span></h2>
+        <div class="divider" style="margin:24px auto;"></div>
+      </div>
+      <div class="steps-row">
+        <div class="step reveal"><div class="step-dot">📅</div><p class="step-num">Adım 01</p><h3 class="step-title">Randevu</h3><p class="step-desc">Her iki kişinin doğum tarihi, saati ve şehri ile randevu alınır. İki harita ayrı ayrı hazırlanır.</p></div>
+        <div class="step reveal"><div class="step-dot">🗺️</div><p class="step-num">Adım 02</p><h3 class="step-title">Harita Hazırlığı</h3><p class="step-desc">Sinastri ve kompozit harita birlikte hazırlanır, önemli açı örüntüleri önceden belirlenir.</p></div>
+        <div class="step reveal"><div class="step-dot">✨</div><p class="step-num">Adım 03</p><h3 class="step-title">Analiz Seansı</h3><p class="step-desc">75 dakika boyunca her iki harita ve ilişki dinamikleri katman katman okunur. Ses kaydı alınır.</p></div>
+        <div class="step reveal"><div class="step-dot">📄</div><p class="step-num">Adım 04</p><h3 class="step-title">Rapor & Takip</h3><p class="step-desc">48 saat içinde yazılı rapor ve ses kaydı iletilir. Takip görüşmesi planlanabilir.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="reveal" style="margin-bottom:40px;">
+        <span class="section-label">Merak Edilenler</span>
+        <h2 class="section-title">Sık Sorulan <span>Sorular</span></h2>
+        <div class="divider"></div>
+      </div>
+      <div class="accordion-list reveal">
+        <div class="accordion-item"><button class="accordion-trigger" aria-expanded="false"><span class="accordion-question">Partnerim seansa katılmak zorunda mı?</span><span class="accordion-icon">+</span></button><div class="accordion-panel"><p class="accordion-answer">Hayır. Partnerinizin doğum bilgileri yeterlidir, bizzat katılması gerekmez. Seans yalnızca sizin perspektifinizden ilişki dinamiklerini inceler.</p></div></div>
+        <div class="accordion-item"><button class="accordion-trigger" aria-expanded="false"><span class="accordion-question">Eski bir ilişki için de analiz yapılabilir mi?</span><span class="accordion-icon">+</span></button><div class="accordion-panel"><p class="accordion-answer">Evet. Eski ilişkilerin sinastri analizi çoğu zaman en derin içgörüleri sağlar; neden bu kişiyi çektiğinizi, neden güçlük yaşadığınızı ve bu ilişkiden ne öğrendiğinizi anlamanıza yardımcı olur.</p></div></div>
+        <div class="accordion-item"><button class="accordion-trigger" aria-expanded="false"><span class="accordion-question">Arkadaşlık veya iş ortaklığı için de uygun mu?</span><span class="accordion-icon">+</span></button><div class="accordion-panel"><p class="accordion-answer">Kesinlikle. Sinastri yalnızca romantik ilişkiler için değil; aile, arkadaşlık, iş ortaklığı ve her türlü önemli ilişki dinamiğini anlamak için de kullanılır.</p></div></div>
+        <div class="accordion-item"><button class="accordion-trigger" aria-expanded="false"><span class="accordion-question">Partnerimin doğum saatini bilmiyorum, ne yapabilirim?</span><span class="accordion-icon">+</span></button><div class="accordion-panel"><p class="accordion-answer">Doğum saati bilinmediğinde ev analizi yapılamaz; ancak gezegen konumları ve temel sinastri açıları değerlendirilebilir. Bu durumu seans öncesinde belirtmeniz yeterlidir.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cta-randevu">
+    <div class="cta-inner">
+      <span class="cta-symbol">💞</span>
+      <h2 class="cta-title">İlişkinizin <em>Haritasını</em><br>Birlikte Okuyalım</h2>
+      <p class="cta-desc">İki kişinin doğum bilgileriyle randevu alın. Birlikteliğinizin derinliğini ve potansiyelini keşfedin.</p>
+      <div class="cta-buttons">
+        <a href="index.html#iletisim" class="btn-primary">✦ Randevu Al</a>
+        <a href="index.html#astroloji" class="btn-secondary">Diğer Hizmetler →</a>
+      </div>
+    </div>
+  </section>
+</main>
+<footer><div class="footer-inner"><a href="index.html" class="footer-logo">QHHT <span>✦</span> Astroloji</a><p class="footer-copy">© 2025 Tüm hakları saklıdır. ✦ QHHT & Astroloji</p></div></footer>
+<script>
+  const navbar=document.getElementById('navbar');
+  window.addEventListener('scroll',()=>navbar.classList.toggle('scrolled',window.scrollY>50));
+  const revealEls=document.querySelectorAll('.reveal');
+  const observer=new IntersectionObserver((entries)=>{entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*80);observer.unobserve(e.target);}});},{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+  revealEls.forEach(el=>observer.observe(el));
+  document.querySelectorAll('.accordion-trigger').forEach(btn=>{btn.addEventListener('click',()=>{const item=btn.closest('.accordion-item');const panel=item.querySelector('.accordion-panel');const isOpen=item.classList.contains('active');document.querySelectorAll('.accordion-item.active').forEach(o=>{o.classList.remove('active');o.querySelector('.accordion-panel').classList.remove('open');o.querySelector('.accordion-trigger').setAttribute('aria-expanded',false);});if(!isOpen){item.classList.add('active');panel.classList.add('open');btn.setAttribute('aria-expanded',true);}});});
+</script>
+</body>
+</html>

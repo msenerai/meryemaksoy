@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instagram — QHHT & Astroloji</title>
+  <meta name="description" content="Astroloji, QHHT ve ruhsal içerikler. Instagram paylaşımlarını keşfedin." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.elifyildiz.com/instagram.html" />
+  <meta property="og:title" content="Instagram — QHHT & Astroloji" />
+  <meta property="og:description" content="Astroloji, QHHT ve ruhsal içerikler." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, query, orderBy }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const db = getFirestore(initializeApp({
+      apiKey:            "AIzaSyBsAZj0Swtn77HvsGxpsgispuluvIEIcvU",
+      authDomain:        "meryemaksoy1-45ce5.firebaseapp.com",
+      projectId:         "meryemaksoy1-45ce5",
+      storageBucket:     "meryemaksoy1-45ce5.firebasestorage.app",
+      messagingSenderId: "212318615377",
+      appId:             "1:212318615377:web:b28387f101a4c42ad34570"
+    }));
+
+    async function loadPage() {
+      // Site genel bilgileri
+      try {
+        const snap = await getDoc(doc(db, "siteContent", "main"));
+        if (snap.exists()) {
+          const d = snap.data();
+          if (d.instagramHandle) {
+            document.getElementById('igHandle').textContent = "@" + d.instagramHandle;
+            document.getElementById('igHandleFooter').textContent = "@" + d.instagramHandle;
+          }
+          if (d.instagramUrl) {
+            document.querySelectorAll('.ig-profile-btn').forEach(el => {
+              el.href = d.instagramUrl;
+            });
+          }
+          if (d.profilePhoto) {
+            const av = document.getElementById('profileAvatar');
+            if (av) av.innerHTML = `<img src="${d.profilePhoto}" alt="Profil" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+          }
+          if (d.aboutName) {
+            document.getElementById('profileName').textContent = d.aboutName;
+          }
+        }
+      } catch(e) { console.warn(e); }
+
+      // Instagram gönderileri
+      const grid = document.getElementById('igGrid');
+      try {
+        const snap = await getDocs(query(collection(db, 'instagramPosts'), orderBy('order', 'asc')));
+        const posts = [];
+        snap.forEach(d => { if (d.data().visible !== false) posts.push({ id: d.id, ...d.data() }); });
+
+        if (posts.length === 0) {
+          grid.innerHTML = '<p class="empty-msg">Henüz Instagram gönderisi eklenmemiş.</p>';
+          return;
+        }
+
+        grid.innerHTML = '';
+        posts.forEach((p, idx) => {
+          const item = document.createElement('div');
+          item.className = 'ig-item';
+          item.setAttribute('data-idx', idx);
+          item.innerHTML = `
+            <div class="ig-item-inner">
+              ${p.image
+                ? `<img src="${p.image}" alt="${p.caption||''}" loading="lazy" />`
+                : `<div class="ig-item-emoji">${p.emoji || '✦'}</div>`}
+              <div class="ig-item-overlay">
+                <div class="ig-item-overlay-inner">
+                  ${p.likes ? `<span>♥ ${p.likes}</span>` : ''}
+                  ${p.category ? `<span class="ig-cat-pill">${p.category}</span>` : ''}
+                </div>
+                <button class="ig-item-zoom" onclick="openLightbox(${idx})">↗</button>
+              </div>
+            </div>`;
+          item.querySelector('.ig-item-inner').addEventListener('click', () => openLightbox(idx));
+          grid.appendChild(item);
+        });
+
+        window._igPosts = posts;
+        buildCategoryFilter(posts);
+      } catch(e) {
+        grid.innerHTML = `<p class="empty-msg">Yüklenirken hata: ${e.message}</p>`;
+      }
+    }
+
+    function buildCategoryFilter(posts) {
+      const cats = ['Tümü', ...new Set(posts.map(p => p.category).filter(Boolean))];
+      const bar = document.getElementById('catFilterBar');
+      bar.innerHTML = cats.map((c, i) =>
+        `<button class="filter-btn${i===0?' active':''}" data-cat="${c}" onclick="filterIG('${c}',this)">${c}</button>`
+      ).join('');
+    }
+
+    window.filterIG = function(cat, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const items = document.querySelectorAll('.ig-item');
+      items.forEach(item => {
+        const idx = parseInt(item.dataset.idx);
+        const p = window._igPosts[idx];
+        const show = cat === 'Tümü' || p.category === cat;
+        item.style.display = show ? '' : 'none';
+      });
+    };
+
+    window.openLightbox = function(idx) {
+      const posts = window._igPosts;
+      window._lbIdx = idx;
+      renderLightbox(idx);
+      document.getElementById('lightbox').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    };
+
+    // ── Slug'dan gönderi aç ──────────────────────────────────
+    window.openBySlug = function(slug) {
+      const posts = window._igPosts;
+      if (!posts) return;
+      const idx = posts.findIndex(p => p.slug === slug);
+      if (idx !== -1) window.openLightbox(idx);
+    };
+
+    function renderLightbox(idx) {
+      const posts = window._igPosts;
+      const p = posts[idx];
+      const d = document.getElementById('lbDate');
+      const dateStr = p.postedAt?.toDate
+        ? p.postedAt.toDate().toLocaleDateString('tr-TR', {day:'numeric',month:'long',year:'numeric'})
+        : (p.dateLabel || '');
+
+      document.getElementById('lbImage').innerHTML = p.image
+        ? `<img src="${p.image}" alt="${p.caption||''}" />`
+        : `<div class="lb-emoji">${p.emoji || '✦'}</div>`;
+      document.getElementById('lbCaption').textContent = p.caption || '';
+      document.getElementById('lbCategory').textContent = p.category || '';
+      if (d) d.textContent = dateStr;
+
+      const link = document.getElementById('lbLink');
+      if (link) {
+        if (p.url) { link.href = p.url; link.style.display = 'inline-flex'; }
+        else { link.style.display = 'none'; }
+      }
+
+      // prev/next
+      document.getElementById('lbPrev').style.opacity = idx > 0 ? '1' : '0.3';
+      document.getElementById('lbNext').style.opacity = idx < posts.length-1 ? '1' : '0.3';
+
+      // ── SEO: URL hash + meta güncelle ──────────────────────────
+      if (p.slug) {
+        history.replaceState(null, '', '#/' + p.slug);
+        // title
+        const pageTitle = (p.caption ? p.caption.slice(0,60) : (p.category||'Gönderi')) + ' — Instagram | QHHT & Astroloji';
+        document.title = pageTitle;
+        // description
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', p.caption ? p.caption.slice(0,155) : pageTitle);
+        // canonical
+        const canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) canonical.setAttribute('href', location.origin + location.pathname + '#/' + p.slug);
+        // og:title / og:description / og:image
+        const ogTitle = document.querySelector('meta[property="og:title"]');
+        if (ogTitle) ogTitle.setAttribute('content', pageTitle);
+        const ogDesc = document.querySelector('meta[property="og:description"]');
+        if (ogDesc) ogDesc.setAttribute('content', p.caption ? p.caption.slice(0,155) : pageTitle);
+        if (p.image) {
+          let ogImg = document.querySelector('meta[property="og:image"]');
+          if (!ogImg) { ogImg = document.createElement('meta'); ogImg.setAttribute('property','og:image'); document.head.appendChild(ogImg); }
+          ogImg.setAttribute('content', p.image);
+        }
+        // og:url
+        const ogUrl = document.querySelector('meta[property="og:url"]');
+        if (ogUrl) ogUrl.setAttribute('content', location.origin + location.pathname + '#/' + p.slug);
+        // JSON-LD structured data
+        let ld = document.getElementById('ig-ld');
+        if (!ld) { ld = document.createElement('script'); ld.id='ig-ld'; ld.type='application/ld+json'; document.head.appendChild(ld); }
+        ld.textContent = JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ImageObject",
+          "name": p.caption ? p.caption.slice(0,60) : (p.category||'Instagram Gönderisi'),
+          "description": p.caption || '',
+          "url": location.origin + location.pathname + '#/' + p.slug,
+          "contentUrl": p.image || '',
+          "keywords": p.category || '',
+          "datePublished": p.postedAt?.toDate ? p.postedAt.toDate().toISOString() : ''
+        });
+      }
+    }
+
+    window.lbNav = function(dir) {
+      const posts = window._igPosts;
+      const next = window._lbIdx + dir;
+      if (next >= 0 && next < posts.length) {
+        window._lbIdx = next;
+        renderLightbox(next);
+      }
+    };
+
+    window.closeLightbox = function() {
+      document.getElementById('lightbox').classList.remove('open');
+      document.body.style.overflow = '';
+      history.replaceState(null, '', location.pathname);
+      document.title = 'Instagram — QHHT & Astroloji';
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', 'Astroloji, QHHT ve ruhsal içerikler. Instagram paylaşımlarını keşfedin.');
+      const canonical = document.querySelector('link[rel="canonical"]');
+      if (canonical) canonical.setAttribute('href', 'https://www.elifyildiz.com/instagram.html');
+    };
+
+    document.addEventListener('keydown', e => {
+      if (!document.getElementById('lightbox').classList.contains('open')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') lbNav(-1);
+      if (e.key === 'ArrowRight') lbNav(1);
+    });
+
+    // ── Hash routing: sayfa yüklenince veya hash değişince ──
+    async function initHashRouting() {
+      await loadPage(); // postları yükle
+      const hash = location.hash; // #/slug
+      if (hash && hash.startsWith('#/')) {
+        const slug = hash.slice(2);
+        if (slug) window.openBySlug(slug);
+      }
+    }
+
+    window.addEventListener('hashchange', () => {
+      const hash = location.hash;
+      if (!hash || !hash.startsWith('#/')) { window.closeLightbox(); return; }
+      const slug = hash.slice(2);
+      if (slug && window._igPosts) window.openBySlug(slug);
+    });
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initHashRouting);
+    } else { initHashRouting(); }
+  </script>
+
+  <style>
+    :root {
+      --bg:          #f0ece4;
+      --bg2:         #ede8df;
+      --gold:        #8a6a1a;
+      --gold-light:  #9e7b22;
+      --text:        #2c2535;
+      --text-dim:    rgba(44,37,53,0.6);
+      --border:      rgba(138,106,26,0.15);
+      --radius:      12px;
+      --font-serif:  'Cormorant Garamond', Georgia, serif;
+      --font-sans:   'Jost', sans-serif;
+      --transition:  all 0.35s cubic-bezier(0.25,0.8,0.25,1);
+      --max-width:   1200px;
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-thumb { background:linear-gradient(var(--gold),#7c5cbf); border-radius:3px; }
+    body { font-family:var(--font-sans); background:var(--bg); color:var(--text); overflow-x:hidden; }
+
+    /* NAV */
+    nav {
+      position:sticky; top:0; z-index:50;
+      background:rgba(240,236,228,0.95); backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--border);
+      padding:14px 40px; display:flex; align-items:center; justify-content:space-between;
+    }
+    .nav-logo { font-family:var(--font-serif); font-size:1.4rem; font-weight:400; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:8px; }
+    .nav-links { display:flex; gap:28px; list-style:none; }
+    .nav-links a { font-family:var(--font-sans); font-size:.78rem; font-weight:300; letter-spacing:.12em; text-transform:uppercase; color:var(--text-dim); text-decoration:none; transition:color .3s; }
+    .nav-links a:hover, .nav-links a.active { color:var(--gold-light); }
+    .nav-cta { color:var(--gold)!important; border:1px solid var(--gold); padding:7px 18px; border-radius:40px; }
+    .nav-cta:hover { background:var(--gold); color:#faf8f5!important; }
+    .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; background:none; border:none; padding:4px; }
+    .hamburger span { display:block; width:22px; height:1.5px; background:var(--gold); transition:var(--transition); }
+    .hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity:0; }
+    .hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+    .mobile-menu { display:none; position:fixed; inset:0; background:rgba(240,236,228,.98); z-index:99; flex-direction:column; align-items:center; justify-content:center; gap:36px; }
+    .mobile-menu.open { display:flex; }
+    .mobile-menu a { font-family:var(--font-serif); font-size:1.8rem; font-weight:300; color:var(--text); text-decoration:none; }
+    .mobile-menu a:hover { color:var(--gold); }
+
+    /* PAGE HERO */
+    .page-hero {
+      padding: 60px 40px 50px;
+      background: linear-gradient(180deg, rgba(180,160,200,0.06) 0%, transparent 100%);
+    }
+    .hero-inner-ig { max-width:var(--max-width); margin:0 auto; display:flex; align-items:center; gap:40px; flex-wrap:wrap; }
+    .profile-avatar { width:90px; height:90px; border-radius:50%; background:linear-gradient(135deg,#f9ce34,#ee2a7b,#6228d7); padding:3px; flex-shrink:0; }
+    .profile-avatar-inner { width:100%; height:100%; border-radius:50%; background:var(--bg); display:flex; align-items:center; justify-content:center; font-size:2.2rem; overflow:hidden; }
+    .profile-info { flex:1; }
+    .section-label { font-family:var(--font-sans); font-size:.68rem; font-weight:400; letter-spacing:.35em; text-transform:uppercase; color:var(--gold); display:block; margin-bottom:8px; }
+    .profile-name-big { font-family:var(--font-serif); font-size:clamp(1.8rem,4vw,2.8rem); font-weight:300; color:var(--text); line-height:1.15; margin-bottom:6px; }
+    .profile-name-big span { color:var(--gold-light); font-style:italic; }
+    .ig-handle { font-family:var(--font-sans); font-size:.85rem; font-weight:300; color:var(--text-dim); margin-bottom:16px; }
+    .ig-follow-btn {
+      display:inline-flex; align-items:center; gap:8px;
+      background:linear-gradient(135deg,#f9ce34,#ee2a7b,#6228d7);
+      color:#fff; font-family:var(--font-sans); font-size:.75rem; font-weight:500;
+      letter-spacing:.1em; text-transform:uppercase; text-decoration:none;
+      padding:10px 24px; border-radius:40px; transition:var(--transition);
+      box-shadow:0 4px 20px rgba(238,42,123,0.25);
+    }
+    .ig-follow-btn:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(238,42,123,0.35); }
+    .divider { width:60px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:20px 0; }
+
+    /* FILTER */
+    .filter-wrap { max-width:var(--max-width); margin:0 auto; padding:0 24px 32px; display:flex; gap:10px; flex-wrap:wrap; }
+    .filter-btn { font-family:var(--font-sans); font-size:.7rem; font-weight:400; letter-spacing:.15em; text-transform:uppercase; color:var(--text-dim); background:transparent; border:1px solid rgba(44,37,53,.14); padding:7px 18px; border-radius:40px; cursor:pointer; transition:var(--transition); }
+    .filter-btn:hover, .filter-btn.active { background:rgba(138,106,26,.08); border-color:var(--gold); color:var(--gold); }
+
+    /* GRID */
+    .ig-grid-wrap { max-width:var(--max-width); margin:0 auto; padding:0 24px 80px; }
+    #igGrid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .ig-item { cursor:pointer; }
+    .ig-item-inner { position:relative; aspect-ratio:1; border-radius:var(--radius); overflow:hidden; background:linear-gradient(135deg,rgba(220,212,200,.8),rgba(235,228,218,.9)); border:1px solid var(--border); transition:var(--transition); }
+    .ig-item-inner:hover { transform:scale(1.02); box-shadow:0 16px 40px rgba(0,0,0,.1); }
+    .ig-item-inner img { width:100%; height:100%; object-fit:cover; display:block; }
+    .ig-item-emoji { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:3.5rem; opacity:.5; }
+    .ig-item-overlay { position:absolute; inset:0; background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.65)); opacity:0; transition:opacity .3s; display:flex; align-items:flex-end; justify-content:space-between; padding:14px; }
+    .ig-item-inner:hover .ig-item-overlay { opacity:1; }
+    .ig-item-overlay-inner { display:flex; flex-direction:column; gap:6px; }
+    .ig-item-overlay span { font-family:var(--font-sans); font-size:.72rem; font-weight:400; color:#fff; }
+    .ig-cat-pill { background:rgba(255,255,255,.2); backdrop-filter:blur(8px); border-radius:20px; padding:3px 10px; font-size:.62rem; letter-spacing:.1em; }
+    .ig-item-zoom { background:rgba(255,255,255,.2); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.3); color:#fff; width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; transition:var(--transition); align-self:flex-end; }
+    .ig-item-zoom:hover { background:rgba(255,255,255,.4); }
+
+    /* LIGHTBOX */
+    #lightbox { position:fixed; inset:0; z-index:200; background:rgba(20,16,30,.92); backdrop-filter:blur(16px); display:none; align-items:center; justify-content:center; padding:20px; }
+    #lightbox.open { display:flex; }
+    .lb-wrap { max-width:960px; width:100%; display:grid; grid-template-columns:1fr 360px; gap:0; border-radius:16px; overflow:hidden; background:var(--bg); box-shadow:0 40px 120px rgba(0,0,0,.4); }
+    .lb-visual { position:relative; background:#111; display:flex; align-items:center; justify-content:center; min-height:480px; }
+    .lb-visual img { width:100%; height:100%; object-fit:contain; max-height:600px; }
+    .lb-emoji { font-size:7rem; opacity:.4; }
+    .lb-close { position:absolute; top:14px; right:14px; background:rgba(255,255,255,.15); border:none; color:#fff; width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; justify-content:center; transition:var(--transition); }
+    .lb-close:hover { background:rgba(255,255,255,.3); }
+    .lb-nav { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,.15); border:none; color:#fff; width:40px; height:40px; border-radius:50%; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center; transition:var(--transition); }
+    .lb-nav:hover { background:rgba(255,255,255,.3); }
+    #lbPrev { left:14px; }
+    #lbNext { right:14px; }
+    .lb-info { padding:32px 28px; display:flex; flex-direction:column; gap:14px; overflow-y:auto; }
+    .lb-cat { font-family:var(--font-sans); font-size:.62rem; font-weight:400; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); border:1px solid rgba(138,106,26,.3); padding:4px 12px; border-radius:20px; align-self:flex-start; }
+    .lb-caption { font-family:var(--font-serif); font-size:1.1rem; font-weight:300; color:var(--text); line-height:1.8; }
+    .lb-date { font-family:var(--font-sans); font-size:.75rem; font-weight:300; color:var(--text-dim); }
+    .lb-link { display:inline-flex; align-items:center; gap:8px; font-family:var(--font-sans); font-size:.72rem; font-weight:400; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); border:1px solid rgba(138,106,26,.3); padding:8px 18px; border-radius:40px; text-decoration:none; transition:var(--transition); }
+    .lb-link:hover { background:rgba(138,106,26,.08); border-color:var(--gold); }
+
+    /* FOOTER */
+    footer { background:rgba(232,226,216,.95); border-top:1px solid var(--border); padding:40px; }
+    .footer-inner { max-width:var(--max-width); margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+    .footer-logo { font-family:var(--font-serif); font-size:1.4rem; font-weight:400; color:var(--text); text-decoration:none; }
+    .footer-logo span { color:var(--gold); }
+    .footer-copy { font-family:var(--font-sans); font-size:.75rem; font-weight:300; color:rgba(44,37,53,.4); }
+
+    .empty-msg { grid-column:1/-1; text-align:center; font-family:var(--font-serif); font-style:italic; color:var(--text-dim); padding:60px 20px; font-size:1.1rem; }
+
+    @media (max-width:768px) {
+      nav { padding:14px 20px; }
+      .nav-links { display:none; }
+      .hamburger { display:flex; }
+      .page-hero { padding:50px 20px 36px; }
+      #igGrid { grid-template-columns:repeat(2,1fr); gap:8px; }
+      .lb-wrap { grid-template-columns:1fr; }
+      .lb-info { padding:20px; }
+    }
+    @media (max-width:480px) {
+      #igGrid { grid-template-columns:repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">✦ QHHT & Astroloji</a>
+  <ul class="nav-links">
+    <li><a href="index.html#hakkimda">Hakkımda</a></li>
+    <li><a href="index.html#qhht">QHHT</a></li>
+    <li><a href="index.html#astroloji">Astroloji</a></li>
+    <li><a href="blog.html">Blog</a></li>
+    <li><a href="youtube.html">YouTube</a></li>
+    <li><a href="instagram.html" class="active">Instagram</a></li>
+    <li><a href="index.html#iletisim" class="nav-cta">Randevu Al</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menü">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" onclick="closeMM()">Ana Sayfa</a>
+  <a href="blog.html" onclick="closeMM()">Blog</a>
+  <a href="youtube.html" onclick="closeMM()">YouTube</a>
+  <a href="instagram.html" onclick="closeMM()">Instagram</a>
+  <a href="index.html#iletisim" onclick="closeMM()">Randevu Al</a>
+</div>
+
+<div class="page-hero">
+  <div class="hero-inner-ig">
+    <div class="profile-avatar">
+      <div class="profile-avatar-inner" id="profileAvatar">📸</div>
+    </div>
+    <div class="profile-info">
+      <span class="section-label">Sosyal Medya</span>
+      <h1 class="profile-name-big">Instagram <span>Galerim</span></h1>
+      <p class="ig-handle" id="igHandle">@instagram</p>
+      <a href="#" class="ig-follow-btn ig-profile-btn" target="_blank" rel="noopener">
+        📸 Instagram'da Takip Et
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="filter-wrap" id="catFilterBar"></div>
+
+<div class="ig-grid-wrap">
+  <div id="igGrid">
+    <p class="empty-msg">Yükleniyor…</p>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Gönderi Detayı" onclick="if(event.target===this)closeLightbox()">
+  <div class="lb-wrap">
+    <div class="lb-visual">
+      <div id="lbImage"></div>
+      <button class="lb-close" onclick="closeLightbox()">✕</button>
+      <button class="lb-nav" id="lbPrev" onclick="lbNav(-1)">←</button>
+      <button class="lb-nav" id="lbNext" onclick="lbNav(1)">→</button>
+    </div>
+    <div class="lb-info">
+      <span class="lb-cat" id="lbCategory"></span>
+      <p class="lb-caption" id="lbCaption"></p>
+      <p class="lb-date" id="lbDate"></p>
+      <a href="#" class="lb-link" id="lbLink" target="_blank" rel="noopener">Instagram'da Gör →</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <a href="index.html" class="footer-logo">QHHT <span>✦</span> Astroloji</a>
+    <p class="footer-copy" id="igHandleFooter">© 2025 QHHT & Astroloji</p>
+  </div>
+</footer>
+
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => {
+    const o = mobileMenu.classList.toggle('open');
+    hamburger.classList.toggle('open', o);
+    document.body.style.overflow = o ? 'hidden' : '';
+  });
+  function closeMM() {
+    mobileMenu.classList.remove('open');
+    hamburger.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+</script>
+</body>
+</html>

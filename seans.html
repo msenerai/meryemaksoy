@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Seans Yolculuğu | QHHT & Astroloji</title>
+  <meta name="description" content="QHHT ve astroloji seansı için adım adım hazırlık rehberi. Rezervasyondan seansa, seanstan entegrasyona kadar tüm süreç."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --navy-deep:#f0ece4;--navy-mid:#ede8df;--navy-light:#e6e0d6;
+      --gold:#8a6a1a;--gold-light:#9e7b22;--gold-pale:#b8922e;
+      --purple-glow:#7c5cbf;
+      --white:#2c2535;--white-dim:rgba(44,37,53,0.65);
+      --font-serif:'Cormorant Garamond',Georgia,serif;
+      --font-sans:'Jost',sans-serif;
+      --transition:all 0.4s cubic-bezier(0.25,0.8,0.25,1);
+      --radius-lg:16px;--radius-md:10px;--max-width:1060px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:var(--font-sans);background:var(--navy-deep);color:var(--white);line-height:1.7;overflow-x:hidden;animation:fadeIn 0.8s ease forwards;}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 40px;display:flex;align-items:center;justify-content:space-between;background:rgba(240,236,228,0.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(184,146,46,0.15);}
+    .nav-logo{font-family:var(--font-serif);font-size:1.4rem;font-weight:400;color:var(--white);text-decoration:none;display:flex;align-items:center;gap:8px;}
+    .nav-back{font-family:var(--font-sans);font-size:0.78rem;font-weight:400;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid rgba(138,106,26,0.3);padding:8px 20px;border-radius:40px;transition:var(--transition);}
+    .nav-back:hover{background:rgba(138,106,26,0.08);border-color:var(--gold);}
+
+    .page-hero{min-height:44vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:140px 40px 80px;background:linear-gradient(160deg,#ede8df 0%,#e0d9cf 50%,#ede8df 100%);position:relative;overflow:hidden;}
+    .page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(138,106,26,0.08) 0%,transparent 70%);pointer-events:none;}
+    .page-hero-eyebrow{font-family:var(--font-sans);font-size:0.7rem;font-weight:300;letter-spacing:0.4em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:16px;}
+    .page-hero-title{font-family:var(--font-serif);font-size:clamp(2.8rem,6vw,5rem);font-weight:300;line-height:1.1;color:var(--white);margin-bottom:20px;}
+    .page-hero-title span{color:var(--gold-light);font-style:italic;}
+    .page-hero-sub{font-family:var(--font-sans);font-size:1rem;font-weight:300;color:var(--white-dim);max-width:560px;margin:0 auto;line-height:1.8;}
+    .hero-deco{position:absolute;font-size:14rem;opacity:0.04;font-family:var(--font-serif);color:var(--gold);pointer-events:none;user-select:none;right:-60px;bottom:-60px;line-height:1;}
+
+    main{max-width:var(--max-width);margin:0 auto;padding:80px 24px 100px;}
+    .section-label{font-family:var(--font-sans);font-size:0.7rem;font-weight:400;letter-spacing:0.35em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:12px;}
+    .section-title{font-family:var(--font-serif);font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:300;line-height:1.2;color:var(--white);margin-bottom:16px;}
+    .section-title span{color:var(--gold-light);font-style:italic;}
+    .divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:24px 0;}
+
+    /* BÜYÜK TİMELINE */
+    .big-timeline{margin-bottom:90px;}
+    .timeline-steps{display:flex;flex-direction:column;gap:0;margin-top:50px;}
+    .tl-step{display:grid;grid-template-columns:80px 1fr;gap:32px;align-items:start;padding-bottom:60px;position:relative;}
+    .tl-step:not(:last-child)::after{content:'';position:absolute;left:40px;top:80px;bottom:0;width:1px;background:linear-gradient(180deg,rgba(138,106,26,0.4),rgba(138,106,26,0.05));transform:translateX(-50%);}
+    .tl-dot{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--purple-glow));display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;box-shadow:0 0 30px rgba(138,106,26,0.25);position:relative;}
+    .tl-dot::before{content:'';position:absolute;inset:-5px;border-radius:50%;border:1px solid rgba(138,106,26,0.25);}
+    .tl-content{padding-top:12px;}
+    .tl-step-label{font-family:var(--font-sans);font-size:0.65rem;font-weight:400;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:block;}
+    .tl-title{font-family:var(--font-serif);font-size:1.8rem;font-weight:400;color:var(--white);margin-bottom:16px;line-height:1.2;}
+    .tl-desc{font-family:var(--font-serif);font-size:1.1rem;font-weight:300;color:var(--white-dim);line-height:1.9;margin-bottom:20px;}
+    .tl-tips{list-style:none;display:flex;flex-direction:column;gap:10px;padding:24px;background:rgba(138,106,26,0.04);border:1px solid rgba(138,106,26,0.1);border-radius:var(--radius-md);}
+    .tl-tips li{display:flex;align-items:flex-start;gap:10px;font-family:var(--font-sans);font-size:0.82rem;font-weight:300;color:var(--white-dim);line-height:1.6;}
+    .tl-tips li::before{content:'✦';color:var(--gold);font-size:0.65rem;margin-top:4px;flex-shrink:0;}
+    .tl-time{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-sans);font-size:0.72rem;font-weight:400;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);background:rgba(138,106,26,0.07);border:1px solid rgba(138,106,26,0.2);padding:6px 16px;border-radius:20px;margin-bottom:16px;}
+
+    /* HAZIRLIK LİSTESİ */
+    .prep-section{margin-bottom:80px;}
+    .prep-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:40px;}
+    .prep-card{padding:32px;background:linear-gradient(145deg,rgba(230,224,214,0.8),rgba(245,241,234,0.95));border:1px solid rgba(138,106,26,0.12);border-radius:var(--radius-lg);transition:var(--transition);}
+    .prep-card:hover{transform:translateY(-4px);border-color:rgba(138,106,26,0.3);}
+    .prep-card-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid rgba(138,106,26,0.1);}
+    .prep-icon{font-size:1.8rem;}
+    .prep-title{font-family:var(--font-serif);font-size:1.25rem;font-weight:400;color:var(--white);}
+    .prep-list{list-style:none;display:flex;flex-direction:column;gap:10px;}
+    .prep-list li{display:flex;align-items:flex-start;gap:10px;font-family:var(--font-sans);font-size:0.83rem;font-weight:300;color:var(--white-dim);line-height:1.6;}
+    .prep-list li span.dot{color:var(--gold);font-size:0.7rem;margin-top:4px;flex-shrink:0;}
+
+    /* SORU HAZIRLIĞI */
+    .questions-section{margin-bottom:80px;}
+    .questions-inner{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:start;margin-top:40px;}
+    .q-text p{font-family:var(--font-serif);font-size:1.1rem;font-weight:300;color:var(--white-dim);line-height:1.9;margin-bottom:20px;}
+    .q-text strong{color:var(--gold-light);font-weight:400;}
+    .q-examples{display:flex;flex-direction:column;gap:10px;}
+    .q-chip{font-family:var(--font-sans);font-size:0.8rem;font-weight:300;color:var(--white-dim);padding:10px 16px;background:rgba(138,106,26,0.04);border:1px solid rgba(138,106,26,0.12);border-radius:8px;line-height:1.6;}
+
+    /* ENTEGRASyon */
+    .integration-section{margin-bottom:60px;}
+    .integration-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:40px;}
+    .int-card{padding:28px;background:linear-gradient(145deg,rgba(230,224,214,0.7),rgba(245,241,234,0.9));border:1px solid rgba(124,92,191,0.1);border-radius:var(--radius-lg);transition:var(--transition);}
+    .int-card:hover{transform:translateY(-5px);border-color:rgba(124,92,191,0.3);}
+    .int-icon{font-size:2rem;margin-bottom:12px;display:block;}
+    .int-title{font-family:var(--font-serif);font-size:1.1rem;font-weight:400;color:var(--white);margin-bottom:8px;}
+    .int-desc{font-family:var(--font-sans);font-size:0.82rem;font-weight:300;color:var(--white-dim);line-height:1.7;}
+
+    /* CTA */
+    .page-cta{text-align:center;padding:70px 40px;background:linear-gradient(135deg,rgba(220,213,202,0.6),rgba(235,228,218,0.8));border:1px solid rgba(138,106,26,0.15);border-radius:var(--radius-lg);}
+    .page-cta-title{font-family:var(--font-serif);font-size:clamp(1.8rem,3vw,2.4rem);font-weight:300;color:var(--white);margin-bottom:16px;}
+    .page-cta-title span{color:var(--gold-light);font-style:italic;}
+    .page-cta p{font-family:var(--font-sans);font-size:0.95rem;font-weight:300;color:var(--white-dim);margin-bottom:32px;}
+    .btn-primary{font-family:var(--font-sans);font-size:0.82rem;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:#faf8f5;background:linear-gradient(135deg,var(--gold-light),var(--gold));border:none;padding:16px 42px;border-radius:50px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:var(--transition);box-shadow:0 4px 24px rgba(138,106,26,0.25);}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(138,106,26,0.35);}
+
+    footer{background:rgba(232,226,216,0.95);border-top:1px solid rgba(138,106,26,0.12);padding:40px;text-align:center;}
+    footer p{font-family:var(--font-sans);font-size:0.78rem;font-weight:300;color:rgba(44,37,53,0.45);}
+
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity 0.7s ease,transform 0.7s ease;}
+    .reveal.visible{opacity:1;transform:translateY(0);}
+
+    @media(max-width:900px){
+      .prep-grid,.questions-inner{grid-template-columns:1fr;}
+      .integration-grid{grid-template-columns:repeat(2,1fr);}
+    }
+    @media(max-width:600px){
+      nav{padding:14px 20px;}
+      .page-hero{padding:120px 20px 60px;}
+      main{padding:50px 16px 80px;}
+      .tl-step{grid-template-columns:60px 1fr;gap:20px;}
+      .tl-dot{width:60px;height:60px;font-size:1.2rem;}
+      .integration-grid{grid-template-columns:1fr;}
+    }
+  </style>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    const _fapp = initializeApp({
+      apiKey:"AIzaSyBsAZj0Swtn77HvsGxpsgispuluvIEIcvU",
+      authDomain:"meryemaksoy1-45ce5.firebaseapp.com",
+      projectId:"meryemaksoy1-45ce5",
+      storageBucket:"meryemaksoy1-45ce5.firebasestorage.app",
+      messagingSenderId:"212318615377",
+      appId:"1:212318615377:web:b28387f101a4c42ad34570"
+    });
+    const _fdb = getFirestore(_fapp);
+    async function loadPageContent(pageKey) {
+      try {
+        const snap = await getDoc(doc(_fdb, 'pageContent', pageKey));
+        if (!snap.exists()) return;
+        const d = snap.data();
+        document.querySelectorAll('[data-sc]').forEach(el => {
+          const key = el.dataset.sc;
+          if (d[key] === undefined || d[key] === null || d[key] === '') return;
+          if (el.hasAttribute('data-sc-html')) { el.innerHTML = d[key]; }
+          else if (el.tagName === 'IMG') { el.src = d[key]; el.style.display='block'; }
+          else { el.textContent = d[key]; }
+        });
+        const pp = document.getElementById('profilePhotoEl');
+        if (pp && d.profilePhoto) pp.innerHTML = '<img src="'+d.profilePhoto+'" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" alt="">';
+      } catch(e) { console.warn('pageContent error:', e); }
+    }
+    document.addEventListener('DOMContentLoaded', () => loadPageContent('seans'));
+  </script>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">✦ QHHT & Astroloji</a>
+  <a href="index.html" class="nav-back">← Ana Sayfa</a>
+</nav>
+
+<div class="page-hero">
+  <div>
+    <span class="page-hero-eyebrow" data-sc="heroEyebrow">Süreç</span>
+    <h1 class="page-hero-title" data-sc="heroTitle" data-sc-html>Seans <span>Yolculuğu</span></h1>
+    <p class="page-hero-sub" data-sc="heroSub">İlk temastan seansın tamamlanmasına kadar her adımda güvenli ve destekleyici bir alan sizin için hazır.</p>
+  </div>
+  <span class="hero-deco">📅</span>
+</div>
+
+<main>
+
+  <!-- ANA TİMELİNE -->
+  <div class="big-timeline reveal">
+    <span class="section-label">Adım Adım</span>
+    <h2 class="section-title">Seans Öncesi, <span>Sırası ve Sonrası</span></h2>
+    <div class="divider"></div>
+
+    <div class="timeline-steps">
+
+      <div class="tl-step">
+        <div class="tl-dot">📅</div>
+        <div class="tl-content">
+          <span class="tl-step-label">Adım 01</span>
+          <span class="tl-time">İletişim & Planlama</span>
+          <h3 class="tl-title">Rezervasyon</h3>
+          <p class="tl-desc">İletişim formu, WhatsApp veya e-posta üzerinden ulaşın. Size uygun tarih, saat ve format (online / yüz yüze) birlikte belirlenir. Ön ödeme onaylandıktan sonra takvim kaydı yapılır ve hazırlık bilgileri gönderilir.</p>
+          <ul class="tl-tips">
+            <li>Online seanslar Zoom veya Google Meet üzerinden gerçekleştirilir.</li>
+            <li>Yüz yüze seanslar İstanbul'da yapılmaktadır; adres bilgisi rezervasyon sonrası paylaşılır.</li>
+            <li>QHHT seansları için sabah saatleri önerilir; beyin Theta durumuna daha kolay geçer.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-step">
+        <div class="tl-dot">📋</div>
+        <div class="tl-content">
+          <span class="tl-step-label">Adım 02</span>
+          <span class="tl-time">1–2 Gün Önce</span>
+          <h3 class="tl-title">Hazırlık</h3>
+          <p class="tl-desc">Seans öncesi kendinizi hazırlamak süreci derinleştirir. Sormak istediğiniz soruları yazılı olarak hazırlayın. Yaşam hikâyenizi, önemli ilişkileri ve tekrar eden örüntüleri kısaca gözden geçirin.</p>
+          <ul class="tl-tips">
+            <li>Seans günü yeterince uyuyun; yorgunluk Theta girişini zorlaştırır.</li>
+            <li>Ağır yemek yemekten kaçının; hafif, sağlıklı beslenin.</li>
+            <li>Alkol ve rekreasyonel madde kullanmayın.</li>
+            <li>Rahat, sizi sıkmayan kıyafetler tercih edin.</li>
+            <li>Zihninizi merak ve açıklık ile hazırlayın; beklenti değil niyet belirleyin.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-step">
+        <div class="tl-dot">🗣️</div>
+        <div class="tl-content">
+          <span class="tl-step-label">Adım 03</span>
+          <span class="tl-time">1 – 2 Saat</span>
+          <h3 class="tl-title">Ön Görüşme</h3>
+          <p class="tl-desc">Seans güvenli bir konuşmayla başlar. Yaşam hikâyenizi, önemli anları, sorunları ve niyetinizi paylaşırsınız. Bu aşama hipnoz için zemin hazırlar; ne kadar dürüst ve açık olursanız regresyon o kadar derinleşir.</p>
+          <ul class="tl-tips">
+            <li>Hazırladığınız soruları bu aşamada gözden geçiririz.</li>
+            <li>Seans nasıl işleyecek, neler yaşanabilir — tüm süreç açıklanır.</li>
+            <li>Endişelerinizi paylaşmaktan çekinmeyin; her soru geçerlidir.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-step">
+        <div class="tl-dot">🌀</div>
+        <div class="tl-content">
+          <span class="tl-step-label">Adım 04</span>
+          <span class="tl-time">2 – 3 Saat</span>
+          <h3 class="tl-title">Hipnotik Regresyon & Yüksek Benlik</h3>
+          <p class="tl-desc">Rehberli bir meditasyonla Theta bilinç durumuna girilir. Bilinçaltı size o an için en uygun sahneyi gösterir — bir geçmiş yaşam, sembolik imgeler ya da doğrudan bilgi alışverişi. Ardından Yüksek Benlik ile diyalog kurularak sorularınız cevaplanır.</p>
+          <ul class="tl-tips">
+            <li>Tüm seans ses kaydı alınır; kopyası size teslim edilir.</li>
+            <li>"Doğru" yaşamak için çaba harcamayın; akan her şeye izin verin.</li>
+            <li>Ne hissediyorsanız paylaşın — "hayal gördüm" diye düşünsünüz de paylaşın.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-step">
+        <div class="tl-dot">🌱</div>
+        <div class="tl-content">
+          <span class="tl-step-label">Adım 05</span>
+          <span class="tl-time">Seans Sonrası</span>
+          <h3 class="tl-title">Değerlendirme & Entegrasyon</h3>
+          <p class="tl-desc">Seans sona erdiğinde birlikte kısa bir değerlendirme yapılır. Seans kaydı 24 saat içinde paylaşılır. Sonraki 48 saat içinde kontrol mesajı gönderilir; sorularınız varsa yanıtlanır.</p>
+          <ul class="tl-tips">
+            <li>Seans sonrası istirahat edin; ağır programa girmeyin.</li>
+            <li>Bol su için ve doğada vakit geçirin.</li>
+            <li>Kaydı birkaç kez dinleyin — her dinlemede yeni katmanlar açılır.</li>
+            <li>Günlük tutmak entegrasyon sürecini güçlendirir.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- HAZIRLIK LİSTELERİ -->
+  <div class="prep-section reveal">
+    <span class="section-label">Ne Getirmelisiniz?</span>
+    <h2 class="section-title">Hazırlık <span>Listesi</span></h2>
+    <div class="divider"></div>
+    <div class="prep-grid">
+      <div class="prep-card">
+        <div class="prep-card-header">
+          <span class="prep-icon">🧘</span>
+          <h3 class="prep-title">QHHT Seansı İçin</h3>
+        </div>
+        <ul class="prep-list">
+          <li><span class="dot">✦</span>Yazılı soru listesi (en az 5, en fazla 15 soru)</li>
+          <li><span class="dot">✦</span>Rahat, sıkmayan kıyafetler</li>
+          <li><span class="dot">✦</span>Su şişesi ve hafif atıştırmalık</li>
+          <li><span class="dot">✦</span>Yeterli uyku (en az 7 saat)</li>
+          <li><span class="dot">✦</span>Boş mide ya da hafif öğün</li>
+          <li><span class="dot">✦</span>4–6 saatlik boş zaman; seans sonrası randevu koymayın</li>
+          <li><span class="dot">✦</span>Merak ve açık yüreklilik ✨</li>
+        </ul>
+      </div>
+      <div class="prep-card">
+        <div class="prep-card-header">
+          <span class="prep-icon">🔭</span>
+          <h3 class="prep-title">Astroloji Seansı İçin</h3>
+        </div>
+        <ul class="prep-list">
+          <li><span class="dot">✦</span>Kesin doğum tarihi (gün/ay/yıl)</li>
+          <li><span class="dot">✦</span>Kesin doğum saati (ne kadar kesin, o kadar iyi)</li>
+          <li><span class="dot">✦</span>Doğum şehri ve ülkesi</li>
+          <li><span class="dot">✦</span>Odaklanmak istediğiniz konular (kariyer, ilişki, ruh amacı vs.)</li>
+          <li><span class="dot">✦</span>Sinastri için ikinci kişinin doğum bilgileri</li>
+          <li><span class="dot">✦</span>Seans kaydını alabileceğiniz platform (e-posta vs.)</li>
+          <li><span class="dot">✦</span>Not alacak kalem + defter 📝</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SORU HAZIRLIĞI -->
+  <div class="questions-section reveal">
+    <span class="section-label">QHHT için</span>
+    <h2 class="section-title">Sorularınızı <span>Nasıl Hazırlarsınız?</span></h2>
+    <div class="divider"></div>
+    <div class="questions-inner">
+      <div class="q-text">
+        <p>QHHT seansında Yüksek Benlik ile doğrudan diyalog kurulur. Bu fırsat, hayatınızda gerçekten anlamak istediğiniz her şeyi sorma şansıdır. <strong>Sorularınızı korkusuzca ve dürüstçe hazırlayın.</strong></p>
+        <p>Soru sayısı 5 ile 15 arasında tutulması önerilir. Çok fazla soru süreci dağıtabilir; çok az soru ise potansiyeli sınırlar. Sorular öncelik sırasına göre yazılı olarak getirilmeli, ancak seans sırasında kendiliğinden gelişen sorular da eklenebilir.</p>
+        <p>En derin, en <strong>"utanç verici"</strong>, en uzun süredir merak ettiğiniz soruları sormaktan çekinmeyin. Yüksek Benlik yargılamaz.</p>
+      </div>
+      <div>
+        <p style="font-family:var(--font-sans);font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;">Örnek soru kategorileri</p>
+        <div class="q-examples">
+          <div class="q-chip">🏥 Neden bu hastalık / bu ağrı / bu semptom var?</div>
+          <div class="q-chip">💞 Bu ilişkiyle bağım neden bu kadar güçlü / yıkıcı?</div>
+          <div class="q-chip">🎯 Bu yaşamda gerçek amacım ve misyonum ne?</div>
+          <div class="q-chip">😨 Bu korkum / fobim nereden geliyor?</div>
+          <div class="q-chip">🔄 Neden aynı durumu tekrar tekrar yaşıyorum?</div>
+          <div class="q-chip">🌍 Hangi gezegen / yaşam döneminde kimleydim?</div>
+          <div class="q-chip">💡 Bu kararı vermeli miyim, nasıl ilerlemeliyim?</div>
+          <div class="q-chip">🌟 Bu yaşamda gerçekten mutlu olmam mümkün mü?</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENTEGRASYON -->
+  <div class="integration-section reveal">
+    <span class="section-label">Seans Sonrası</span>
+    <h2 class="section-title">Entegrasyon <span>Süreci</span></h2>
+    <div class="divider"></div>
+    <div class="integration-grid">
+      <div class="int-card">
+        <span class="int-icon">🎧</span>
+        <h3 class="int-title">Kaydı Dinleyin</h3>
+        <p class="int-desc">Seans kaydını ilk haftada en az 2–3 kez dinleyin. Her dinlemede yeni detaylar fark edilir ve entegrasyon derinleşir.</p>
+      </div>
+      <div class="int-card">
+        <span class="int-icon">📓</span>
+        <h3 class="int-title">Günlük Tutun</h3>
+        <p class="int-desc">Rüyalarınızı, seans sonrası gelen içgörüleri ve değişimleri günlüğe not edin. Bu pratik dönüşümü somutlaştırır.</p>
+      </div>
+      <div class="int-card">
+        <span class="int-icon">💧</span>
+        <h3 class="int-title">Dinlenin & Beslenin</h3>
+        <p class="int-desc">İlk 48 saat seans enerjisinin yerleşmesi için kritik. Bol su, hafif yemek ve doğa yürüyüşü önerilir.</p>
+      </div>
+      <div class="int-card">
+        <span class="int-icon">🌿</span>
+        <h3 class="int-title">Sabır Gösterin</h3>
+        <p class="int-desc">Bazı değişimler anlık, bazıları haftalar hatta aylar içinde kendini gösterir. Sürece güvenin.</p>
+      </div>
+      <div class="int-card">
+        <span class="int-icon">💬</span>
+        <h3 class="int-title">Destek Mesajı</h3>
+        <p class="int-desc">Seans sonrası 48 saat içinde kontrol mesajı alırsınız. Sorunuzu ya da deneyiminizi paylaşabilirsiniz.</p>
+      </div>
+      <div class="int-card">
+        <span class="int-icon">🔄</span>
+        <h3 class="int-title">Takip Seansı</h3>
+        <p class="int-desc">Belirli konuları derinleştirmek isterseniz takip seansı planlanabilir. Bu tamamen isteğe bağlı.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="page-cta reveal">
+    <h2 class="page-cta-title">Yolculuğa <span>Başlamaya Hazır mısınız?</span></h2>
+    <p>İlk adımı atmak için iletişim formu ya da WhatsApp yeterli.</p>
+    <a href="index.html#iletisim" class="btn-primary">✦ Randevu Al</a>
+  </div>
+
+</main>
+
+<footer>
+  <p>© 2025 Tüm hakları saklıdır. ✦ QHHT & Astroloji</p>
+</footer>
+
+<script>
+  const revealEls=document.querySelectorAll('.reveal');
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach((e,i)=>{
+      if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*80);obs.unobserve(e.target);}
+    });
+  },{threshold:0.08});
+  revealEls.forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
