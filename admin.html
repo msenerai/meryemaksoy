@@ -83,7 +83,7 @@
       'igPost1Url','igPost1Label','igPost2Url','igPost2Label','igPost3Url','igPost3Label',
       'igPost4Url','igPost4Label','igPost5Url','igPost5Label','igPost6Url','igPost6Label',
       'ytVideo1Url','ytVideo1Label','ytVideo2Url','ytVideo2Label','ytVideo3Url','ytVideo3Label','ytVideo4Url','ytVideo4Label',
-      'email','whatsapp','location','footerCopy'];
+      'email','whatsapp','phone','location','footerCopy'];
     const DEFAULTS={navLogo:'QHHT & Astroloji',heroEyebrow:'QHHT & Astroloji',heroTitle:'Ruhsal Yolculuğunu Keşfet',
       heroSubtitle:'QHHT Seansları ve Astrolojik Danışmanlık ile Bilinçaltına Yolculuk.',
       aboutName:'QHHT Uzmanı & Astrolog',aboutTitle:'İstanbul, Türkiye',
@@ -91,7 +91,7 @@
       aboutText1:'Hayatımın en zorlu dönemlerinde bilinçaltının şifa gücüyle tanıştım.',
       aboutText2:'Dolores Cannon metodolojisini derinlemesine öğrenerek QHHT Level II sertifikasını tamamladım.',
       stat1Number:'500+',stat1Label:'QHHT Seansı',stat2Number:'1200+',stat2Label:'Harita Analizi',stat3Number:'10+',stat3Label:'Yıl Deneyim',
-      email:'info@elifyildiz.com',whatsapp:'0533 415 49 82',location:'İstanbul, Türkiye (Online seanslar dünya geneli)',
+      email:'info@elifyildiz.com',whatsapp:'0533 415 49 82',phone:'',location:'İstanbul, Türkiye (Online seanslar dünya geneli)',
       footerCopy:'© 2025 Tüm hakları saklıdır. ✦ QHHT & Astroloji',
       instagramHandle:'',instagramUrl:'',youtubeHandle:'',youtubeUrl:'',
       igPost1Url:'',igPost1Label:'Ay & Burçlar',igPost2Url:'',igPost2Label:'QHHT Deneyimi',
@@ -110,12 +110,25 @@
         SC_FIELDS.forEach(f=>{const el=document.getElementById('sc_'+f);if(el&&d[f]!==undefined&&d[f]!==null&&d[f]!=='')el.value=d[f];});
         if(d.heroBg?.trim()){const p=document.getElementById('prev_heroBg');if(p){p.src=d.heroBg;p.style.display='block';}}
         if(d.profilePhoto?.trim()){const p=document.getElementById('prev_pp');if(p){p.src=d.profilePhoto;p.style.display='block';}}
+        /* certItems */
+        if(d.certItems && Array.isArray(d.certItems)){
+          const el=document.getElementById('sc_certItems');
+          if(el) el.value=d.certItems.map(i=>(i.icon||'')+'|'+(i.text||'')).join('\n');
+        }
         if(statusEl){statusEl.textContent=snap.exists()?'✓ Firestore\'dan yüklendi — '+new Date().toLocaleTimeString('tr-TR'):'⚠ Varsayılanlar gösteriliyor';statusEl.style.color=snap.exists()?'#38a169':'#d69e2e';}
       }catch(e){if(statusEl){statusEl.textContent='✕ '+e.message;statusEl.style.color='#e53e3e';}}
     }
     window._saveSite=async function(btnId){
       const btn=document.getElementById(btnId||'saveSiteBtn');btn.textContent='…';btn.disabled=true;
       try{const data={};SC_FIELDS.forEach(f=>{const el=document.getElementById('sc_'+f);if(el)data[f]=el.value.trim();});
+        /* certItems parse */
+        const certEl=document.getElementById('sc_certItems');
+        if(certEl){
+          data.certItems=certEl.value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{
+            const sep=l.indexOf('|');
+            return sep>=0?{icon:l.slice(0,sep).trim(),text:l.slice(sep+1).trim()}:{icon:'✦',text:l};
+          });
+        }
         await setDoc(doc(db,'siteContent','main'),{...data,updatedAt:serverTimestamp()},{merge:true});toast('✦ Kaydedildi');}
       catch(e){toast(e.message,true);}finally{btn.textContent='Kaydet';btn.disabled=false;}
     };
@@ -144,12 +157,24 @@
       try{
         const snap=await getDocs(query(collection(db,'appointments'),orderBy('createdAt','desc')));
         if(snap.empty){list.innerHTML='<p class="empty">Henüz randevu yok.</p>';return;}
-        list.innerHTML='';
+        list.innerHTML='<div class="appt-table-wrap"><table class="appt-table"><thead><tr><th>Ad Soyad</th><th>E-posta</th><th>Telefon</th><th>Hizmet</th><th>Mesaj</th><th>Tarih</th><th>Durum</th><th>İşlem</th></tr></thead><tbody id="apptTbody"></tbody></table></div>';
+        const tbody=document.getElementById('apptTbody');
         snap.forEach(d=>{
-          const a=d.data(),dt=a.createdAt?.toDate?a.createdAt.toDate().toLocaleString('tr-TR'):'—';
-          const card=document.createElement('div');card.className='dcard '+(a.status==='read'?'ok':'wait');
-          card.innerHTML=`<div class="dcard-top"><div class="dcard-name">${a.firstName||''} ${a.lastName||''} <span class="pill ${a.status==='read'?'pill-g':'pill-y'}">${a.status==='read'?'Okundu':'Yeni'}</span></div><div class="dcard-meta">${a.email||''} · ${dt}</div></div><p class="dcard-body"><strong>${a.service||'—'}</strong> — ${a.message||''}</p><div class="dcard-actions">${a.status!=='read'?`<button class="abtn abtn-g" onclick="markRead('${d.id}',this)">✓ Okundu</button>`:''}<button class="abtn abtn-r" onclick="deleteA('${d.id}',this)">✕ Sil</button></div>`;
-          list.appendChild(card);});
+          const a=d.data(),dt=a.createdAt?.toDate?a.createdAt.toDate().toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
+          const isNew=a.status!=='read';
+          const tr=document.createElement('tr');
+          tr.className=isNew?'appt-row-new':'';
+          tr.innerHTML=
+            '<td class="appt-name">'+(a.firstName||'')+' '+(a.lastName||'')+'</td>'+
+            '<td class="appt-email"><a href="mailto:'+(a.email||'')+'">'+(a.email||'—')+'</a></td>'+
+            '<td class="appt-phone">'+(a.phone?'<a href="tel:'+a.phone+'">'+a.phone+'</a>':'—')+'</td>'+
+            '<td class="appt-service">'+(a.service||'—')+'</td>'+
+            '<td class="appt-msg-cell">'+(a.message||'')+'</td>'+
+            '<td class="appt-date">'+dt+'</td>'+
+            '<td><span class="pill '+(isNew?'pill-y':'pill-g')+'">'+(isNew?'Yeni':'Okundu')+'</span></td>'+
+            '<td class="appt-actions">'+(isNew?'<button class="abtn abtn-g" onclick="markRead(\''+d.id+'\',this)">✓ Okundu</button>':'')+'<button class="abtn abtn-r" onclick="deleteA(\''+d.id+'\',this)">✕ Sil</button></td>';
+          tbody.appendChild(tr);
+        });
       }catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}
     }
     window.markRead=async(id,btn)=>{btn.disabled=true;await updateDoc(doc(db,'appointments',id),{status:'read'});loadAppointments();toast('Okundu işaretlendi');};
@@ -485,6 +510,25 @@
     .toast{position:fixed;bottom:20px;right:20px;background:#1a1628;color:#f0ece4;padding:9px 18px;border-radius:6px;font-size:.76rem;z-index:999;opacity:0;transform:translateY(8px);transition:all .22s;pointer-events:none;}
     .toast.show{opacity:1;transform:none;}.toast.err{background:#c53030;}
     @media(max-width:640px){#app{grid-template-columns:1fr;}.sb{display:none;}.g2,.g3{grid-template-columns:1fr;}}
+
+    /* ── RANDEVU TABLOSU ──────────────────────────────────────── */
+    .appt-table-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border);}
+    .appt-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+    .appt-table thead tr{background:#f0ece4;border-bottom:2px solid var(--border);}
+    .appt-table th{padding:9px 12px;text-align:left;font-size:.62rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);white-space:nowrap;}
+    .appt-table td{padding:10px 12px;border-bottom:1px solid rgba(138,106,26,.08);vertical-align:top;}
+    .appt-table tbody tr:last-child td{border-bottom:none;}
+    .appt-table tbody tr:hover{background:rgba(138,106,26,.03);}
+    .appt-row-new{background:rgba(254,252,191,.25);}
+    .appt-row-new:hover{background:rgba(254,252,191,.45) !important;}
+    .appt-name{font-weight:600;font-size:.88rem;color:var(--text);white-space:nowrap;}
+    .appt-email a,.appt-phone a{font-size:.9rem;font-weight:500;color:var(--gold);text-decoration:none;white-space:nowrap;}
+    .appt-email a:hover,.appt-phone a:hover{text-decoration:underline;}
+    .appt-email,.appt-phone{font-size:.9rem;}
+    .appt-service{font-size:.8rem;color:#555;white-space:nowrap;}
+    .appt-date{font-size:.75rem;color:var(--muted);white-space:nowrap;}
+    .appt-msg-cell{font-size:.8rem;color:#666;font-style:italic;max-width:220px;line-height:1.5;}
+    .appt-actions{display:flex;gap:5px;white-space:nowrap;}
   </style>
 </head>
 <body>
@@ -545,12 +589,13 @@
         <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📷</span>Profil Fotoğrafı</h3><span class="arr">▾</span></div><div class="cb"><div class="irow"><img id="prev_pp" class="iprev circ" alt="" /><input type="file" id="f_pp" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('f_pp','prev_pp','sc_profilePhoto',this)">Yükle</button></div><div class="fg"><label>URL</label><input type="text" id="sc_profilePhoto" placeholder="https://..." /></div></div></div>
         <div class="card"><div class="ch" onclick="tog(this)"><h3><span>👤</span>Profil Bilgileri</h3><span class="arr">▾</span></div><div class="cb"><div class="g2"><div class="fg"><label>İsim / Unvan</label><input type="text" id="sc_aboutName" /></div><div class="fg"><label>Konum</label><input type="text" id="sc_aboutTitle" /></div></div><div class="fg"><label>Alıntı</label><textarea id="sc_aboutQuote"></textarea></div><div class="fg"><label>1. Paragraf (HTML)</label><textarea id="sc_aboutText1"></textarea></div><div class="fg"><label>2. Paragraf (HTML)</label><textarea id="sc_aboutText2"></textarea></div></div></div>
         <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📊</span>İstatistikler</h3><span class="arr">▾</span></div><div class="cb"><div class="g3"><div><div class="fg"><label>1. Sayı</label><input type="text" id="sc_stat1Number" /></div><div class="fg"><label>1. Etiket</label><input type="text" id="sc_stat1Label" /></div></div><div><div class="fg"><label>2. Sayı</label><input type="text" id="sc_stat2Number" /></div><div class="fg"><label>2. Etiket</label><input type="text" id="sc_stat2Label" /></div></div><div><div class="fg"><label>3. Sayı</label><input type="text" id="sc_stat3Number" /></div><div class="fg"><label>3. Etiket</label><input type="text" id="sc_stat3Label" /></div></div></div></div></div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>🎓</span>Sertifikalar & Eğitimler</h3><span class="arr">▾</span></div><div class="cb"><div class="fg"><label>Sertifika Listesi</label><textarea id="sc_certItems" style="min-height:160px;font-family:monospace;font-size:.82rem;" placeholder="Her satıra bir madde. Format: emoji|metin&#10;Örnek:&#10;🎓|QHHT Level II Sertifikası — Dolores Cannon&#10;⭐|Karmik Astroloji Uzmanlığı&#10;🌙|Vedik Astroloji Temel Eğitimi&#10;🔮|Transpersonal Psikoloji Sertifikası&#10;✦|10+ Yıl Uygulayıcı Deneyim"></textarea><p class="help-text">Her satır bir madde. Başına emoji, ardından <code>|</code>, sonra metin. Örnek: <code>🎓|QHHT Level II Sertifikası</code></p></div></div></div>
         <button class="btn-save" id="saveAboutBtn" onclick="_saveSite('saveAboutBtn')">✦ Kaydet</button>
       </div>
 
       <!-- İLETİŞİM -->
       <div class="panel" id="p_iletisim">
-        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📬</span>İletişim Bilgileri</h3><span class="arr">▾</span></div><div class="cb"><div class="g2"><div class="fg"><label>E-posta</label><input type="email" id="sc_email" /></div><div class="fg"><label>WhatsApp</label><input type="text" id="sc_whatsapp" /></div></div><div class="fg"><label>Konum</label><input type="text" id="sc_location" /></div></div></div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📬</span>İletişim Bilgileri</h3><span class="arr">▾</span></div><div class="cb"><div class="g2"><div class="fg"><label>E-posta</label><input type="email" id="sc_email" /></div><div class="fg"><label>WhatsApp</label><input type="text" id="sc_whatsapp" /></div></div><div class="fg"><label>Telefon</label><input type="tel" id="sc_phone" placeholder="Örn: +90 533 415 49 82" /><p class="help-text">Dolu olursa sitede "Telefon" satırı görünür.</p></div><div class="fg"><label>Konum</label><input type="text" id="sc_location" /></div></div></div>
         <button class="btn-save" id="saveContactBtn" onclick="_saveSite('saveContactBtn')">✦ Kaydet</button>
       </div>
 
