@@ -1,6 +1,91 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+  <!-- Schema 1: Hizmet Kataloğu -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Astroloji Danışmanlığı",
+  "serviceType": "Astrolojik Danışmanlık",
+  "description": "Doğum haritası analizi, sinastri, yıllık öngörü, karmik astroloji ve meslek göstergeleri hizmetleri. Batı ve Vedik astroloji geleneklerini harmanlayan bütüncül bir yaklaşımla, her danışanın özgün ruhsal yolunu ortaya çıkarmak için çalışılır.",
+  "url": "https://ageofvibration.com/astroloji.html",
+  "provider": {
+    "@type": "Person",
+    "name": "Age of Vibration",
+    "url": "https://ageofvibration.com"
+  },
+  "availableChannel": {
+    "@type": "ServiceChannel",
+    "serviceType": "Online",
+    "availableLanguage": ["Turkish", "English"],
+    "serviceUrl": "https://ageofvibration.com/#iletisim"
+  },
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Astroloji Hizmetleri",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Doğum Haritası Analizi",
+          "description": "90 dakika kapsamlı doğum haritası analizi. Güçlü yanlar, yetenekler ve engeller. Yazılı rapor dahil.",
+          "url": "https://ageofvibration.com/dogumharitasianalizi.html"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "İlişki Uyumu — Sinastri",
+          "description": "75 dakika sinastri ve kompozit harita analizi. Sağlıklı ilişki dinamikleri rehberliği.",
+          "url": "https://ageofvibration.com/sinastri.html"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Yıllık Öngörü",
+          "description": "60 dakika solar dönüş haritası ve transit analizi. Önümüzdeki 12 ay.",
+          "url": "https://ageofvibration.com/yillikongoru.html"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Karmik Astroloji",
+          "description": "90 dakika Kuzey/Güney Düğüm ve Chiron analizi. Ruhsal amaç ve geçmiş yaşam örüntüleri.",
+          "url": "https://ageofvibration.com/karmikastroloji.html"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Meslek Göstergeleri",
+          "description": "60 dakika 10. ev, MC, Saturn ve kariyer analizi.",
+          "url": "https://ageofvibration.com/meslekgostergeleri.html"
+        }
+      }
+    ]
+  }
+}
+</script>
+
+<!-- Schema 2: BreadcrumbList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://ageofvibration.com" },
+    { "@type": "ListItem", "position": 2, "name": "Astroloji", "item": "https://ageofvibration.com/astroloji.html" }
+  ]
+}
+</script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Astroloji Hizmetleri | QHHT & Astroloji</title>
@@ -394,4 +479,5 @@
   revealEls.forEach(el=>obs.observe(el));
 </script>
 </body>
+
 </html>
