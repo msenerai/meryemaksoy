@@ -1,6 +1,104 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+  <!-- Schema 1: Hizmet -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "QHHT Seansı",
+  "alternateName": "Quantum Healing Hypnosis Technique",
+  "serviceType": "Bilinçaltı Regresyon Terapisi",
+  "description": "Dolores Cannon tarafından 50 yılı aşkın araştırmanın ürünü olarak geliştirilen QHHT yöntemiyle derin hipnoz aracılığıyla geçmiş yaşamları keşfetme, hastalıkların ve engellerin kökünü anlama ve Yüksek Benlik ile iletişim kurma seansı. Seans 4-6 saat sürer ve ses kaydı teslim edilir.",
+  "url": "https://ageofvibration.com/qhht.html",
+  "provider": {
+    "@type": "Person",
+    "name": "Age of Vibration",
+    "url": "https://ageofvibration.com",
+    "telephone": "+905334154982",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "İstanbul",
+      "addressCountry": "TR"
+    }
+  },
+  "areaServed": [
+    { "@type": "Country", "name": "Türkiye" },
+    { "@type": "AdministrativeArea", "name": "Online — Dünya Geneli" }
+  ],
+  "availableChannel": {
+    "@type": "ServiceChannel",
+    "serviceType": "Online ve Yüz Yüze",
+    "availableLanguage": ["Turkish", "English"],
+    "serviceUrl": "https://ageofvibration.com/#iletisim"
+  },
+  "offers": {
+    "@type": "Offer",
+    "availability": "https://schema.org/InStock",
+    "url": "https://ageofvibration.com/qhht.html",
+    "priceCurrency": "TRY"
+  },
+  "termsOfService": "https://ageofvibration.com/#sss",
+  "category": "Terapi & Ruhsal Danışmanlık"
+}
+</script>
+
+<!-- Schema 2: HowTo — Seans Adımları -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "QHHT Seans Süreci Nasıl İşler?",
+  "description": "Quantum Healing Hypnosis Technique seansının adım adım süreci.",
+  "totalTime": "PT6H",
+  "tool": [
+    { "@type": "HowToTool", "name": "Ses kayıt cihazı" },
+    { "@type": "HowToTool", "name": "Rahat uzanma alanı" }
+  ],
+  "step": [
+    {
+      "@type": "HowToStep",
+      "position": 1,
+      "name": "Ön Görüşme",
+      "text": "Danışanın niyeti, soruları ve geçmişi dinlenir. Güvenli ve açık bir alan yaratılır. Ortalama 1–2 saat sürer.",
+      "url": "https://ageofvibration.com/qhht.html#on-gorusme"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 2,
+      "name": "Hipnotik Regresyon",
+      "text": "Theta dalga durumuna ulaşıldığında danışan geçmiş yaşamlara veya önemli anlara yolculuk eder. Bu aşama 2–3 saat sürer.",
+      "url": "https://ageofvibration.com/qhht.html#hipnotik-regresyon"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 3,
+      "name": "Bilinçaltı İletişimi",
+      "text": "Yüksek Benlik ile diyalog kurularak danışanın tüm soruları cevaplanır ve şifa talep edilir.",
+      "url": "https://ageofvibration.com/qhht.html#bilinc-alti-iletisimi"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 4,
+      "name": "Şifa ve Entegrasyon",
+      "text": "Seans sonrası entegrasyon desteği sağlanır. Ses kaydı danışana teslim edilir. Kaydı dinledikçe dönüşüm derinleşir ve yaşama yansır.",
+      "url": "https://ageofvibration.com/qhht.html#sifa-sureci"
+    }
+  ]
+}
+</script>
+
+<!-- Schema 3: BreadcrumbList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://ageofvibration.com" },
+    { "@type": "ListItem", "position": 2, "name": "QHHT", "item": "https://ageofvibration.com/qhht.html" }
+  ]
+}
+</script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>QHHT Nedir? | QHHT & Astroloji</title>
@@ -368,4 +466,5 @@
   revealEls.forEach(el=>obs.observe(el));
 </script>
 </body>
+
 </html>
