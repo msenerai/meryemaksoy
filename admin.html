@@ -77,261 +77,241 @@
       loadSiteContent();
       loadReviews(); loadReviewsEN();
       loadAppointments(); loadAppointmentsEN();
-      loadBlogPosts(); loadBlogPostsEN();
+      loadBlogPosts();
       loadIgPosts(); loadYtPosts();
     }
 
     /* ════════════════════════════════════════════════════════
-       SİTE İÇERİĞİ — TR: siteContent/main  |  EN: siteContentEN/main
+       SİTE İÇERİĞİ
        ════════════════════════════════════════════════════════ */
     const TR_FIELDS=['navLogo','heroBg','heroEyebrow','heroTitle','heroSubtitle',
       'aboutName','aboutTitle','profilePhoto','aboutQuote','aboutText1','aboutText2',
       'stat1Number','stat1Label','stat2Number','stat2Label','stat3Number','stat3Label',
       'instagramUrl','instagramHandle','youtubeUrl','youtubeHandle',
       'email','whatsapp','phone','location','footerCopy'];
-
-    const EN_FIELDS=['navLogo','heroBg','heroEyebrow','heroTitle','heroSubtitle',
-      'aboutName','aboutTitle','profilePhoto','aboutQuote','aboutText1','aboutText2',
-      'stat1Number','stat1Label','stat2Number','stat2Label','stat3Number','stat3Label',
-      'instagramUrl','instagramHandle','youtubeUrl','youtubeHandle',
-      'email','whatsapp','phone','location','footerCopy'];
-
+    const EN_FIELDS=[...TR_FIELDS];
     const TR_DEF={navLogo:'QHHT & Astroloji',heroEyebrow:'QHHT & Astroloji',heroTitle:'Ruhsal Yolculuğunu Keşfet',heroSubtitle:'QHHT Seansları ve Astrolojik Danışmanlık ile Bilinçaltına Yolculuk.',aboutName:'QHHT Uzmanı & Astrolog',aboutTitle:'İstanbul, Türkiye',aboutQuote:'"Her bilinç biriciktir; yıldız haritanız sizin ruhsal parmak izinizdir."',aboutText1:'Hayatımın en zorlu dönemlerinde bilinçaltının şifa gücüyle tanıştım.',aboutText2:'Dolores Cannon metodolojisini derinlemesine öğrenerek QHHT Level II sertifikasını tamamladım.',stat1Number:'500+',stat1Label:'QHHT Seansı',stat2Number:'1200+',stat2Label:'Harita Analizi',stat3Number:'10+',stat3Label:'Yıl Deneyim',email:'info@elifyildiz.com',whatsapp:'0533 415 49 82',phone:'',location:'İstanbul, Türkiye (Online seanslar dünya geneli)',footerCopy:'© 2025 Tüm hakları saklıdır. ✦ QHHT & Astroloji',instagramHandle:'',instagramUrl:'',youtubeHandle:'',youtubeUrl:'',heroBg:'',profilePhoto:''};
-
     const EN_DEF={navLogo:'QHHT & Astrology',heroEyebrow:'QHHT & Astrology',heroTitle:'Discover Your<br><span>Spiritual Path</span>',heroSubtitle:'Journey into your subconscious through QHHT Sessions and Astrological Consultations.',aboutName:'QHHT Expert & Astrologer',aboutTitle:'Istanbul, Turkey',aboutQuote:'"Every consciousness is unique; your star chart is your soul\'s fingerprint."',aboutText1:'During the most challenging period of my life, I discovered the healing power of the subconscious mind.',aboutText2:'I completed the QHHT Level II certification after deeply studying Dolores Cannon\'s methodology.',stat1Number:'500+',stat1Label:'QHHT Sessions',stat2Number:'1200+',stat2Label:'Chart Readings',stat3Number:'10+',stat3Label:'Years Experience',email:'info@elifyildiz.com',whatsapp:'+90 533 415 49 82',phone:'',location:'Istanbul, Turkey<br>(Online sessions available worldwide)',footerCopy:'© 2025 All rights reserved. ✦ QHHT & Astrology',instagramHandle:'',instagramUrl:'',youtubeHandle:'',youtubeUrl:'',heroBg:'',profilePhoto:''};
 
     async function loadSiteContent(){
       const st=document.getElementById('loadStatus');
-      /* defaults */
       TR_FIELDS.forEach(f=>{const el=document.getElementById('tr_'+f);if(el&&TR_DEF[f]!==undefined)el.value=TR_DEF[f];});
       EN_FIELDS.forEach(f=>{const el=document.getElementById('en_'+f);if(el&&EN_DEF[f]!==undefined)el.value=EN_DEF[f];});
       try{
-        /* TR */
         const trSnap=await getDoc(doc(db,'siteContent','main'));
-        if(trSnap.exists()){
-          const d=trSnap.data();
-          TR_FIELDS.forEach(f=>{const el=document.getElementById('tr_'+f);if(el&&d[f]!=null&&d[f]!=='')el.value=d[f];});
-          if(d.heroBg?.trim()){const p=document.getElementById('tr_prev_heroBg');if(p){p.src=d.heroBg;p.style.display='block';}}
-          if(d.profilePhoto?.trim()){const p=document.getElementById('tr_prev_pp');if(p){p.src=d.profilePhoto;p.style.display='block';}}
-          if(d.certItems&&Array.isArray(d.certItems)){const el=document.getElementById('tr_certItems');if(el)el.value=d.certItems.map(i=>(i.icon||'')+'|'+(i.text||'')).join('\n');}
-        }
-        /* EN */
+        if(trSnap.exists()){const d=trSnap.data();TR_FIELDS.forEach(f=>{const el=document.getElementById('tr_'+f);if(el&&d[f]!=null&&d[f]!=='')el.value=d[f];});if(d.heroBg?.trim()){const p=document.getElementById('tr_prev_heroBg');if(p){p.src=d.heroBg;p.style.display='block';}}if(d.profilePhoto?.trim()){const p=document.getElementById('tr_prev_pp');if(p){p.src=d.profilePhoto;p.style.display='block';}}if(d.certItems&&Array.isArray(d.certItems)){const el=document.getElementById('tr_certItems');if(el)el.value=d.certItems.map(i=>(i.icon||'')+'|'+(i.text||'')).join('\n');}}
         const enSnap=await getDoc(doc(db,'siteContentEN','main'));
-        if(enSnap.exists()){
-          const d=enSnap.data();
-          EN_FIELDS.forEach(f=>{const el=document.getElementById('en_'+f);if(el&&d[f]!=null&&d[f]!=='')el.value=d[f];});
-          if(d.heroBg?.trim()){const p=document.getElementById('en_prev_heroBg');if(p){p.src=d.heroBg;p.style.display='block';}}
-          if(d.profilePhoto?.trim()){const p=document.getElementById('en_prev_pp');if(p){p.src=d.profilePhoto;p.style.display='block';}}
-          if(d.certItems&&Array.isArray(d.certItems)){const el=document.getElementById('en_certItems');if(el)el.value=d.certItems.map(i=>(i.icon||'')+'|'+(i.text||'')).join('\n');}
-        }
+        if(enSnap.exists()){const d=enSnap.data();EN_FIELDS.forEach(f=>{const el=document.getElementById('en_'+f);if(el&&d[f]!=null&&d[f]!=='')el.value=d[f];});if(d.heroBg?.trim()){const p=document.getElementById('en_prev_heroBg');if(p){p.src=d.heroBg;p.style.display='block';}}if(d.profilePhoto?.trim()){const p=document.getElementById('en_prev_pp');if(p){p.src=d.profilePhoto;p.style.display='block';}}if(d.certItems&&Array.isArray(d.certItems)){const el=document.getElementById('en_certItems');if(el)el.value=d.certItems.map(i=>(i.icon||'')+'|'+(i.text||'')).join('\n');}}
         if(st){st.textContent='✓ Yüklendi — '+new Date().toLocaleTimeString('tr-TR');st.style.color='#38a169';}
       }catch(e){if(st){st.textContent='✕ '+e.message;st.style.color='#e53e3e';}}
     }
-
-    /* TR kaydet */
     window._saveTR=async function(btnId){
       const btn=document.getElementById(btnId);btn.textContent='…';btn.disabled=true;
-      try{
-        const data={};
-        TR_FIELDS.forEach(f=>{const el=document.getElementById('tr_'+f);if(el)data[f]=el.value.trim();});
-        const certEl=document.getElementById('tr_certItems');
-        if(certEl){data.certItems=certEl.value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{const s=l.indexOf('|');return s>=0?{icon:l.slice(0,s).trim(),text:l.slice(s+1).trim()}:{icon:'✦',text:l};});}
-        await setDoc(doc(db,'siteContent','main'),{...data,updatedAt:serverTimestamp()},{merge:true});
-        toast('✦ TR kaydedildi');
-      }catch(e){toast(e.message,true);}
-      finally{btn.textContent='Kaydet';btn.disabled=false;}
+      try{const data={};TR_FIELDS.forEach(f=>{const el=document.getElementById('tr_'+f);if(el)data[f]=el.value.trim();});const certEl=document.getElementById('tr_certItems');if(certEl){data.certItems=certEl.value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{const s=l.indexOf('|');return s>=0?{icon:l.slice(0,s).trim(),text:l.slice(s+1).trim()}:{icon:'✦',text:l};});}await setDoc(doc(db,'siteContent','main'),{...data,updatedAt:serverTimestamp()},{merge:true});toast('✦ TR kaydedildi');}catch(e){toast(e.message,true);}finally{btn.textContent='Kaydet';btn.disabled=false;}
     };
-
-    /* EN kaydet */
     window._saveEN=async function(btnId){
       const btn=document.getElementById(btnId);btn.textContent='…';btn.disabled=true;
-      try{
-        const data={};
-        EN_FIELDS.forEach(f=>{const el=document.getElementById('en_'+f);if(el)data[f]=el.value.trim();});
-        const certEl=document.getElementById('en_certItems');
-        if(certEl){data.certItems=certEl.value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{const s=l.indexOf('|');return s>=0?{icon:l.slice(0,s).trim(),text:l.slice(s+1).trim()}:{icon:'✦',text:l};});}
-        await setDoc(doc(db,'siteContentEN','main'),{...data,updatedAt:serverTimestamp()},{merge:true});
-        toast('✦ EN kaydedildi');
-      }catch(e){toast(e.message,true);}
-      finally{btn.textContent='Save';btn.disabled=false;}
+      try{const data={};EN_FIELDS.forEach(f=>{const el=document.getElementById('en_'+f);if(el)data[f]=el.value.trim();});const certEl=document.getElementById('en_certItems');if(certEl){data.certItems=certEl.value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{const s=l.indexOf('|');return s>=0?{icon:l.slice(0,s).trim(),text:l.slice(s+1).trim()}:{icon:'✦',text:l};});}await setDoc(doc(db,'siteContentEN','main'),{...data,updatedAt:serverTimestamp()},{merge:true});toast('✦ EN kaydedildi');}catch(e){toast(e.message,true);}finally{btn.textContent='Save';btn.disabled=false;}
     };
 
     /* ════════════════════════════════════════════════════════
-       YORUMLAR  TR: reviews  |  EN: reviewsEN
+       YORUMLAR
        ════════════════════════════════════════════════════════ */
-    async function loadReviews(){
-      const list=document.getElementById('reviewList');list.innerHTML='<p class="empty">Yükleniyor…</p>';
-      try{
-        const snap=await getDocs(query(collection(db,'reviews'),orderBy('createdAt','desc')));
-        if(snap.empty){list.innerHTML='<p class="empty">Henüz yorum yok.</p>';return;}
-        list.innerHTML='';
-        snap.forEach(d=>{
-          const r=d.data(),dt=r.createdAt?.toDate?r.createdAt.toDate().toLocaleDateString('tr-TR'):'—';
-          const card=document.createElement('div');card.className='dcard '+(r.approved?'ok':'wait');
-          card.innerHTML=`<div class="dcard-top"><div class="dcard-name">${r.name} <span class="pill ${r.approved?'pill-g':'pill-y'}">${r.approved?'Onaylı':'Bekliyor'}</span></div><div class="dcard-meta">${r.service||'—'} · ${'★'.repeat(r.stars||5)} · ${dt}</div></div><p class="dcard-body">"${r.text}"</p><div class="dcard-actions">${!r.approved?`<button class="abtn abtn-g" onclick="approveR('${d.id}',this)">✓ Onayla</button>`:`<button class="abtn abtn-gray" onclick="unapproveR('${d.id}',this)">↩ Geri Al</button>`}<button class="abtn abtn-r" onclick="deleteR('${d.id}',this)">✕ Sil</button></div>`;
-          list.appendChild(card);});
-      }catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}
-    }
+    async function loadReviews(){const list=document.getElementById('reviewList');list.innerHTML='<p class="empty">Yükleniyor…</p>';try{const snap=await getDocs(query(collection(db,'reviews'),orderBy('createdAt','desc')));if(snap.empty){list.innerHTML='<p class="empty">Henüz yorum yok.</p>';return;}list.innerHTML='';snap.forEach(d=>{const r=d.data(),dt=r.createdAt?.toDate?r.createdAt.toDate().toLocaleDateString('tr-TR'):'—';const card=document.createElement('div');card.className='dcard '+(r.approved?'ok':'wait');card.innerHTML=`<div class="dcard-top"><div class="dcard-name">${r.name} <span class="pill ${r.approved?'pill-g':'pill-y'}">${r.approved?'Onaylı':'Bekliyor'}</span></div><div class="dcard-meta">${r.service||'—'} · ${'★'.repeat(r.stars||5)} · ${dt}</div></div><p class="dcard-body">"${r.text}"</p><div class="dcard-actions">${!r.approved?`<button class="abtn abtn-g" onclick="approveR('${d.id}',this)">✓ Onayla</button>`:`<button class="abtn abtn-gray" onclick="unapproveR('${d.id}',this)">↩ Geri Al</button>`}<button class="abtn abtn-r" onclick="deleteR('${d.id}',this)">✕ Sil</button></div>`;list.appendChild(card);});}catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}}
     window.approveR=async(id,btn)=>{btn.disabled=true;await updateDoc(doc(db,'reviews',id),{approved:true});loadReviews();toast('Onaylandı');};
     window.unapproveR=async(id,btn)=>{btn.disabled=true;await updateDoc(doc(db,'reviews',id),{approved:false});loadReviews();toast('Onay kaldırıldı');};
     window.deleteR=async(id,btn)=>{if(!confirm('Silinsin mi?'))return;btn.disabled=true;await deleteDoc(doc(db,'reviews',id));loadReviews();toast('Silindi');};
-
-    async function loadReviewsEN(){
-      const list=document.getElementById('reviewListEN');list.innerHTML='<p class="empty">Loading…</p>';
-      try{
-        const snap=await getDocs(query(collection(db,'reviewsEN'),orderBy('createdAt','desc')));
-        if(snap.empty){list.innerHTML='<p class="empty">No reviews yet.</p>';return;}
-        list.innerHTML='';
-        snap.forEach(d=>{
-          const r=d.data(),dt=r.createdAt?.toDate?r.createdAt.toDate().toLocaleDateString('en-GB'):'—';
-          const card=document.createElement('div');card.className='dcard '+(r.approved?'ok':'wait');
-          card.innerHTML=`<div class="dcard-top"><div class="dcard-name">${r.name} <span class="pill ${r.approved?'pill-g':'pill-y'}">${r.approved?'Approved':'Pending'}</span></div><div class="dcard-meta">${r.service||'—'} · ${'★'.repeat(r.stars||5)} · ${dt}</div></div><p class="dcard-body">"${r.text}"</p><div class="dcard-actions">${!r.approved?`<button class="abtn abtn-g" onclick="approveREN('${d.id}',this)">✓ Approve</button>`:`<button class="abtn abtn-gray" onclick="unapproveREN('${d.id}',this)">↩ Undo</button>`}<button class="abtn abtn-r" onclick="deleteREN('${d.id}',this)">✕ Delete</button></div>`;
-          list.appendChild(card);});
-      }catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}
-    }
+    async function loadReviewsEN(){const list=document.getElementById('reviewListEN');list.innerHTML='<p class="empty">Loading…</p>';try{const snap=await getDocs(query(collection(db,'reviewsEN'),orderBy('createdAt','desc')));if(snap.empty){list.innerHTML='<p class="empty">No reviews yet.</p>';return;}list.innerHTML='';snap.forEach(d=>{const r=d.data(),dt=r.createdAt?.toDate?r.createdAt.toDate().toLocaleDateString('en-GB'):'—';const card=document.createElement('div');card.className='dcard '+(r.approved?'ok':'wait');card.innerHTML=`<div class="dcard-top"><div class="dcard-name">${r.name} <span class="pill ${r.approved?'pill-g':'pill-y'}">${r.approved?'Approved':'Pending'}</span></div><div class="dcard-meta">${r.service||'—'} · ${'★'.repeat(r.stars||5)} · ${dt}</div></div><p class="dcard-body">"${r.text}"</p><div class="dcard-actions">${!r.approved?`<button class="abtn abtn-g" onclick="approveREN('${d.id}',this)">✓ Approve</button>`:`<button class="abtn abtn-gray" onclick="unapproveREN('${d.id}',this)">↩ Undo</button>`}<button class="abtn abtn-r" onclick="deleteREN('${d.id}',this)">✕ Delete</button></div>`;list.appendChild(card);});}catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}}
     window.approveREN=async(id,btn)=>{btn.disabled=true;await updateDoc(doc(db,'reviewsEN',id),{approved:true});loadReviewsEN();toast('Approved');};
     window.unapproveREN=async(id,btn)=>{btn.disabled=true;await updateDoc(doc(db,'reviewsEN',id),{approved:false});loadReviewsEN();toast('Approval removed');};
     window.deleteREN=async(id,btn)=>{if(!confirm('Delete?'))return;btn.disabled=true;await deleteDoc(doc(db,'reviewsEN',id));loadReviewsEN();toast('Deleted');};
 
     /* ════════════════════════════════════════════════════════
-       RANDEVULAR  TR: appointments  |  EN: appointmentsEN
+       RANDEVULAR
        ════════════════════════════════════════════════════════ */
-    async function loadAppointments(){
-      const list=document.getElementById('apptList');list.innerHTML='<p class="empty">Yükleniyor…</p>';
-      try{
-        const snap=await getDocs(query(collection(db,'appointments'),orderBy('createdAt','desc')));
-        if(snap.empty){list.innerHTML='<p class="empty">Henüz randevu yok.</p>';return;}
-        list.innerHTML='<div class="appt-table-wrap"><table class="appt-table"><thead><tr><th>Ad Soyad</th><th>E-posta</th><th>Telefon</th><th>Hizmet</th><th>Mesaj</th><th>Tarih</th><th>Durum</th><th>İşlem</th></tr></thead><tbody id="apptTbody"></tbody></table></div>';
-        const tb=document.getElementById('apptTbody');
-        snap.forEach(d=>{
-          const a=d.data(),dt=a.createdAt?.toDate?a.createdAt.toDate().toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
-          const isNew=a.status!=='read';const tr=document.createElement('tr');tr.className=isNew?'appt-row-new':'';
-          tr.innerHTML='<td class="appt-name">'+(a.firstName||'')+' '+(a.lastName||'')+'</td><td class="appt-email"><a href="mailto:'+(a.email||'')+'">'+(a.email||'—')+'</a></td><td class="appt-phone">'+(a.phone?'<a href="tel:'+a.phone+'">'+a.phone+'</a>':'—')+'</td><td class="appt-service">'+(a.service||'—')+'</td><td class="appt-msg-cell">'+(a.message||'')+'</td><td class="appt-date">'+dt+'</td><td><span class="pill '+(isNew?'pill-y':'pill-g')+'">'+(isNew?'Yeni':'Okundu')+'</span></td><td class="appt-actions">'+(isNew?'<button class="abtn abtn-g" onclick="markRead(\''+d.id+'\',this)">✓ Okundu</button>':'')+'<button class="abtn abtn-r" onclick="deleteA(\''+d.id+'\',this)">✕ Sil</button></td>';
-          tb.appendChild(tr);});
-      }catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}
-    }
+    async function loadAppointments(){const list=document.getElementById('apptList');list.innerHTML='<p class="empty">Yükleniyor…</p>';try{const snap=await getDocs(query(collection(db,'appointments'),orderBy('createdAt','desc')));if(snap.empty){list.innerHTML='<p class="empty">Henüz randevu yok.</p>';return;}list.innerHTML='<div class="appt-table-wrap"><table class="appt-table"><thead><tr><th>Ad Soyad</th><th>E-posta</th><th>Telefon</th><th>Hizmet</th><th>Mesaj</th><th>Tarih</th><th>Durum</th><th>İşlem</th></tr></thead><tbody id="apptTbody"></tbody></table></div>';const tb=document.getElementById('apptTbody');snap.forEach(d=>{const a=d.data(),dt=a.createdAt?.toDate?a.createdAt.toDate().toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';const isNew=a.status!=='read';const tr=document.createElement('tr');tr.className=isNew?'appt-row-new':'';tr.innerHTML='<td class="appt-name">'+(a.firstName||'')+' '+(a.lastName||'')+'</td><td class="appt-email"><a href="mailto:'+(a.email||'')+'">'+(a.email||'—')+'</a></td><td class="appt-phone">'+(a.phone?'<a href="tel:'+a.phone+'">'+a.phone+'</a>':'—')+'</td><td class="appt-service">'+(a.service||'—')+'</td><td class="appt-msg-cell">'+(a.message||'')+'</td><td class="appt-date">'+dt+'</td><td><span class="pill '+(isNew?'pill-y':'pill-g')+'">'+(isNew?'Yeni':'Okundu')+'</span></td><td class="appt-actions">'+(isNew?'<button class="abtn abtn-g" onclick="markRead(\''+d.id+'\',this)">✓ Okundu</button>':'')+'<button class="abtn abtn-r" onclick="deleteA(\''+d.id+'\',this)">✕ Sil</button></td>';tb.appendChild(tr);});}catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}}
     window.markRead=async(id,btn)=>{btn.disabled=true;await updateDoc(doc(db,'appointments',id),{status:'read'});loadAppointments();toast('Okundu');};
     window.deleteA=async(id,btn)=>{if(!confirm('Silinsin mi?'))return;btn.disabled=true;await deleteDoc(doc(db,'appointments',id));loadAppointments();toast('Silindi');};
-
-    async function loadAppointmentsEN(){
-      const list=document.getElementById('apptListEN');list.innerHTML='<p class="empty">Loading…</p>';
-      try{
-        const snap=await getDocs(query(collection(db,'appointmentsEN'),orderBy('createdAt','desc')));
-        if(snap.empty){list.innerHTML='<p class="empty">No appointments yet.</p>';return;}
-        list.innerHTML='<div class="appt-table-wrap"><table class="appt-table"><thead><tr><th>Full Name</th><th>Email</th><th>Phone</th><th>Service</th><th>Message</th><th>Date</th><th>Status</th><th>Action</th></tr></thead><tbody id="apptTbodyEN"></tbody></table></div>';
-        const tb=document.getElementById('apptTbodyEN');
-        snap.forEach(d=>{
-          const a=d.data(),dt=a.createdAt?.toDate?a.createdAt.toDate().toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
-          const isNew=a.status!=='read';const tr=document.createElement('tr');tr.className=isNew?'appt-row-new':'';
-          tr.innerHTML='<td class="appt-name">'+(a.firstName||'')+' '+(a.lastName||'')+'</td><td class="appt-email"><a href="mailto:'+(a.email||'')+'">'+(a.email||'—')+'</a></td><td class="appt-phone">'+(a.phone?'<a href="tel:'+a.phone+'">'+a.phone+'</a>':'—')+'</td><td class="appt-service">'+(a.service||'—')+'</td><td class="appt-msg-cell">'+(a.message||'')+'</td><td class="appt-date">'+dt+'</td><td><span class="pill '+(isNew?'pill-y':'pill-g')+'">'+(isNew?'New':'Read')+'</span></td><td class="appt-actions">'+(isNew?'<button class="abtn abtn-g" onclick="markReadEN(\''+d.id+'\',this)">✓ Mark Read</button>':'')+'<button class="abtn abtn-r" onclick="deleteAEN(\''+d.id+'\',this)">✕ Delete</button></td>';
-          tb.appendChild(tr);});
-      }catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}
-    }
+    async function loadAppointmentsEN(){const list=document.getElementById('apptListEN');list.innerHTML='<p class="empty">Loading…</p>';try{const snap=await getDocs(query(collection(db,'appointmentsEN'),orderBy('createdAt','desc')));if(snap.empty){list.innerHTML='<p class="empty">No appointments yet.</p>';return;}list.innerHTML='<div class="appt-table-wrap"><table class="appt-table"><thead><tr><th>Full Name</th><th>Email</th><th>Phone</th><th>Service</th><th>Message</th><th>Date</th><th>Status</th><th>Action</th></tr></thead><tbody id="apptTbodyEN"></tbody></table></div>';const tb=document.getElementById('apptTbodyEN');snap.forEach(d=>{const a=d.data(),dt=a.createdAt?.toDate?a.createdAt.toDate().toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';const isNew=a.status!=='read';const tr=document.createElement('tr');tr.className=isNew?'appt-row-new':'';tr.innerHTML='<td class="appt-name">'+(a.firstName||'')+' '+(a.lastName||'')+'</td><td class="appt-email"><a href="mailto:'+(a.email||'')+'">'+(a.email||'—')+'</a></td><td class="appt-phone">'+(a.phone?'<a href="tel:'+a.phone+'">'+a.phone+'</a>':'—')+'</td><td class="appt-service">'+(a.service||'—')+'</td><td class="appt-msg-cell">'+(a.message||'')+'</td><td class="appt-date">'+dt+'</td><td><span class="pill '+(isNew?'pill-y':'pill-g')+'">'+(isNew?'New':'Read')+'</span></td><td class="appt-actions">'+(isNew?'<button class="abtn abtn-g" onclick="markReadEN(\''+d.id+'\',this)">✓ Mark Read</button>':'')+'<button class="abtn abtn-r" onclick="deleteAEN(\''+d.id+'\',this)">✕ Delete</button></td>';tb.appendChild(tr);});}catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}}
     window.markReadEN=async(id,btn)=>{btn.disabled=true;await updateDoc(doc(db,'appointmentsEN',id),{status:'read'});loadAppointmentsEN();toast('Marked as read');};
     window.deleteAEN=async(id,btn)=>{if(!confirm('Delete?'))return;btn.disabled=true;await deleteDoc(doc(db,'appointmentsEN',id));loadAppointmentsEN();toast('Deleted');};
 
     /* ════════════════════════════════════════════════════════
-       BLOG  TR: blogPosts  |  EN: blogPostsEN
+       BLOG — BİRLEŞİK PANEL (TR: blogPosts | EN: blogPostsEN)
        ════════════════════════════════════════════════════════ */
     let _editTR=null, _editEN=null;
+    let _trPosts=[], _enPosts=[];
 
-    /* ── TR BLOG ── */
+    /* ── LISTE: Her yazı için TR + EN kartı birlikte göster ── */
     async function loadBlogPosts(){
-      const list=document.getElementById('blogPostList');list.innerHTML='<p class="empty">Yükleniyor…</p>';
+      const list=document.getElementById('blogPostList');
+      list.innerHTML='<p class="empty">Yükleniyor…</p>';
       try{
-        const snap=await getDocs(query(collection(db,'blogPosts'),orderBy('publishedAt','desc')));
-        if(snap.empty){list.innerHTML='<p class="empty">Henüz blog yazısı yok.</p>';return;}
+        const [trSnap,enSnap]=await Promise.all([
+          getDocs(query(collection(db,'blogPosts'),orderBy('publishedAt','desc'))),
+          getDocs(query(collection(db,'blogPostsEN'),orderBy('publishedAt','desc')))
+        ]);
+        _trPosts=[]; _enPosts=[];
+        trSnap.forEach(d=>_trPosts.push({id:d.id,...d.data()}));
+        enSnap.forEach(d=>_enPosts.push({id:d.id,...d.data()}));
+
+        if(_trPosts.length===0 && _enPosts.length===0){
+          list.innerHTML='<p class="empty">Henüz blog yazısı yok.</p>';return;
+        }
+
         list.innerHTML='';
-        snap.forEach(d=>{
-          const p=d.data(),dt=p.publishedAt?.toDate?p.publishedAt.toDate().toLocaleDateString('tr-TR'):'—';
-          const card=document.createElement('div');card.className='dcard '+(p.published!==false?'ok':'wait');
-          card.innerHTML=`<div class="dcard-top"><div class="dcard-name">${p.title||'(Başlıksız)'} <span class="pill ${p.published!==false?'pill-g':'pill-y'}">${p.published!==false?'Yayında':'Taslak'}</span>${p.category?`<span class="pill" style="background:rgba(124,58,237,.12);color:#7c3aed;">${p.category}</span>`:''}</div><div class="dcard-meta">/${p.slug||''} · ${dt}</div></div>${p.excerpt?`<p class="dcard-body">${p.excerpt.slice(0,120)}…</p>`:''}<div class="dcard-actions"><a class="abtn abtn-b" href="blog.html#/${p.slug||''}" target="_blank">👁</a><button class="abtn abtn-g" onclick="editPost('${d.id}')">✏ Düzenle</button><button class="abtn abtn-gray" onclick="togglePublish('${d.id}',${p.published!==false},this)">${p.published!==false?'⏸ Taslak':'▶ Yayınla'}</button><button class="abtn abtn-r" onclick="deletePost('${d.id}',this)">✕</button></div>`;
-          list.appendChild(card);});
+
+        /* TR'de olan her yazıyı göster, yanına EN eşleşmesini bağla */
+        const usedEN=new Set();
+        _trPosts.forEach(p=>{
+          const enMatch=_enPosts.find(e=>e.slug===p.slug || e.enLinkedSlug===p.slug);
+          if(enMatch)usedEN.add(enMatch.id);
+          list.appendChild(makePairCard(p,enMatch||null));
+        });
+
+        /* Sadece EN'de olanlar (TR'de karşılığı olmayanlar) */
+        _enPosts.filter(e=>!usedEN.has(e.id)).forEach(e=>{
+          list.appendChild(makePairCard(null,e));
+        });
+
       }catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}
     }
+
+    function makePairCard(tr,en){
+      const wrapper=document.createElement('div');
+      wrapper.className='pair-card';
+
+      /* TR tarafı */
+      const trSide=document.createElement('div');
+      trSide.className='pair-side pair-side-tr';
+      if(tr){
+        const dt=tr.publishedAt?.toDate?tr.publishedAt.toDate().toLocaleDateString('tr-TR'):'—';
+        trSide.innerHTML=`
+          <div class="pair-lang-badge tr-badge">🇹🇷 TR — blogPosts</div>
+          <div class="pair-title">${tr.title||'(Başlıksız)'} <span class="pill ${tr.published!==false?'pill-g':'pill-y'}">${tr.published!==false?'Yayında':'Taslak'}</span>${tr.category?`<span class="pill pill-cat">${tr.category}</span>`:''}</div>
+          <div class="pair-meta">/${tr.slug||''} · ${dt}</div>
+          ${tr.excerpt?`<p class="pair-excerpt">${tr.excerpt.slice(0,100)}…</p>`:''}
+          <div class="dcard-actions">
+            <a class="abtn abtn-b" href="blog.html#/${tr.slug||''}" target="_blank">👁</a>
+            <button class="abtn abtn-g" onclick="editPost('${tr.id}')">✏ TR Düzenle</button>
+            <button class="abtn abtn-gray" onclick="togglePublish('${tr.id}',${tr.published!==false},this)">${tr.published!==false?'⏸ Taslak':'▶ Yayınla'}</button>
+            <button class="abtn abtn-r" onclick="deletePost('${tr.id}',this)">✕</button>
+          </div>`;
+      } else {
+        trSide.innerHTML=`<div class="pair-lang-badge tr-badge">🇹🇷 TR — blogPosts</div><div class="pair-empty-side">Bu yazı için Türkçe içerik eklenmemiş.<br><button class="abtn abtn-g" style="margin-top:8px;" onclick="newPostTRForSlug('${en?.slug||''}')">+ TR Ekle</button></div>`;
+      }
+
+      /* EN tarafı */
+      const enSide=document.createElement('div');
+      enSide.className='pair-side pair-side-en';
+      if(en){
+        const dt=en.publishedAt?.toDate?en.publishedAt.toDate().toLocaleDateString('en-GB'):'—';
+        enSide.innerHTML=`
+          <div class="pair-lang-badge en-badge">🇬🇧 EN — blogPostsEN</div>
+          <div class="pair-title">${en.title||'(Untitled)'} <span class="pill ${en.published!==false?'pill-g':'pill-y'}">${en.published!==false?'Live':'Draft'}</span>${en.category?`<span class="pill pill-cat">${en.category}</span>`:''}</div>
+          <div class="pair-meta">/${en.slug||''} · ${dt}</div>
+          ${en.excerpt?`<p class="pair-excerpt">${en.excerpt.slice(0,100)}…</p>`:''}
+          <div class="dcard-actions">
+            <a class="abtn abtn-b" href="blog-en.html#/${en.slug||''}" target="_blank">👁</a>
+            <button class="abtn abtn-g" onclick="editPostEN('${en.id}')">✏ EN Edit</button>
+            <button class="abtn abtn-gray" onclick="togglePublishEN('${en.id}',${en.published!==false},this)">${en.published!==false?'⏸ Draft':'▶ Publish'}</button>
+            <button class="abtn abtn-r" onclick="deletePostEN('${en.id}',this)">✕</button>
+          </div>`;
+      } else {
+        enSide.innerHTML=`<div class="pair-lang-badge en-badge">🇬🇧 EN — blogPostsEN</div><div class="pair-empty-side">No English content for this post yet.<br><button class="abtn abtn-g" style="margin-top:8px;" onclick="newPostENForSlug('${tr?.slug||''}','${(tr?.title||'').replace(/'/g,"\\'")}')">+ Add EN</button></div>`;
+      }
+
+      wrapper.appendChild(trSide);
+      wrapper.appendChild(enSide);
+      return wrapper;
+    }
+
+    /* ── TR CRUD ── */
     window.editPost=async function(id){
       const snap=await getDoc(doc(db,'blogPosts',id));if(!snap.exists())return;
       const p=snap.data();_editTR=id;
       _setForm('tr',{title:p.title,slug:p.slug,category:p.category,emoji:p.emoji,excerpt:p.excerpt,tags:(p.tags||[]).join(', '),readingTime:p.readingTime,coverUrl:p.coverImage,authorName:p.authorName,metaDesc:p.metaDesc,published:p.published!==false,content:p.content});
       const prev=document.getElementById('tr_prev_bpCover');if(p.coverImage){prev.src=p.coverImage;prev.style.display='block';}else prev.style.display='none';
-      document.getElementById('tr_postFormTitle').textContent='✏ Yazıyı Düzenle';
-      document.getElementById('tr_postFormWrap').style.display='block';
-      document.getElementById('tr_postFormWrap').scrollIntoView({behavior:'smooth'});
+      document.getElementById('bothPostFormTitle').textContent='✏ Yazıyı Düzenle';
+      openForm('bothPostFormWrap');
     };
     window.newPost=function(){
       _editTR=null;_setForm('tr',{published:true});
       document.getElementById('tr_prev_bpCover').style.display='none';
-      document.getElementById('tr_postFormTitle').textContent='+ Yeni Blog Yazısı';
-      document.getElementById('tr_postFormWrap').style.display='block';
-      document.getElementById('tr_postFormWrap').scrollIntoView({behavior:'smooth'});
+      document.getElementById('bothPostFormTitle').textContent='+ Yeni Yazı';
+      openForm('bothPostFormWrap');
     };
-    window.cancelPost=()=>{document.getElementById('tr_postFormWrap').style.display='none';_editTR=null;};
+    window.newPostTRForSlug=function(slug){
+      _editTR=null;_setForm('tr',{published:true,slug});
+      document.getElementById('tr_prev_bpCover').style.display='none';
+      document.getElementById('bothPostFormTitle').textContent='+ Yeni Yazı';
+      openForm('bothPostFormWrap');
+    };
+    window.cancelPost=()=>{closeForm('bothPostFormWrap');_editTR=null;};
     window._savePost=async function(){
       const btn=document.getElementById('tr_savePostBtn');btn.textContent='…';btn.disabled=true;
       const title=document.getElementById('tr_bp_title').value.trim();
       const slug=document.getElementById('tr_bp_slug').value.trim()||window._makeSlug(title);
-      if(!title){toast('Başlık zorunlu',true);btn.textContent='Kaydet';btn.disabled=false;return;}
+      if(!title){toast('Başlık zorunlu',true);btn.textContent='Türkçe Kaydet';btn.disabled=false;return;}
       const ed=document.getElementById('tr_richEditor');
       const tagsRaw=document.getElementById('tr_bp_tags').value;
       const payload={title,slug,category:document.getElementById('tr_bp_category').value.trim(),emoji:document.getElementById('tr_bp_emoji').value.trim(),excerpt:document.getElementById('tr_bp_excerpt').value.trim(),content:ed?ed.innerHTML.trim():'',tags:tagsRaw?tagsRaw.split(',').map(t=>t.trim()).filter(Boolean):[],readingTime:parseInt(document.getElementById('tr_bp_readingTime').value)||null,coverImage:document.getElementById('tr_bp_coverUrl').value.trim(),authorName:document.getElementById('tr_bp_authorName').value.trim(),metaDesc:document.getElementById('tr_bp_metaDesc').value.trim(),published:document.getElementById('tr_bp_published').checked,updatedAt:serverTimestamp()};
-      try{
-        if(_editTR){await updateDoc(doc(db,'blogPosts',_editTR),payload);toast('✦ Yazı güncellendi');}
-        else{payload.publishedAt=serverTimestamp();await addDoc(collection(db,'blogPosts'),payload);toast('✦ Yazı yayınlandı');}
-        document.getElementById('tr_postFormWrap').style.display='none';_editTR=null;loadBlogPosts();
-      }catch(e){toast(e.message,true);}finally{btn.textContent='Kaydet';btn.disabled=false;}
+      try{if(_editTR){await updateDoc(doc(db,'blogPosts',_editTR),payload);toast('✦ TR yazı güncellendi');}else{payload.publishedAt=serverTimestamp();await addDoc(collection(db,'blogPosts'),payload);toast('✦ TR yazı yayınlandı');}loadBlogPosts();}catch(e){toast(e.message,true);}finally{btn.textContent='✦ Türkçe Kaydet';btn.disabled=false;}
     };
     window.togglePublish=async(id,cur,btn)=>{btn.disabled=true;try{await updateDoc(doc(db,'blogPosts',id),{published:!cur});toast(cur?'Taslağa alındı':'Yayınlandı');loadBlogPosts();}catch(e){toast(e.message,true);btn.disabled=false;}};
     window.deletePost=async(id,btn)=>{if(!confirm('Kalıcı silinsin mi?'))return;btn.disabled=true;try{await deleteDoc(doc(db,'blogPosts',id));toast('Silindi');loadBlogPosts();}catch(e){toast(e.message,true);btn.disabled=false;}};
 
-    /* ── EN BLOG ── */
-    async function loadBlogPostsEN(){
-      const list=document.getElementById('blogPostListEN');list.innerHTML='<p class="empty">Loading…</p>';
-      try{
-        const snap=await getDocs(query(collection(db,'blogPostsEN'),orderBy('publishedAt','desc')));
-        if(snap.empty){list.innerHTML='<p class="empty">No blog posts yet.</p>';return;}
-        list.innerHTML='';
-        snap.forEach(d=>{
-          const p=d.data(),dt=p.publishedAt?.toDate?p.publishedAt.toDate().toLocaleDateString('en-GB'):'—';
-          const card=document.createElement('div');card.className='dcard '+(p.published!==false?'ok':'wait');
-          card.innerHTML=`<div class="dcard-top"><div class="dcard-name">${p.title||'(Untitled)'} <span class="pill ${p.published!==false?'pill-g':'pill-y'}">${p.published!==false?'Live':'Draft'}</span>${p.category?`<span class="pill" style="background:rgba(124,58,237,.12);color:#7c3aed;">${p.category}</span>`:''}</div><div class="dcard-meta">/${p.slug||''} · ${dt}</div></div>${p.excerpt?`<p class="dcard-body">${p.excerpt.slice(0,120)}…</p>`:''}<div class="dcard-actions"><a class="abtn abtn-b" href="blog-en.html#/${p.slug||''}" target="_blank">👁</a><button class="abtn abtn-g" onclick="editPostEN('${d.id}')">✏ Edit</button><button class="abtn abtn-gray" onclick="togglePublishEN('${d.id}',${p.published!==false},this)">${p.published!==false?'⏸ Draft':'▶ Publish'}</button><button class="abtn abtn-r" onclick="deletePostEN('${d.id}',this)">✕</button></div>`;
-          list.appendChild(card);});
-      }catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}
-    }
+    /* ── EN CRUD ── */
     window.editPostEN=async function(id){
       const snap=await getDoc(doc(db,'blogPostsEN',id));if(!snap.exists())return;
       const p=snap.data();_editEN=id;
       _setForm('en',{title:p.title,slug:p.slug,category:p.category,emoji:p.emoji,excerpt:p.excerpt,tags:(p.tags||[]).join(', '),readingTime:p.readingTime,coverUrl:p.coverImage,authorName:p.authorName,metaDesc:p.metaDesc,published:p.published!==false,content:p.content});
       const prev=document.getElementById('en_prev_bpCover');if(p.coverImage){prev.src=p.coverImage;prev.style.display='block';}else prev.style.display='none';
-      document.getElementById('en_postFormTitle').textContent='✏ Edit Post';
-      document.getElementById('en_postFormWrap').style.display='block';
-      document.getElementById('en_postFormWrap').scrollIntoView({behavior:'smooth'});
+      document.getElementById('bothPostFormTitle').textContent='✏ Yazıyı Düzenle';
+      openForm('bothPostFormWrap');
     };
     window.newPostEN=function(){
       _editEN=null;_setForm('en',{published:true});
       document.getElementById('en_prev_bpCover').style.display='none';
-      document.getElementById('en_postFormTitle').textContent='+ New Blog Post';
-      document.getElementById('en_postFormWrap').style.display='block';
-      document.getElementById('en_postFormWrap').scrollIntoView({behavior:'smooth'});
+      document.getElementById('bothPostFormTitle').textContent='+ Yeni Yazı';
+      openForm('bothPostFormWrap');
     };
-    window.cancelPostEN=()=>{document.getElementById('en_postFormWrap').style.display='none';_editEN=null;};
+    window.newPostENForSlug=function(slug,trTitle){
+      _editEN=null;_setForm('en',{published:true,slug});
+      document.getElementById('en_prev_bpCover').style.display='none';
+      document.getElementById('bothPostFormTitle').textContent='+ Yeni Yazı';
+      openForm('bothPostFormWrap');
+    };
+    window.cancelBothPost=()=>{closeForm('bothPostFormWrap');_editTR=null;_editEN=null;};
+    window.cancelPostEN=()=>{closeForm('bothPostFormWrap');_editEN=null;};
     window._savePostEN=async function(){
       const btn=document.getElementById('en_savePostBtn');btn.textContent='…';btn.disabled=true;
       const title=document.getElementById('en_bp_title').value.trim();
       const slug=document.getElementById('en_bp_slug').value.trim()||window._makeSlug(title);
-      if(!title){toast('Title is required',true);btn.textContent='Save';btn.disabled=false;return;}
+      if(!title){toast('Title is required',true);btn.textContent='✦ English Save';btn.disabled=false;return;}
       const ed=document.getElementById('en_richEditor');
       const tagsRaw=document.getElementById('en_bp_tags').value;
       const payload={title,slug,category:document.getElementById('en_bp_category').value.trim(),emoji:document.getElementById('en_bp_emoji').value.trim(),excerpt:document.getElementById('en_bp_excerpt').value.trim(),content:ed?ed.innerHTML.trim():'',tags:tagsRaw?tagsRaw.split(',').map(t=>t.trim()).filter(Boolean):[],readingTime:parseInt(document.getElementById('en_bp_readingTime').value)||null,coverImage:document.getElementById('en_bp_coverUrl').value.trim(),authorName:document.getElementById('en_bp_authorName').value.trim(),metaDesc:document.getElementById('en_bp_metaDesc').value.trim(),published:document.getElementById('en_bp_published').checked,updatedAt:serverTimestamp()};
-      try{
-        if(_editEN){await updateDoc(doc(db,'blogPostsEN',_editEN),payload);toast('✦ Post updated');}
-        else{payload.publishedAt=serverTimestamp();await addDoc(collection(db,'blogPostsEN'),payload);toast('✦ Post published');}
-        document.getElementById('en_postFormWrap').style.display='none';_editEN=null;loadBlogPostsEN();
-      }catch(e){toast(e.message,true);}finally{btn.textContent='Save';btn.disabled=false;}
+      try{if(_editEN){await updateDoc(doc(db,'blogPostsEN',_editEN),payload);toast('✦ EN post updated');}else{payload.publishedAt=serverTimestamp();await addDoc(collection(db,'blogPostsEN'),payload);toast('✦ EN post published');}loadBlogPosts();}catch(e){toast(e.message,true);}finally{btn.textContent='✦ English Save';btn.disabled=false;}
     };
-    window.togglePublishEN=async(id,cur,btn)=>{btn.disabled=true;try{await updateDoc(doc(db,'blogPostsEN',id),{published:!cur});toast(cur?'Moved to draft':'Published');loadBlogPostsEN();}catch(e){toast(e.message,true);btn.disabled=false;}};
-    window.deletePostEN=async(id,btn)=>{if(!confirm('Permanently delete?'))return;btn.disabled=true;try{await deleteDoc(doc(db,'blogPostsEN',id));toast('Deleted');loadBlogPostsEN();}catch(e){toast(e.message,true);btn.disabled=false;}};
+    window.togglePublishEN=async(id,cur,btn)=>{btn.disabled=true;try{await updateDoc(doc(db,'blogPostsEN',id),{published:!cur});toast(cur?'Draft\'a alındı':'Published');loadBlogPosts();}catch(e){toast(e.message,true);btn.disabled=false;}};
+    window.deletePostEN=async(id,btn)=>{if(!confirm('Permanently delete?'))return;btn.disabled=true;try{await deleteDoc(doc(db,'blogPostsEN',id));toast('Deleted');loadBlogPosts();}catch(e){toast(e.message,true);btn.disabled=false;}};
 
     /* helpers */
+    function openForm(id){document.getElementById(id).style.display='block';document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});}
+    function closeForm(id){document.getElementById(id).style.display='none';}
+
+    /* Hem TR hem EN formu aynı anda sıfırla ve aç */
+    window.newPostBoth=function(){
+      _editTR=null;_editEN=null;
+      _setForm('tr',{published:true});
+      _setForm('en',{published:true});
+      document.getElementById('tr_prev_bpCover').style.display='none';
+      document.getElementById('en_prev_bpCover').style.display='none';
+      document.getElementById('bothPostFormTitle').textContent='+ Yeni Yazı';
+      openForm('bothPostFormWrap');
+    };
+
     function _setForm(lang,p){
       const g=(id)=>document.getElementById(lang+'_bp_'+id);
       if(g('title'))g('title').value=p.title||'';
@@ -350,134 +330,268 @@
     }
 
     /* ════════════════════════════════════════════════════════
-       INSTAGRAM & YOUTUBE  (ortak)
+       INSTAGRAM — TR: instagramPosts | EN: instagramPostsEN
        ════════════════════════════════════════════════════════ */
-    let _editIgId=null;
-    async function loadIgPosts(){
-      const list=document.getElementById('igPostList');list.innerHTML='<p class="empty">Yükleniyor…</p>';
-      try{
-        const snap=await getDocs(query(collection(db,'instagramPosts'),orderBy('order','asc')));
-        if(snap.empty){list.innerHTML='<p class="empty">Gönderi yok.</p>';return;}
-        list.innerHTML='';
-        snap.forEach(d=>{
-          const p=d.data();const card=document.createElement('div');card.className='dcard '+(p.visible!==false?'ok':'wait');
-          card.innerHTML=`<div class="dcard-top"><div class="dcard-name" style="display:flex;align-items:center;gap:8px;">${p.image?`<img src="${p.image}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;" />`:`<span style="font-size:1.5rem">${p.emoji||'📸'}</span>`}${p.caption?p.caption.slice(0,60)+'…':'(Açıklamasız)'} <span class="pill ${p.visible!==false?'pill-g':'pill-y'}">${p.visible!==false?'Görünür':'Gizli'}</span></div><div class="dcard-meta">Sıra: ${p.order??'—'}</div></div><div class="dcard-actions"><button class="abtn abtn-g" onclick="editIgPost('${d.id}')">✏ Düzenle</button><button class="abtn abtn-gray" onclick="toggleIgVisible('${d.id}',${p.visible!==false},this)">${p.visible!==false?'Gizle':'Göster'}</button><button class="abtn abtn-r" onclick="deleteIgPost('${d.id}',this)">✕ Sil</button></div>`;
-          list.appendChild(card);});
-      }catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}
-    }
-    window.editIgPost=async function(id){
-      const snap=await getDoc(doc(db,'instagramPosts',id));if(!snap.exists())return;
-      const p=snap.data();_editIgId=id;
-      document.getElementById('ig_caption').value=p.caption||'';document.getElementById('ig_slug').value=p.slug||'';
-      document.getElementById('ig_category').value=p.category||'';document.getElementById('ig_emoji').value=p.emoji||'';
-      document.getElementById('ig_url').value=p.url||'';document.getElementById('ig_imgUrl').value=p.image||'';
-      document.getElementById('ig_likes').value=p.likes||'';document.getElementById('ig_order').value=p.order??0;
-      document.getElementById('ig_visible').checked=p.visible!==false;
-      const prev=document.getElementById('prev_igImg');if(p.image){prev.src=p.image;prev.style.display='block';}else prev.style.display='none';
-      const sp=document.getElementById('igSlugPreview');if(sp)sp.textContent=p.slug||'…';
-      document.getElementById('igFormTitle').textContent='✏ Gönderiyi Düzenle';
-      document.getElementById('igFormWrap').style.display='block';
-      document.getElementById('igFormWrap').scrollIntoView({behavior:'smooth'});
-    };
-    window.newIgPost=function(){
-      _editIgId=null;
-      ['ig_caption','ig_slug','ig_category','ig_emoji','ig_url','ig_imgUrl','ig_likes'].forEach(id=>{document.getElementById(id).value='';});
-      document.getElementById('ig_order').value=0;document.getElementById('ig_visible').checked=true;
-      document.getElementById('prev_igImg').style.display='none';
-      const sp=document.getElementById('igSlugPreview');if(sp)sp.textContent='…';
-      document.getElementById('igFormTitle').textContent='+ Yeni Gönderi';
-      document.getElementById('igFormWrap').style.display='block';
-      document.getElementById('igFormWrap').scrollIntoView({behavior:'smooth'});
-    };
-    window.cancelIgPost=()=>{document.getElementById('igFormWrap').style.display='none';_editIgId=null;};
-    window._saveIgPost=async function(){
-      const btn=document.getElementById('saveIgBtn');btn.textContent='…';btn.disabled=true;
-      const igCap=document.getElementById('ig_caption').value.trim();
-      const igSlug=document.getElementById('ig_slug').value.trim()||window._makeSlug(igCap.slice(0,60))||('gonderi-'+Date.now());
-      const payload={caption:igCap,slug:igSlug,category:document.getElementById('ig_category').value.trim(),emoji:document.getElementById('ig_emoji').value.trim(),url:document.getElementById('ig_url').value.trim(),image:document.getElementById('ig_imgUrl').value.trim(),likes:document.getElementById('ig_likes').value.trim(),order:parseInt(document.getElementById('ig_order').value)||0,visible:document.getElementById('ig_visible').checked,updatedAt:serverTimestamp()};
-      try{
-        if(_editIgId){await updateDoc(doc(db,'instagramPosts',_editIgId),payload);toast('✦ Güncellendi');}
-        else{payload.createdAt=serverTimestamp();await addDoc(collection(db,'instagramPosts'),payload);toast('✦ Eklendi');}
-        document.getElementById('igFormWrap').style.display='none';_editIgId=null;loadIgPosts();
-      }catch(e){toast(e.message,true);}finally{btn.textContent='Kaydet';btn.disabled=false;}
-    };
-    window.toggleIgVisible=async(id,cur,btn)=>{btn.disabled=true;await updateDoc(doc(db,'instagramPosts',id),{visible:!cur});toast(cur?'Gizlendi':'Gösterildi');loadIgPosts();};
-    window.deleteIgPost=async(id,btn)=>{if(!confirm('Silinsin mi?'))return;btn.disabled=true;await deleteDoc(doc(db,'instagramPosts',id));toast('Silindi');loadIgPosts();};
+    let _editIgTR=null, _editIgEN=null;
+    let _igTRPosts=[], _igENPosts=[];
 
-    let _editYtId=null;
-    function extractYtId(url){if(!url)return'';const m=url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);return m?m[1]:'';}
-    async function loadYtPosts(){
-      const list=document.getElementById('ytPostList');list.innerHTML='<p class="empty">Yükleniyor…</p>';
+    function _igThumb(p){ return p.image?`<img src="${p.image}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;" />`:`<span style="font-size:1.5rem">${p.emoji||'📸'}</span>`; }
+
+    async function loadIgPosts(){
+      const list=document.getElementById('igPostList');
+      list.innerHTML='<p class="empty">Yükleniyor…</p>';
       try{
-        const snap=await getDocs(query(collection(db,'youtubePosts'),orderBy('order','asc')));
-        if(snap.empty){list.innerHTML='<p class="empty">Video yok.</p>';return;}
+        const [trSnap,enSnap]=await Promise.all([
+          getDocs(query(collection(db,'instagramPosts'),orderBy('order','asc'))),
+          getDocs(query(collection(db,'instagramPostsEN'),orderBy('order','asc')))
+        ]);
+        _igTRPosts=[]; _igENPosts=[];
+        trSnap.forEach(d=>_igTRPosts.push({id:d.id,...d.data()}));
+        enSnap.forEach(d=>_igENPosts.push({id:d.id,...d.data()}));
+        if(!_igTRPosts.length&&!_igENPosts.length){list.innerHTML='<p class="empty">Gönderi yok.</p>';return;}
         list.innerHTML='';
-        snap.forEach(d=>{
-          const p=d.data();const thumb=p.thumbnail||(p.videoUrl?`https://img.youtube.com/vi/${extractYtId(p.videoUrl)}/hqdefault.jpg`:'');
-          const card=document.createElement('div');card.className='dcard '+(p.visible!==false?'ok':'wait');
-          card.innerHTML=`<div class="dcard-top"><div class="dcard-name" style="display:flex;align-items:center;gap:8px;">${thumb?`<img src="${thumb}" style="width:56px;height:32px;object-fit:cover;border-radius:4px;flex-shrink:0;" />`:'<span>▶️</span>'}${p.title?p.title.slice(0,55):'(Başlıksız)'} <span class="pill ${p.visible!==false?'pill-g':'pill-y'}">${p.visible!==false?'Görünür':'Gizli'}</span></div><div class="dcard-meta">Sıra: ${p.order??'—'}</div></div><div class="dcard-actions"><button class="abtn abtn-g" onclick="editYtPost('${d.id}')">✏ Düzenle</button><button class="abtn abtn-gray" onclick="toggleYtVisible('${d.id}',${p.visible!==false},this)">${p.visible!==false?'Gizle':'Göster'}</button><button class="abtn abtn-r" onclick="deleteYtPost('${d.id}',this)">✕ Sil</button></div>`;
-          list.appendChild(card);});
+        const usedEN=new Set();
+        _igTRPosts.forEach(p=>{
+          const en=_igENPosts.find(e=>e.slug===p.slug);
+          if(en)usedEN.add(en.id);
+          list.appendChild(makeIgPairCard(p,en||null));
+        });
+        _igENPosts.filter(e=>!usedEN.has(e.id)).forEach(e=>list.appendChild(makeIgPairCard(null,e)));
       }catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}
     }
-    window.editYtPost=async function(id){
-      const snap=await getDoc(doc(db,'youtubePosts',id));if(!snap.exists())return;
-      const p=snap.data();_editYtId=id;
-      document.getElementById('yt_title').value=p.title||'';document.getElementById('yt_slug').value=p.slug||'';
-      document.getElementById('yt_videoUrl').value=p.videoUrl||'';document.getElementById('yt_category').value=p.category||'';
-      document.getElementById('yt_description').value=p.description||'';document.getElementById('yt_dateLabel').value=p.dateLabel||'';
-      document.getElementById('yt_thumbnail').value=p.thumbnail||'';document.getElementById('yt_order').value=p.order??0;
-      document.getElementById('yt_visible').checked=p.visible!==false;
-      const sp=document.getElementById('ytSlugPreview');if(sp)sp.textContent=p.slug||'…';
-      const thumb=p.thumbnail||(p.videoUrl?`https://img.youtube.com/vi/${extractYtId(p.videoUrl)}/hqdefault.jpg`:'');
-      const prev=document.getElementById('prev_ytThumb');if(thumb){prev.src=thumb;prev.style.display='block';}else prev.style.display='none';
-      document.getElementById('ytFormTitle').textContent='✏ Videoyu Düzenle';
-      document.getElementById('ytFormWrap').style.display='block';
-      document.getElementById('ytFormWrap').scrollIntoView({behavior:'smooth'});
+
+    function makeIgPairCard(tr,en){
+      const wrap=document.createElement('div'); wrap.className='pair-card';
+      // TR
+      const ts=document.createElement('div'); ts.className='pair-side pair-side-tr';
+      if(tr){
+        ts.innerHTML=`<div class="pair-lang-badge tr-badge">🇹🇷 TR — instagramPosts</div>
+          <div class="pair-title" style="display:flex;align-items:center;gap:8px;margin:6px 0;">${_igThumb(tr)}<span>${(tr.caption||'(Açıklamasız)').slice(0,55)}</span> <span class="pill ${tr.visible!==false?'pill-g':'pill-y'}">${tr.visible!==false?'Görünür':'Gizli'}</span></div>
+          <div class="pair-meta">Sıra: ${tr.order??'—'} · ${tr.category||''}</div>
+          <div class="dcard-actions" style="margin-top:8px;">
+            <button class="abtn abtn-g" onclick="editIgPost('${tr.id}','tr')">✏ Düzenle</button>
+            <button class="abtn abtn-gray" onclick="toggleIgVisible('${tr.id}','tr',${tr.visible!==false},this)">${tr.visible!==false?'Gizle':'Göster'}</button>
+            <button class="abtn abtn-r" onclick="deleteIgPost('${tr.id}','tr',this)">✕</button>
+          </div>`;
+      } else {
+        ts.innerHTML=`<div class="pair-lang-badge tr-badge">🇹🇷 TR — instagramPosts</div><div class="pair-empty-side">TR içerik yok.<br><button class="abtn abtn-g" style="margin-top:8px;" onclick="newIgForSlug('tr','${en?.slug||''}')">+ TR Ekle</button></div>`;
+      }
+      // EN
+      const es=document.createElement('div'); es.className='pair-side pair-side-en';
+      if(en){
+        es.innerHTML=`<div class="pair-lang-badge en-badge">🇬🇧 EN — instagramPostsEN</div>
+          <div class="pair-title" style="display:flex;align-items:center;gap:8px;margin:6px 0;">${_igThumb(en)}<span>${(en.caption||'(No caption)').slice(0,55)}</span> <span class="pill ${en.visible!==false?'pill-g':'pill-y'}">${en.visible!==false?'Visible':'Hidden'}</span></div>
+          <div class="pair-meta">Order: ${en.order??'—'} · ${en.category||''}</div>
+          <div class="dcard-actions" style="margin-top:8px;">
+            <button class="abtn abtn-g" onclick="editIgPost('${en.id}','en')">✏ Edit</button>
+            <button class="abtn abtn-gray" onclick="toggleIgVisible('${en.id}','en',${en.visible!==false},this)">${en.visible!==false?'Hide':'Show'}</button>
+            <button class="abtn abtn-r" onclick="deleteIgPost('${en.id}','en',this)">✕</button>
+          </div>`;
+      } else {
+        es.innerHTML=`<div class="pair-lang-badge en-badge">🇬🇧 EN — instagramPostsEN</div><div class="pair-empty-side">No EN content.<br><button class="abtn abtn-g" style="margin-top:8px;" onclick="newIgForSlug('en','${tr?.slug||''}')">+ Add EN</button></div>`;
+      }
+      wrap.appendChild(ts); wrap.appendChild(es); return wrap;
+    }
+
+    function _igCol(lang){ return lang==='tr'?'instagramPosts':'instagramPostsEN'; }
+    function _setIgForm(lang,p){
+      const g=id=>document.getElementById('ig_'+lang+'_'+id);
+      g('caption').value=p.caption||''; g('slug').value=p.slug||''; g('category').value=p.category||'';
+      g('emoji').value=p.emoji||''; g('url').value=p.url||''; g('imgUrl').value=p.image||'';
+      g('likes').value=p.likes||''; g('order').value=p.order??0; g('visible').checked=p.visible!==false;
+      const prev=document.getElementById('ig_'+lang+'_prev'); if(p.image){prev.src=p.image;prev.style.display='block';}else prev.style.display='none';
+      const sp=document.getElementById('ig_'+lang+'_slugPreview'); if(sp)sp.textContent=p.slug||'…';
+    }
+    window.newIgBoth=function(){
+      _editIgTR=null;_editIgEN=null;
+      _setIgForm('tr',{visible:true}); _setIgForm('en',{visible:true});
+      document.getElementById('igBothFormTitle').textContent='+ Yeni Gönderi';
+      openForm('igBothFormWrap');
     };
-    window.newYtPost=function(){
-      _editYtId=null;
-      ['yt_title','yt_slug','yt_videoUrl','yt_category','yt_description','yt_dateLabel','yt_thumbnail'].forEach(id=>{document.getElementById(id).value='';});
-      document.getElementById('yt_order').value=0;document.getElementById('yt_visible').checked=true;
-      document.getElementById('prev_ytThumb').style.display='none';
-      const sp=document.getElementById('ytSlugPreview');if(sp)sp.textContent='…';
-      document.getElementById('ytFormTitle').textContent='+ Yeni Video';
-      document.getElementById('ytFormWrap').style.display='block';
-      document.getElementById('ytFormWrap').scrollIntoView({behavior:'smooth'});
+    window.newIgForSlug=function(lang,slug){
+      if(lang==='tr'){_editIgTR=null;_setIgForm('tr',{visible:true,slug});}
+      else{_editIgEN=null;_setIgForm('en',{visible:true,slug});}
+      document.getElementById('igBothFormTitle').textContent='+ Yeni Gönderi';
+      openForm('igBothFormWrap');
     };
-    window.cancelYtPost=()=>{document.getElementById('ytFormWrap').style.display='none';_editYtId=null;};
-    window._saveYtPost=async function(){
-      const btn=document.getElementById('saveYtBtn');btn.textContent='…';btn.disabled=true;
-      const videoUrl=document.getElementById('yt_videoUrl').value.trim();
-      if(!videoUrl){toast('Video URL zorunlu',true);btn.textContent='Kaydet';btn.disabled=false;return;}
-      const ytTitle=document.getElementById('yt_title').value.trim();
-      const ytSlug=document.getElementById('yt_slug').value.trim()||window._makeSlug(ytTitle.slice(0,60))||('video-'+Date.now());
-      const payload={title:ytTitle,slug:ytSlug,videoUrl,category:document.getElementById('yt_category').value.trim(),description:document.getElementById('yt_description').value.trim(),dateLabel:document.getElementById('yt_dateLabel').value.trim(),thumbnail:document.getElementById('yt_thumbnail').value.trim()||(videoUrl?`https://img.youtube.com/vi/${extractYtId(videoUrl)}/hqdefault.jpg`:''),order:parseInt(document.getElementById('yt_order').value)||0,visible:document.getElementById('yt_visible').checked,updatedAt:serverTimestamp()};
+    window.editIgPost=async function(id,lang){
+      const snap=await getDoc(doc(db,_igCol(lang),id)); if(!snap.exists())return;
+      const p=snap.data();
+      if(lang==='tr')_editIgTR=id; else _editIgEN=id;
+      _setIgForm(lang,{caption:p.caption,slug:p.slug,category:p.category,emoji:p.emoji,url:p.url,image:p.image,likes:p.likes,order:p.order,visible:p.visible!==false});
+      document.getElementById('igBothFormTitle').textContent='✏ Gönderiyi Düzenle';
+      openForm('igBothFormWrap');
+    };
+    window.cancelIgPost=()=>{closeForm('igBothFormWrap');_editIgTR=null;_editIgEN=null;};
+    async function _doSaveIg(lang,editId){
+      const btn=document.getElementById('ig_'+lang+'_saveBtn'); btn.textContent='…';btn.disabled=true;
+      const g=id=>document.getElementById('ig_'+lang+'_'+id);
+      const cap=g('caption').value.trim();
+      const slug=g('slug').value.trim()||window._makeSlug(cap.slice(0,60))||('gonderi-'+Date.now());
+      const payload={caption:cap,slug,category:g('category').value.trim(),emoji:g('emoji').value.trim(),url:g('url').value.trim(),image:g('imgUrl').value.trim(),likes:g('likes').value.trim(),order:parseInt(g('order').value)||0,visible:g('visible').checked,updatedAt:serverTimestamp()};
       try{
-        if(_editYtId){await updateDoc(doc(db,'youtubePosts',_editYtId),payload);toast('✦ Video güncellendi');}
-        else{payload.createdAt=serverTimestamp();await addDoc(collection(db,'youtubePosts'),payload);toast('✦ Video eklendi');}
-        document.getElementById('ytFormWrap').style.display='none';_editYtId=null;loadYtPosts();
-      }catch(e){toast(e.message,true);}finally{btn.textContent='Kaydet';btn.disabled=false;}
+        if(editId){await updateDoc(doc(db,_igCol(lang),editId),payload);toast('✦ '+(lang==='tr'?'TR':'EN')+' güncellendi');}
+        else{payload.createdAt=serverTimestamp();await addDoc(collection(db,_igCol(lang)),payload);toast('✦ '+(lang==='tr'?'TR':'EN')+' eklendi');}
+        if(lang==='tr')_editIgTR=null; else _editIgEN=null;
+        loadIgPosts();
+      }catch(e){toast(e.message,true);}
+      finally{btn.textContent=lang==='tr'?'✦ Türkçe Kaydet':'✦ English Save';btn.disabled=false;}
+    }
+    window._saveIgTR=()=>_doSaveIg('tr',_editIgTR);
+    window._saveIgEN=()=>_doSaveIg('en',_editIgEN);
+    window.toggleIgVisible=async(id,lang,cur,btn)=>{btn.disabled=true;await updateDoc(doc(db,_igCol(lang),id),{visible:!cur});toast(cur?'Gizlendi':'Gösterildi');loadIgPosts();};
+    window.deleteIgPost=async(id,lang,btn)=>{if(!confirm('Silinsin mi?'))return;btn.disabled=true;await deleteDoc(doc(db,_igCol(lang),id));toast('Silindi');loadIgPosts();};
+
+    /* ════════════════════════════════════════════════════════
+       YOUTUBE — TR: youtubePosts | EN: youtubePostsEN
+       ════════════════════════════════════════════════════════ */
+    let _editYtTR=null, _editYtEN=null;
+    function extractYtId(url){if(!url)return'';const m=url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);return m?m[1]:'';}
+    function _ytThumb(p){const t=p.thumbnail||(p.videoUrl?`https://img.youtube.com/vi/${extractYtId(p.videoUrl)}/hqdefault.jpg`:'');return t?`<img src="${t}" style="width:56px;height:32px;object-fit:cover;border-radius:4px;flex-shrink:0;" />`:'<span>▶️</span>';}
+
+    async function loadYtPosts(){
+      const list=document.getElementById('ytPostList');
+      list.innerHTML='<p class="empty">Yükleniyor…</p>';
+      try{
+        const [trSnap,enSnap]=await Promise.all([
+          getDocs(query(collection(db,'youtubePosts'),orderBy('order','asc'))),
+          getDocs(query(collection(db,'youtubePostsEN'),orderBy('order','asc')))
+        ]);
+        const trPosts=[],enPosts=[];
+        trSnap.forEach(d=>trPosts.push({id:d.id,...d.data()}));
+        enSnap.forEach(d=>enPosts.push({id:d.id,...d.data()}));
+        if(!trPosts.length&&!enPosts.length){list.innerHTML='<p class="empty">Video yok.</p>';return;}
+        list.innerHTML='';
+        const usedEN=new Set();
+        trPosts.forEach(p=>{
+          const en=enPosts.find(e=>e.slug===p.slug);
+          if(en)usedEN.add(en.id);
+          list.appendChild(makeYtPairCard(p,en||null));
+        });
+        enPosts.filter(e=>!usedEN.has(e.id)).forEach(e=>list.appendChild(makeYtPairCard(null,e)));
+      }catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}
+    }
+
+    function makeYtPairCard(tr,en){
+      const wrap=document.createElement('div'); wrap.className='pair-card';
+      const ts=document.createElement('div'); ts.className='pair-side pair-side-tr';
+      if(tr){
+        ts.innerHTML=`<div class="pair-lang-badge tr-badge">🇹🇷 TR — youtubePosts</div>
+          <div class="pair-title" style="display:flex;align-items:center;gap:8px;margin:6px 0;">${_ytThumb(tr)}<span>${(tr.title||'(Başlıksız)').slice(0,50)}</span> <span class="pill ${tr.visible!==false?'pill-g':'pill-y'}">${tr.visible!==false?'Görünür':'Gizli'}</span></div>
+          <div class="pair-meta">Sıra: ${tr.order??'—'} · ${tr.category||''}</div>
+          <div class="dcard-actions" style="margin-top:8px;">
+            <button class="abtn abtn-g" onclick="editYtPost('${tr.id}','tr')">✏ Düzenle</button>
+            <button class="abtn abtn-gray" onclick="toggleYtVisible('${tr.id}','tr',${tr.visible!==false},this)">${tr.visible!==false?'Gizle':'Göster'}</button>
+            <button class="abtn abtn-r" onclick="deleteYtPost('${tr.id}','tr',this)">✕</button>
+          </div>`;
+      } else {
+        ts.innerHTML=`<div class="pair-lang-badge tr-badge">🇹🇷 TR — youtubePosts</div><div class="pair-empty-side">TR içerik yok.<br><button class="abtn abtn-g" style="margin-top:8px;" onclick="newYtForSlug('tr','${en?.slug||''}')">+ TR Ekle</button></div>`;
+      }
+      const es=document.createElement('div'); es.className='pair-side pair-side-en';
+      if(en){
+        es.innerHTML=`<div class="pair-lang-badge en-badge">🇬🇧 EN — youtubePostsEN</div>
+          <div class="pair-title" style="display:flex;align-items:center;gap:8px;margin:6px 0;">${_ytThumb(en)}<span>${(en.title||'(Untitled)').slice(0,50)}</span> <span class="pill ${en.visible!==false?'pill-g':'pill-y'}">${en.visible!==false?'Visible':'Hidden'}</span></div>
+          <div class="pair-meta">Order: ${en.order??'—'} · ${en.category||''}</div>
+          <div class="dcard-actions" style="margin-top:8px;">
+            <button class="abtn abtn-g" onclick="editYtPost('${en.id}','en')">✏ Edit</button>
+            <button class="abtn abtn-gray" onclick="toggleYtVisible('${en.id}','en',${en.visible!==false},this)">${en.visible!==false?'Hide':'Show'}</button>
+            <button class="abtn abtn-r" onclick="deleteYtPost('${en.id}','en',this)">✕</button>
+          </div>`;
+      } else {
+        es.innerHTML=`<div class="pair-lang-badge en-badge">🇬🇧 EN — youtubePostsEN</div><div class="pair-empty-side">No EN content.<br><button class="abtn abtn-g" style="margin-top:8px;" onclick="newYtForSlug('en','${tr?.slug||''}')">+ Add EN</button></div>`;
+      }
+      wrap.appendChild(ts); wrap.appendChild(es); return wrap;
+    }
+
+    function _ytCol(lang){ return lang==='tr'?'youtubePosts':'youtubePostsEN'; }
+    function _setYtForm(lang,p){
+      const g=id=>document.getElementById('yt_'+lang+'_'+id);
+      g('title').value=p.title||''; g('slug').value=p.slug||''; g('videoUrl').value=p.videoUrl||'';
+      g('category').value=p.category||''; g('description').value=p.description||'';
+      g('dateLabel').value=p.dateLabel||''; g('thumbnail').value=p.thumbnail||'';
+      g('order').value=p.order??0; g('visible').checked=p.visible!==false;
+      const prev=document.getElementById('yt_'+lang+'_thumbPrev');
+      const thumb=p.thumbnail||(p.videoUrl?`https://img.youtube.com/vi/${extractYtId(p.videoUrl)}/hqdefault.jpg`:'');
+      if(thumb){prev.src=thumb;prev.style.display='block';}else prev.style.display='none';
+      const sp=document.getElementById('yt_'+lang+'_slugPreview'); if(sp)sp.textContent=p.slug||'…';
+    }
+    window.newYtBoth=function(){
+      _editYtTR=null;_editYtEN=null;
+      _setYtForm('tr',{visible:true}); _setYtForm('en',{visible:true});
+      document.getElementById('ytBothFormTitle').textContent='+ Yeni Video';
+      openForm('ytBothFormWrap');
     };
-    window.toggleYtVisible=async(id,cur,btn)=>{btn.disabled=true;await updateDoc(doc(db,'youtubePosts',id),{visible:!cur});toast(cur?'Gizlendi':'Gösterildi');loadYtPosts();};
-    window.deleteYtPost=async(id,btn)=>{if(!confirm('Silinsin mi?'))return;btn.disabled=true;await deleteDoc(doc(db,'youtubePosts',id));toast('Silindi');loadYtPosts();};
+    window.newYtForSlug=function(lang,slug){
+      if(lang==='tr'){_editYtTR=null;_setYtForm('tr',{visible:true,slug});}
+      else{_editYtEN=null;_setYtForm('en',{visible:true,slug});}
+      document.getElementById('ytBothFormTitle').textContent='+ Yeni Video';
+      openForm('ytBothFormWrap');
+    };
+    window.editYtPost=async function(id,lang){
+      const snap=await getDoc(doc(db,_ytCol(lang),id)); if(!snap.exists())return;
+      const p=snap.data();
+      if(lang==='tr')_editYtTR=id; else _editYtEN=id;
+      _setYtForm(lang,{title:p.title,slug:p.slug,videoUrl:p.videoUrl,category:p.category,description:p.description,dateLabel:p.dateLabel,thumbnail:p.thumbnail,order:p.order,visible:p.visible!==false});
+      document.getElementById('ytBothFormTitle').textContent='✏ Videoyu Düzenle';
+      openForm('ytBothFormWrap');
+    };
+    window.cancelYtPost=()=>{closeForm('ytBothFormWrap');_editYtTR=null;_editYtEN=null;};
+    async function _doSaveYt(lang,editId){
+      const btn=document.getElementById('yt_'+lang+'_saveBtn'); btn.textContent='…';btn.disabled=true;
+      const g=id=>document.getElementById('yt_'+lang+'_'+id);
+      const videoUrl=g('videoUrl').value.trim();
+      if(!videoUrl){toast('Video URL zorunlu',true);btn.textContent=lang==='tr'?'✦ Türkçe Kaydet':'✦ English Save';btn.disabled=false;return;}
+      const title=g('title').value.trim();
+      const slug=g('slug').value.trim()||window._makeSlug(title.slice(0,60))||('video-'+Date.now());
+      const thumbnail=g('thumbnail').value.trim()||(videoUrl?`https://img.youtube.com/vi/${extractYtId(videoUrl)}/hqdefault.jpg`:'');
+      const payload={title,slug,videoUrl,category:g('category').value.trim(),description:g('description').value.trim(),dateLabel:g('dateLabel').value.trim(),thumbnail,order:parseInt(g('order').value)||0,visible:g('visible').checked,updatedAt:serverTimestamp()};
+      try{
+        if(editId){await updateDoc(doc(db,_ytCol(lang),editId),payload);toast('✦ '+(lang==='tr'?'TR':'EN')+' video güncellendi');}
+        else{payload.createdAt=serverTimestamp();await addDoc(collection(db,_ytCol(lang)),payload);toast('✦ '+(lang==='tr'?'TR':'EN')+' video eklendi');}
+        if(lang==='tr')_editYtTR=null; else _editYtEN=null;
+        loadYtPosts();
+      }catch(e){toast(e.message,true);}
+      finally{btn.textContent=lang==='tr'?'✦ Türkçe Kaydet':'✦ English Save';btn.disabled=false;}
+    }
+    window._saveYtTR=()=>_doSaveYt('tr',_editYtTR);
+    window._saveYtEN=()=>_doSaveYt('en',_editYtEN);
+    window.toggleYtVisible=async(id,lang,cur,btn)=>{btn.disabled=true;await updateDoc(doc(db,_ytCol(lang),id),{visible:!cur});toast(cur?'Gizlendi':'Gösterildi');loadYtPosts();};
+    window.deleteYtPost=async(id,lang,btn)=>{if(!confirm('Silinsin mi?'))return;btn.disabled=true;await deleteDoc(doc(db,_ytCol(lang),id));toast('Silindi');loadYtPosts()};
 
     /* ── AUTO-WIRING ── */
     document.addEventListener('DOMContentLoaded',()=>{
-      /* TR blog slug */
+      // Blog TR slug
       const trTitle=document.getElementById('tr_bp_title'),trSlug=document.getElementById('tr_bp_slug');
       if(trTitle&&trSlug){trTitle.addEventListener('input',()=>{if(!_editTR){trSlug.value=window._makeSlug(trTitle.value);const sp=document.getElementById('tr_slugPreview');if(sp)sp.textContent=trSlug.value||'…';}});trSlug.addEventListener('input',()=>{const sp=document.getElementById('tr_slugPreview');if(sp)sp.textContent=trSlug.value||'…';});}
-      /* EN blog slug */
+      // Blog EN slug
       const enTitle=document.getElementById('en_bp_title'),enSlug=document.getElementById('en_bp_slug');
       if(enTitle&&enSlug){enTitle.addEventListener('input',()=>{if(!_editEN){enSlug.value=window._makeSlug(enTitle.value);const sp=document.getElementById('en_slugPreview');if(sp)sp.textContent=enSlug.value||'…';}});enSlug.addEventListener('input',()=>{const sp=document.getElementById('en_slugPreview');if(sp)sp.textContent=enSlug.value||'…';});}
-      /* IG slug */
-      const igCap=document.getElementById('ig_caption'),igSlugEl=document.getElementById('ig_slug');
-      if(igCap&&igSlugEl){igCap.addEventListener('input',()=>{if(!_editIgId){igSlugEl.value=window._makeSlug(igCap.value.slice(0,60));const sp=document.getElementById('igSlugPreview');if(sp)sp.textContent=igSlugEl.value||'…';}});igSlugEl.addEventListener('input',()=>{const sp=document.getElementById('igSlugPreview');if(sp)sp.textContent=igSlugEl.value||'…';});}
-      /* YT URL → thumbnail */
-      const ytUrl=document.getElementById('yt_videoUrl');
-      if(ytUrl){ytUrl.addEventListener('blur',()=>{const id=extractYtId(ytUrl.value);if(!id)return;const tf=document.getElementById('yt_thumbnail'),prev=document.getElementById('prev_ytThumb');if(!tf.value){const u=`https://img.youtube.com/vi/${id}/hqdefault.jpg`;tf.value=u;if(prev){prev.src=u;prev.style.display='block';}}});}
-      /* YT slug */
-      const ytTitleEl=document.getElementById('yt_title'),ytSlugEl=document.getElementById('yt_slug');
-      if(ytTitleEl&&ytSlugEl){ytTitleEl.addEventListener('input',()=>{if(!_editYtId){ytSlugEl.value=window._makeSlug(ytTitleEl.value.slice(0,60));const sp=document.getElementById('ytSlugPreview');if(sp)sp.textContent=ytSlugEl.value||'…';}});ytSlugEl.addEventListener('input',()=>{const sp=document.getElementById('ytSlugPreview');if(sp)sp.textContent=ytSlugEl.value||'…';});}
+      // IG TR slug auto
+      ['tr','en'].forEach(lang=>{
+        const cap=document.getElementById('ig_'+lang+'_caption');
+        const sl=document.getElementById('ig_'+lang+'_slug');
+        if(cap&&sl){
+          cap.addEventListener('input',()=>{
+            const isEdit=lang==='tr'?_editIgTR:_editIgEN;
+            if(!isEdit){sl.value=window._makeSlug(cap.value.slice(0,60));const sp=document.getElementById('ig_'+lang+'_slugPreview');if(sp)sp.textContent=sl.value||'…';}
+          });
+          sl.addEventListener('input',()=>{const sp=document.getElementById('ig_'+lang+'_slugPreview');if(sp)sp.textContent=sl.value||'…';});
+        }
+      });
+      // YT auto thumbnail + slug
+      ['tr','en'].forEach(lang=>{
+        const urlEl=document.getElementById('yt_'+lang+'_videoUrl');
+        if(urlEl){urlEl.addEventListener('blur',()=>{const id=extractYtId(urlEl.value);if(!id)return;const tf=document.getElementById('yt_'+lang+'_thumbnail'),prev=document.getElementById('yt_'+lang+'_thumbPrev');if(!tf.value){const u=`https://img.youtube.com/vi/${id}/hqdefault.jpg`;tf.value=u;if(prev){prev.src=u;prev.style.display='block';}}});}
+        const titleEl=document.getElementById('yt_'+lang+'_title');
+        const slugEl=document.getElementById('yt_'+lang+'_slug');
+        if(titleEl&&slugEl){
+          titleEl.addEventListener('input',()=>{
+            const isEdit=lang==='tr'?_editYtTR:_editYtEN;
+            if(!isEdit){slugEl.value=window._makeSlug(titleEl.value.slice(0,60));const sp=document.getElementById('yt_'+lang+'_slugPreview');if(sp)sp.textContent=slugEl.value||'…';}
+          });
+          slugEl.addEventListener('input',()=>{const sp=document.getElementById('yt_'+lang+'_slugPreview');if(sp)sp.textContent=slugEl.value||'…';});
+        }
+      });
     });
 
     /* ── TOAST ── */
@@ -490,33 +604,26 @@
     html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);font-size:15px;}
     #loginWrap{position:fixed;inset:0;background:linear-gradient(135deg,#f0ece4,#ddd6ca);display:flex;align-items:center;justify-content:center;z-index:99;}
     .lcard{background:#fff;border:1px solid var(--border);border-radius:12px;padding:32px 28px;width:320px;box-shadow:0 12px 40px rgba(0,0,0,.1);}
-    .lcard h1{font-family:var(--serif);font-size:1.5rem;font-weight:400;text-align:center;margin-bottom:3px;}
-    .lcard h1 span{color:var(--gold);}.lcard .sub{font-size:.7rem;color:var(--muted);text-align:center;margin-bottom:22px;}
+    .lcard h1{font-family:var(--serif);font-size:1.5rem;font-weight:400;text-align:center;margin-bottom:3px;}.lcard h1 span{color:var(--gold);}.lcard .sub{font-size:.7rem;color:var(--muted);text-align:center;margin-bottom:22px;}
     .lf{margin-bottom:10px;}.lf label{display:block;font-size:.62rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
-    .lf input{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-family:var(--font);outline:none;background:#faf8f5;transition:border-color .2s;}
-    .lf input:focus{border-color:var(--gold);background:#fff;}
-    .btn-login{width:100%;margin-top:8px;padding:10px;background:linear-gradient(135deg,#9e7b22,#8a6a1a);color:#fff;border:none;border-radius:40px;font-family:var(--font);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;}
-    .btn-login:hover{opacity:.88;}.btn-login:disabled{opacity:.5;cursor:not-allowed;}
+    .lf input{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-family:var(--font);outline:none;background:#faf8f5;transition:border-color .2s;}.lf input:focus{border-color:var(--gold);background:#fff;}
+    .btn-login{width:100%;margin-top:8px;padding:10px;background:linear-gradient(135deg,#9e7b22,#8a6a1a);color:#fff;border:none;border-radius:40px;font-family:var(--font);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;}.btn-login:hover{opacity:.88;}.btn-login:disabled{opacity:.5;cursor:not-allowed;}
     #lerr{font-size:.72rem;color:#e53e3e;min-height:16px;margin-top:8px;text-align:center;}
     #app{display:none;grid-template-columns:215px 1fr;min-height:100vh;}
     .sb{background:var(--sb);color:#c8c2db;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
     .sb-brand{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.05);}
-    .sb-brand .logo{font-family:var(--serif);font-size:1.1rem;font-weight:400;color:#fff;}
-    .sb-brand .logo em{color:var(--gold2);font-style:normal;}
+    .sb-brand .logo{font-family:var(--serif);font-size:1.1rem;font-weight:400;color:#fff;}.sb-brand .logo em{color:var(--gold2);font-style:normal;}
     .sb-brand .tag{font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-top:2px;}
     .sb-nav{padding:10px 8px 4px;}
     .sb-label{font-size:.56rem;font-weight:500;letter-spacing:.25em;text-transform:uppercase;color:rgba(255,255,255,.22);padding:0 8px;margin-bottom:3px;margin-top:10px;}
     .nb{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:5px;cursor:pointer;font-size:.84rem;font-weight:300;color:rgba(255,255,255,.5);transition:all .18s;border:none;background:none;width:100%;text-align:left;}
     .nb .ic{font-size:.85rem;width:16px;text-align:center;flex-shrink:0;}
-    .nb:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.82);}
-    .nb.on{background:rgba(201,168,76,.14);color:var(--gold2);font-weight:400;}
+    .nb:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.82);}.nb.on{background:rgba(201,168,76,.14);color:var(--gold2);font-weight:400;}
     .sb-foot{margin-top:auto;padding:12px 8px;border-top:1px solid rgba(255,255,255,.05);}
-    .btn-out{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:5px;cursor:pointer;font-size:.74rem;color:rgba(255,255,255,.3);background:none;border:none;width:100%;transition:all .18s;}
-    .btn-out:hover{color:#f08080;background:rgba(240,128,128,.08);}
+    .btn-out{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:5px;cursor:pointer;font-size:.74rem;color:rgba(255,255,255,.3);background:none;border:none;width:100%;transition:all .18s;}.btn-out:hover{color:#f08080;background:rgba(240,128,128,.08);}
     .main{display:flex;flex-direction:column;overflow-y:auto;}
     .topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;height:48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;gap:12px;}
-    .tb-title{font-size:.9rem;font-weight:500;}
-    .tb-badge{font-size:.62rem;background:rgba(138,106,26,.08);color:var(--gold);padding:3px 9px;border-radius:20px;border:1px solid var(--border);}
+    .tb-title{font-size:.9rem;font-weight:500;}.tb-badge{font-size:.62rem;background:rgba(138,106,26,.08);color:var(--gold);padding:3px 9px;border-radius:20px;border:1px solid var(--border);}
     .content{padding:16px 20px;flex:1;}
     .panel{display:none;}.panel.on{display:block;}
     .card{background:#fff;border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;}
@@ -525,8 +632,6 @@
     .ch .arr{font-size:.65rem;color:var(--muted);transition:transform .18s;}
     .card.cl .arr{transform:rotate(-90deg);}.card.cl .cb{display:none;}
     .cb{padding:12px 14px;}
-
-    /* ── DİL SEKME ── */
     .lang-tabs{display:flex;gap:0;margin-bottom:14px;border:1px solid var(--border);border-radius:6px;overflow:hidden;}
     .lang-tab{flex:1;padding:8px 0;text-align:center;font-size:.72rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border:none;background:#faf8f5;color:var(--muted);transition:all .18s;}
     .lang-tab.active-tr{background:linear-gradient(135deg,#9e7b22,#8a6a1a);color:#fff;}
@@ -534,7 +639,6 @@
     .lang-pane{display:none;}.lang-pane.show{display:block;}
     .en-badge{display:inline-block;font-size:.6rem;background:rgba(49,130,206,.12);color:#3182ce;border:1px solid rgba(49,130,206,.25);padding:2px 8px;border-radius:20px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
     .tr-badge{display:inline-block;font-size:.6rem;background:rgba(138,106,26,.1);color:var(--gold);border:1px solid rgba(138,106,26,.25);padding:2px 8px;border-radius:20px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
-
     .fg{margin-bottom:9px;}
     .fg label{display:block;font-size:.72rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
     .fg input,.fg textarea,.fg select{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:5px;font-size:.92rem;font-family:var(--font);color:var(--text);background:#faf8f5;outline:none;transition:border-color .2s;}
@@ -549,19 +653,14 @@
     .iprev{width:56px;height:56px;object-fit:cover;border-radius:5px;border:1px solid var(--border);display:none;background:#e6dfd4;flex-shrink:0;}
     .iprev.circ{border-radius:50%;}.iprev.wide{width:88px;height:48px;}.iprev.rect{width:120px;height:68px;}
     .fpick{font-size:.72rem;color:var(--muted);flex:1;min-width:0;}
-    .btn-up{padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:20px;font-size:.68rem;cursor:pointer;white-space:nowrap;}
-    .btn-up:disabled{opacity:.4;cursor:not-allowed;}
+    .btn-up{padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:20px;font-size:.68rem;cursor:pointer;white-space:nowrap;}.btn-up:disabled{opacity:.4;cursor:not-allowed;}
     .slug-preview{font-size:.72rem;color:var(--muted);margin-top:3px;font-family:monospace;}
     .action-bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
-    .btn-save{padding:8px 24px;background:linear-gradient(135deg,#9e7b22,#8a6a1a);color:#fff;border:none;border-radius:40px;font-family:var(--font);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;margin-top:4px;transition:opacity .2s;}
-    .btn-save:hover{opacity:.88;}.btn-save:disabled{opacity:.5;cursor:not-allowed;}
-    .btn-save-en{padding:8px 24px;background:linear-gradient(135deg,#2b6cb0,#3182ce);color:#fff;border:none;border-radius:40px;font-family:var(--font);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;margin-top:4px;transition:opacity .2s;}
-    .btn-save-en:hover{opacity:.88;}.btn-save-en:disabled{opacity:.5;cursor:not-allowed;}
+    .btn-save{padding:8px 24px;background:linear-gradient(135deg,#9e7b22,#8a6a1a);color:#fff;border:none;border-radius:40px;font-family:var(--font);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;margin-top:4px;transition:opacity .2s;}.btn-save:hover{opacity:.88;}.btn-save:disabled{opacity:.5;cursor:not-allowed;}
+    .btn-save-en{padding:8px 24px;background:linear-gradient(135deg,#2b6cb0,#3182ce);color:#fff;border:none;border-radius:40px;font-family:var(--font);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;margin-top:4px;transition:opacity .2s;}.btn-save-en:hover{opacity:.88;}.btn-save-en:disabled{opacity:.5;cursor:not-allowed;}
     .btn-cancel{padding:8px 20px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:40px;font-family:var(--font);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;margin-top:4px;}
-    .btn-new{padding:8px 20px;background:rgba(138,106,26,.08);color:var(--gold);border:1px solid rgba(138,106,26,.3);border-radius:40px;font-family:var(--font);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;}
-    .btn-new:hover{background:rgba(138,106,26,.14);}
-    .btn-new-en{padding:8px 20px;background:rgba(49,130,206,.08);color:#3182ce;border:1px solid rgba(49,130,206,.3);border-radius:40px;font-family:var(--font);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;}
-    .btn-new-en:hover{background:rgba(49,130,206,.14);}
+    .btn-new{padding:8px 20px;background:rgba(138,106,26,.08);color:var(--gold);border:1px solid rgba(138,106,26,.3);border-radius:40px;font-family:var(--font);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;}.btn-new:hover{background:rgba(138,106,26,.14);}
+    .btn-new-en{padding:8px 20px;background:rgba(49,130,206,.08);color:#3182ce;border:1px solid rgba(49,130,206,.3);border-radius:40px;font-family:var(--font);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;}.btn-new-en:hover{background:rgba(49,130,206,.14);}
     .dcard{background:#faf8f5;border:1px solid var(--border);border-left:3px solid;border-radius:var(--r);padding:10px 12px;margin-bottom:8px;}
     .dcard.ok{border-left-color:#38a169;}.dcard.wait{border-left-color:#d69e2e;}
     .dcard-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;flex-wrap:wrap;gap:3px;}
@@ -570,8 +669,8 @@
     .dcard-actions{display:flex;gap:6px;flex-wrap:wrap;}
     .pill{display:inline-block;font-size:.56rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:20px;margin-left:5px;}
     .pill-g{background:#c6f6d5;color:#276749;}.pill-y{background:#fefcbf;color:#975a16;}
-    .abtn{padding:5px 13px;border:none;border-radius:20px;font-size:.78rem;cursor:pointer;transition:opacity .18s;}
-    .abtn:disabled{opacity:.4;cursor:not-allowed;}
+    .pill-cat{background:rgba(124,58,237,.12);color:#7c3aed;}
+    .abtn{padding:5px 13px;border:none;border-radius:20px;font-size:.78rem;cursor:pointer;transition:opacity .18s;}.abtn:disabled{opacity:.4;cursor:not-allowed;}
     .abtn-g{background:#38a169;color:#fff;}.abtn-b{background:#3182ce;color:#fff;text-decoration:none;display:inline-flex;align-items:center;}
     .abtn-gray{background:#718096;color:#fff;}.abtn-r{background:#e53e3e;color:#fff;}
     .abtn:hover:not(:disabled){opacity:.8;}
@@ -581,11 +680,51 @@
     .toast{position:fixed;bottom:20px;right:20px;background:#1a1628;color:#f0ece4;padding:9px 18px;border-radius:6px;font-size:.76rem;z-index:999;opacity:0;transform:translateY(8px);transition:all .22s;pointer-events:none;}
     .toast.show{opacity:1;transform:none;}.toast.err{background:#c53030;}
 
+    /* ── PAIR CARDS (Blog) ── */
+    .pair-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      margin-bottom: 12px;
+      background: #fff;
+    }
+    .pair-side {
+      padding: 12px 14px;
+    }
+    .pair-side-tr {
+      border-right: 1px solid var(--border);
+      background: #fffdf7;
+    }
+    .pair-side-en {
+      background: #f7faff;
+    }
+    .pair-lang-badge {
+      display: inline-block;
+      font-size: .6rem;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-bottom: 6px;
+    }
+    .pair-lang-badge.tr-badge { background: rgba(138,106,26,.1); color: var(--gold); border: 1px solid rgba(138,106,26,.25); }
+    .pair-lang-badge.en-badge { background: rgba(49,130,206,.1); color: #3182ce; border: 1px solid rgba(49,130,206,.25); }
+    .pair-title { font-size: .9rem; font-weight: 500; margin-bottom: 3px; line-height: 1.3; }
+    .pair-meta { font-size: .72rem; color: var(--muted); margin-bottom: 6px; }
+    .pair-excerpt { font-size: .78rem; color: #666; font-style: italic; margin-bottom: 8px; line-height: 1.5; }
+    .pair-empty-side {
+      font-size: .82rem; color: var(--muted); font-style: italic;
+      padding: 16px 0; text-align: center;
+    }
+
     /* Rich editor */
     .rte-wrap{border:1px solid var(--border);border-radius:5px;overflow:hidden;}
     .rte-toolbar{display:flex;flex-wrap:wrap;gap:2px;padding:6px 8px;background:#f7f4ef;border-bottom:1px solid var(--border);align-items:center;}
-    .rte-toolbar button{border:none;background:transparent;border-radius:4px;cursor:pointer;font-size:.78rem;font-family:var(--font);color:var(--text);padding:4px 8px;transition:background .15s;line-height:1.2;min-width:28px;}
-    .rte-toolbar button:hover{background:rgba(138,106,26,.12);}
+    .rte-toolbar button{border:none;background:transparent;border-radius:4px;cursor:pointer;font-size:.78rem;font-family:var(--font);color:var(--text);padding:4px 8px;transition:background .15s;line-height:1.2;min-width:28px;}.rte-toolbar button:hover{background:rgba(138,106,26,.12);}
     .rte-sep{width:1px;height:20px;background:var(--border);margin:0 3px;flex-shrink:0;}
     .rte-sel{border:1px solid var(--border);background:#faf8f5;border-radius:4px;font-family:var(--font);font-size:.75rem;color:var(--text);padding:3px 6px;cursor:pointer;outline:none;max-width:110px;}
     .rich-editor{min-height:280px;max-height:550px;overflow-y:auto;padding:14px 16px;outline:none;font-family:var(--font);font-size:.95rem;line-height:1.8;color:var(--text);background:#fff;}
@@ -614,10 +753,41 @@
     .appt-date{font-size:.75rem;color:var(--muted);white-space:nowrap;}
     .appt-msg-cell{font-size:.8rem;color:#666;font-style:italic;max-width:220px;line-height:1.5;}
     .appt-actions{display:flex;gap:5px;white-space:nowrap;}
-    @media(max-width:640px){#app{grid-template-columns:1fr;}.sb{display:none;}.g2,.g3{grid-template-columns:1fr;}}
 
-    /* Divider between TR and EN in same card */
-    .lang-divider{border:none;border-top:2px dashed rgba(138,106,26,.15);margin:18px 0;}
+    /* ── BİRLEŞİK YAZI FORMU (yan yana) ── */
+    .both-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      min-height: 400px;
+    }
+    .both-col {
+      display: flex;
+      flex-direction: column;
+    }
+    .both-col-tr { border-right: 2px solid rgba(138,106,26,.2); }
+    .both-col-head {
+      padding: 10px 14px 8px;
+      border-bottom: 1px solid var(--border);
+      background: #fffdf7;
+      display: flex;
+      align-items: center;
+    }
+    .both-col-en .both-col-head { background: #f7faff; }
+    .both-col-body {
+      padding: 14px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .both-col-tr .both-col-body { background: #fffdf7; }
+    .both-col-en .both-col-body { background: #f7faff; }
+    @media(max-width:960px){
+      .both-form-grid{grid-template-columns:1fr;}
+      .both-col-tr{border-right:none;border-bottom:2px solid rgba(138,106,26,.2);}
+    }
+
+    @media(max-width:900px){.pair-card{grid-template-columns:1fr;}.pair-side-tr{border-right:none;border-bottom:1px solid var(--border);}}
+    @media(max-width:640px){#app{grid-template-columns:1fr;}.sb{display:none;}.g2,.g3{grid-template-columns:1fr;}}
   </style>
 </head>
 <body>
@@ -646,7 +816,7 @@
       <button class="nb"    data-p="iletisim"   onclick="go('iletisim')">  <span class="ic">📬</span>İletişim & Sosyal</button>
       <button class="nb"    data-p="genel"      onclick="go('genel')">     <span class="ic">⚙️</span>Genel</button>
       <div class="sb-label">İçerik Yönetimi</div>
-      <button class="nb"    data-p="blog"       onclick="go('blog')">      <span class="ic">✍️</span>Blog Yazıları</button>
+      <button class="nb"    data-p="blog"       onclick="go('blog')">      <span class="ic">✍️</span>Blog (TR + EN)</button>
       <button class="nb"    data-p="instagram"  onclick="go('instagram')"> <span class="ic">📸</span>Instagram</button>
       <button class="nb"    data-p="youtube"    onclick="go('youtube')">   <span class="ic">▶️</span>YouTube</button>
       <div class="sb-label">Gelen Kutusu</div>
@@ -668,294 +838,135 @@
 
       <!-- ══════════════ HERO ══════════════ -->
       <div class="panel on" id="p_hero">
-        <div class="card">
-          <div class="ch" onclick="tog(this)"><h3><span>🖼</span>Arka Plan Görseli</h3><span class="arr">▾</span></div>
-          <div class="cb">
-            <div class="lang-tabs">
-              <button class="lang-tab active-tr" onclick="switchTab(this,'hero_bg','tr')">🇹🇷 Türkçe</button>
-              <button class="lang-tab" onclick="switchTab(this,'hero_bg','en')">🇬🇧 English</button>
-            </div>
-            <div id="hero_bg_tr" class="lang-pane show">
-              <span class="tr-badge">TR → siteContent/main</span>
-              <div class="irow"><img id="tr_prev_heroBg" class="iprev wide" alt="" /><input type="file" id="tr_f_heroBg" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('tr_f_heroBg','tr_prev_heroBg','tr_heroBg',this)">Yükle</button></div>
-              <div class="fg"><label>URL</label><input type="text" id="tr_heroBg" placeholder="https://..." /></div>
-            </div>
-            <div id="hero_bg_en" class="lang-pane">
-              <span class="en-badge">EN → siteContentEN/main</span>
-              <div class="irow"><img id="en_prev_heroBg" class="iprev wide" alt="" /><input type="file" id="en_f_heroBg" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('en_f_heroBg','en_prev_heroBg','en_heroBg',this)">Upload</button></div>
-              <div class="fg"><label>URL</label><input type="text" id="en_heroBg" placeholder="https://..." /></div>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="ch" onclick="tog(this)"><h3><span>✏️</span>Hero Metinleri</h3><span class="arr">▾</span></div>
-          <div class="cb">
-            <div class="lang-tabs">
-              <button class="lang-tab active-tr" onclick="switchTab(this,'hero_text','tr')">🇹🇷 Türkçe</button>
-              <button class="lang-tab" onclick="switchTab(this,'hero_text','en')">🇬🇧 English</button>
-            </div>
-            <div id="hero_text_tr" class="lang-pane show">
-              <span class="tr-badge">TR → siteContent/main</span>
-              <div class="fg"><label>Üst Etiket</label><input type="text" id="tr_heroEyebrow" /></div>
-              <div class="fg"><label>Başlık (HTML)</label><textarea id="tr_heroTitle"></textarea></div>
-              <div class="fg"><label>Alt Başlık</label><textarea id="tr_heroSubtitle"></textarea></div>
-              <button class="btn-save" id="tr_saveHeroBtn" onclick="_saveTR('tr_saveHeroBtn')">✦ TR Kaydet</button>
-            </div>
-            <div id="hero_text_en" class="lang-pane">
-              <span class="en-badge">EN → siteContentEN/main</span>
-              <div class="fg"><label>Eyebrow Label</label><input type="text" id="en_heroEyebrow" /></div>
-              <div class="fg"><label>Title (HTML)</label><textarea id="en_heroTitle"></textarea></div>
-              <div class="fg"><label>Subtitle</label><textarea id="en_heroSubtitle"></textarea></div>
-              <button class="btn-save-en" id="en_saveHeroBtn" onclick="_saveEN('en_saveHeroBtn')">✦ EN Save</button>
-            </div>
-          </div>
-        </div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>🖼</span>Arka Plan Görseli</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'hero_bg','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'hero_bg','en')">🇬🇧 English</button></div><div id="hero_bg_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="irow"><img id="tr_prev_heroBg" class="iprev wide" alt="" /><input type="file" id="tr_f_heroBg" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('tr_f_heroBg','tr_prev_heroBg','tr_heroBg',this)">Yükle</button></div><div class="fg"><label>URL</label><input type="text" id="tr_heroBg" placeholder="https://..." /></div></div><div id="hero_bg_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="irow"><img id="en_prev_heroBg" class="iprev wide" alt="" /><input type="file" id="en_f_heroBg" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('en_f_heroBg','en_prev_heroBg','en_heroBg',this)">Upload</button></div><div class="fg"><label>URL</label><input type="text" id="en_heroBg" placeholder="https://..." /></div></div></div></div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>✏️</span>Hero Metinleri</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'hero_text','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'hero_text','en')">🇬🇧 English</button></div><div id="hero_text_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="fg"><label>Üst Etiket</label><input type="text" id="tr_heroEyebrow" /></div><div class="fg"><label>Başlık (HTML)</label><textarea id="tr_heroTitle"></textarea></div><div class="fg"><label>Alt Başlık</label><textarea id="tr_heroSubtitle"></textarea></div><button class="btn-save" id="tr_saveHeroBtn" onclick="_saveTR('tr_saveHeroBtn')">✦ TR Kaydet</button></div><div id="hero_text_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="fg"><label>Eyebrow Label</label><input type="text" id="en_heroEyebrow" /></div><div class="fg"><label>Title (HTML)</label><textarea id="en_heroTitle"></textarea></div><div class="fg"><label>Subtitle</label><textarea id="en_heroSubtitle"></textarea></div><button class="btn-save-en" id="en_saveHeroBtn" onclick="_saveEN('en_saveHeroBtn')">✦ EN Save</button></div></div></div>
       </div>
 
       <!-- ══════════════ HAKKIMDA ══════════════ -->
       <div class="panel" id="p_hakkimda">
-        <div class="card">
-          <div class="ch" onclick="tog(this)"><h3><span>📷</span>Profil Fotoğrafı</h3><span class="arr">▾</span></div>
-          <div class="cb">
-            <div class="lang-tabs">
-              <button class="lang-tab active-tr" onclick="switchTab(this,'pp','tr')">🇹🇷 Türkçe</button>
-              <button class="lang-tab" onclick="switchTab(this,'pp','en')">🇬🇧 English</button>
-            </div>
-            <div id="pp_tr" class="lang-pane show">
-              <span class="tr-badge">TR → siteContent/main</span>
-              <div class="irow"><img id="tr_prev_pp" class="iprev circ" alt="" /><input type="file" id="tr_f_pp" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('tr_f_pp','tr_prev_pp','tr_profilePhoto',this)">Yükle</button></div>
-              <div class="fg"><label>URL</label><input type="text" id="tr_profilePhoto" /></div>
-            </div>
-            <div id="pp_en" class="lang-pane">
-              <span class="en-badge">EN → siteContentEN/main</span>
-              <div class="irow"><img id="en_prev_pp" class="iprev circ" alt="" /><input type="file" id="en_f_pp" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('en_f_pp','en_prev_pp','en_profilePhoto',this)">Upload</button></div>
-              <div class="fg"><label>URL</label><input type="text" id="en_profilePhoto" /></div>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="ch" onclick="tog(this)"><h3><span>👤</span>Profil Bilgileri</h3><span class="arr">▾</span></div>
-          <div class="cb">
-            <div class="lang-tabs">
-              <button class="lang-tab active-tr" onclick="switchTab(this,'about_info','tr')">🇹🇷 Türkçe</button>
-              <button class="lang-tab" onclick="switchTab(this,'about_info','en')">🇬🇧 English</button>
-            </div>
-            <div id="about_info_tr" class="lang-pane show">
-              <span class="tr-badge">TR → siteContent/main</span>
-              <div class="g2"><div class="fg"><label>İsim / Unvan</label><input type="text" id="tr_aboutName" /></div><div class="fg"><label>Konum</label><input type="text" id="tr_aboutTitle" /></div></div>
-              <div class="fg"><label>Alıntı</label><textarea id="tr_aboutQuote"></textarea></div>
-              <div class="fg"><label>1. Paragraf (HTML)</label><textarea id="tr_aboutText1"></textarea></div>
-              <div class="fg"><label>2. Paragraf (HTML)</label><textarea id="tr_aboutText2"></textarea></div>
-              <button class="btn-save" id="tr_saveAboutBtn" onclick="_saveTR('tr_saveAboutBtn')">✦ TR Kaydet</button>
-            </div>
-            <div id="about_info_en" class="lang-pane">
-              <span class="en-badge">EN → siteContentEN/main</span>
-              <div class="g2"><div class="fg"><label>Name / Title</label><input type="text" id="en_aboutName" /></div><div class="fg"><label>Location</label><input type="text" id="en_aboutTitle" /></div></div>
-              <div class="fg"><label>Quote</label><textarea id="en_aboutQuote"></textarea></div>
-              <div class="fg"><label>1st Paragraph (HTML)</label><textarea id="en_aboutText1"></textarea></div>
-              <div class="fg"><label>2nd Paragraph (HTML)</label><textarea id="en_aboutText2"></textarea></div>
-              <button class="btn-save-en" id="en_saveAboutBtn" onclick="_saveEN('en_saveAboutBtn')">✦ EN Save</button>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="ch" onclick="tog(this)"><h3><span>📊</span>İstatistikler</h3><span class="arr">▾</span></div>
-          <div class="cb">
-            <div class="lang-tabs">
-              <button class="lang-tab active-tr" onclick="switchTab(this,'stats','tr')">🇹🇷 Türkçe</button>
-              <button class="lang-tab" onclick="switchTab(this,'stats','en')">🇬🇧 English</button>
-            </div>
-            <div id="stats_tr" class="lang-pane show">
-              <span class="tr-badge">TR → siteContent/main</span>
-              <div class="g3">
-                <div><div class="fg"><label>1. Sayı</label><input type="text" id="tr_stat1Number" /></div><div class="fg"><label>1. Etiket</label><input type="text" id="tr_stat1Label" /></div></div>
-                <div><div class="fg"><label>2. Sayı</label><input type="text" id="tr_stat2Number" /></div><div class="fg"><label>2. Etiket</label><input type="text" id="tr_stat2Label" /></div></div>
-                <div><div class="fg"><label>3. Sayı</label><input type="text" id="tr_stat3Number" /></div><div class="fg"><label>3. Etiket</label><input type="text" id="tr_stat3Label" /></div></div>
-              </div>
-              <button class="btn-save" id="tr_saveStatsBtn" onclick="_saveTR('tr_saveStatsBtn')">✦ TR Kaydet</button>
-            </div>
-            <div id="stats_en" class="lang-pane">
-              <span class="en-badge">EN → siteContentEN/main</span>
-              <div class="g3">
-                <div><div class="fg"><label>Stat 1 #</label><input type="text" id="en_stat1Number" /></div><div class="fg"><label>Stat 1 Label</label><input type="text" id="en_stat1Label" /></div></div>
-                <div><div class="fg"><label>Stat 2 #</label><input type="text" id="en_stat2Number" /></div><div class="fg"><label>Stat 2 Label</label><input type="text" id="en_stat2Label" /></div></div>
-                <div><div class="fg"><label>Stat 3 #</label><input type="text" id="en_stat3Number" /></div><div class="fg"><label>Stat 3 Label</label><input type="text" id="en_stat3Label" /></div></div>
-              </div>
-              <button class="btn-save-en" id="en_saveStatsBtn" onclick="_saveEN('en_saveStatsBtn')">✦ EN Save</button>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="ch" onclick="tog(this)"><h3><span>🎓</span>Sertifikalar & Eğitimler</h3><span class="arr">▾</span></div>
-          <div class="cb">
-            <div class="lang-tabs">
-              <button class="lang-tab active-tr" onclick="switchTab(this,'certs','tr')">🇹🇷 Türkçe</button>
-              <button class="lang-tab" onclick="switchTab(this,'certs','en')">🇬🇧 English</button>
-            </div>
-            <div id="certs_tr" class="lang-pane show">
-              <span class="tr-badge">TR → siteContent/main (certItems)</span>
-              <div class="fg"><textarea id="tr_certItems" style="min-height:140px;font-family:monospace;font-size:.82rem;" placeholder="🎓|QHHT Level II Sertifikası — Dolores Cannon&#10;⭐|Karmik Astroloji Uzmanlığı"></textarea><p class="help-text">Her satır: <code>emoji|metin</code></p></div>
-              <button class="btn-save" id="tr_saveCertBtn" onclick="_saveTR('tr_saveCertBtn')">✦ TR Kaydet</button>
-            </div>
-            <div id="certs_en" class="lang-pane">
-              <span class="en-badge">EN → siteContentEN/main (certItems)</span>
-              <div class="fg"><textarea id="en_certItems" style="min-height:140px;font-family:monospace;font-size:.82rem;" placeholder="🎓|QHHT Level II Certification — Dolores Cannon&#10;⭐|Karmic Astrology Specialisation"></textarea><p class="help-text">Each line: <code>emoji|text</code></p></div>
-              <button class="btn-save-en" id="en_saveCertBtn" onclick="_saveEN('en_saveCertBtn')">✦ EN Save</button>
-            </div>
-          </div>
-        </div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📷</span>Profil Fotoğrafı</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'pp','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'pp','en')">🇬🇧 English</button></div><div id="pp_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="irow"><img id="tr_prev_pp" class="iprev circ" alt="" /><input type="file" id="tr_f_pp" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('tr_f_pp','tr_prev_pp','tr_profilePhoto',this)">Yükle</button></div><div class="fg"><label>URL</label><input type="text" id="tr_profilePhoto" /></div></div><div id="pp_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="irow"><img id="en_prev_pp" class="iprev circ" alt="" /><input type="file" id="en_f_pp" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('en_f_pp','en_prev_pp','en_profilePhoto',this)">Upload</button></div><div class="fg"><label>URL</label><input type="text" id="en_profilePhoto" /></div></div></div></div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>👤</span>Profil Bilgileri</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'about_info','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'about_info','en')">🇬🇧 English</button></div><div id="about_info_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="g2"><div class="fg"><label>İsim / Unvan</label><input type="text" id="tr_aboutName" /></div><div class="fg"><label>Konum</label><input type="text" id="tr_aboutTitle" /></div></div><div class="fg"><label>Alıntı</label><textarea id="tr_aboutQuote"></textarea></div><div class="fg"><label>1. Paragraf (HTML)</label><textarea id="tr_aboutText1"></textarea></div><div class="fg"><label>2. Paragraf (HTML)</label><textarea id="tr_aboutText2"></textarea></div><button class="btn-save" id="tr_saveAboutBtn" onclick="_saveTR('tr_saveAboutBtn')">✦ TR Kaydet</button></div><div id="about_info_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="g2"><div class="fg"><label>Name / Title</label><input type="text" id="en_aboutName" /></div><div class="fg"><label>Location</label><input type="text" id="en_aboutTitle" /></div></div><div class="fg"><label>Quote</label><textarea id="en_aboutQuote"></textarea></div><div class="fg"><label>1st Paragraph (HTML)</label><textarea id="en_aboutText1"></textarea></div><div class="fg"><label>2nd Paragraph (HTML)</label><textarea id="en_aboutText2"></textarea></div><button class="btn-save-en" id="en_saveAboutBtn" onclick="_saveEN('en_saveAboutBtn')">✦ EN Save</button></div></div></div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📊</span>İstatistikler</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'stats','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'stats','en')">🇬🇧 English</button></div><div id="stats_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="g3"><div><div class="fg"><label>1. Sayı</label><input type="text" id="tr_stat1Number" /></div><div class="fg"><label>1. Etiket</label><input type="text" id="tr_stat1Label" /></div></div><div><div class="fg"><label>2. Sayı</label><input type="text" id="tr_stat2Number" /></div><div class="fg"><label>2. Etiket</label><input type="text" id="tr_stat2Label" /></div></div><div><div class="fg"><label>3. Sayı</label><input type="text" id="tr_stat3Number" /></div><div class="fg"><label>3. Etiket</label><input type="text" id="tr_stat3Label" /></div></div></div><button class="btn-save" id="tr_saveStatsBtn" onclick="_saveTR('tr_saveStatsBtn')">✦ TR Kaydet</button></div><div id="stats_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="g3"><div><div class="fg"><label>Stat 1 #</label><input type="text" id="en_stat1Number" /></div><div class="fg"><label>Stat 1 Label</label><input type="text" id="en_stat1Label" /></div></div><div><div class="fg"><label>Stat 2 #</label><input type="text" id="en_stat2Number" /></div><div class="fg"><label>Stat 2 Label</label><input type="text" id="en_stat2Label" /></div></div><div><div class="fg"><label>Stat 3 #</label><input type="text" id="en_stat3Number" /></div><div class="fg"><label>Stat 3 Label</label><input type="text" id="en_stat3Label" /></div></div></div><button class="btn-save-en" id="en_saveStatsBtn" onclick="_saveEN('en_saveStatsBtn')">✦ EN Save</button></div></div></div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>🎓</span>Sertifikalar & Eğitimler</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'certs','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'certs','en')">🇬🇧 English</button></div><div id="certs_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main (certItems)</span><div class="fg"><textarea id="tr_certItems" style="min-height:140px;font-family:monospace;font-size:.82rem;" placeholder="🎓|QHHT Level II Sertifikası — Dolores Cannon&#10;⭐|Karmik Astroloji Uzmanlığı"></textarea><p class="help-text">Her satır: <code>emoji|metin</code></p></div><button class="btn-save" id="tr_saveCertBtn" onclick="_saveTR('tr_saveCertBtn')">✦ TR Kaydet</button></div><div id="certs_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main (certItems)</span><div class="fg"><textarea id="en_certItems" style="min-height:140px;font-family:monospace;font-size:.82rem;" placeholder="🎓|QHHT Level II Certification — Dolores Cannon&#10;⭐|Karmic Astrology Specialisation"></textarea><p class="help-text">Each line: <code>emoji|text</code></p></div><button class="btn-save-en" id="en_saveCertBtn" onclick="_saveEN('en_saveCertBtn')">✦ EN Save</button></div></div></div>
       </div>
 
       <!-- ══════════════ İLETİŞİM ══════════════ -->
       <div class="panel" id="p_iletisim">
-        <div class="card">
-          <div class="ch" onclick="tog(this)"><h3><span>📬</span>İletişim & Sosyal Medya</h3><span class="arr">▾</span></div>
-          <div class="cb">
-            <div class="lang-tabs">
-              <button class="lang-tab active-tr" onclick="switchTab(this,'contact','tr')">🇹🇷 Türkçe</button>
-              <button class="lang-tab" onclick="switchTab(this,'contact','en')">🇬🇧 English</button>
-            </div>
-            <div id="contact_tr" class="lang-pane show">
-              <span class="tr-badge">TR → siteContent/main</span>
-              <div class="g2"><div class="fg"><label>E-posta</label><input type="email" id="tr_email" /></div><div class="fg"><label>WhatsApp</label><input type="text" id="tr_whatsapp" /></div></div>
-              <div class="fg"><label>Telefon</label><input type="tel" id="tr_phone" /></div>
-              <div class="fg"><label>Konum</label><input type="text" id="tr_location" /></div>
-              <div class="g2"><div class="fg"><label>Instagram Kullanıcı Adı</label><input type="text" id="tr_instagramHandle" placeholder="@kullanici_adi" /></div><div class="fg"><label>Instagram URL</label><input type="url" id="tr_instagramUrl" /></div></div>
-              <div class="g2"><div class="fg"><label>YouTube Kanal Adı</label><input type="text" id="tr_youtubeHandle" /></div><div class="fg"><label>YouTube URL</label><input type="url" id="tr_youtubeUrl" /></div></div>
-              <button class="btn-save" id="tr_saveContactBtn" onclick="_saveTR('tr_saveContactBtn')">✦ TR Kaydet</button>
-            </div>
-            <div id="contact_en" class="lang-pane">
-              <span class="en-badge">EN → siteContentEN/main</span>
-              <div class="g2"><div class="fg"><label>Email</label><input type="email" id="en_email" /></div><div class="fg"><label>WhatsApp</label><input type="text" id="en_whatsapp" /></div></div>
-              <div class="fg"><label>Phone</label><input type="tel" id="en_phone" /></div>
-              <div class="fg"><label>Location (HTML)</label><textarea id="en_location"></textarea></div>
-              <div class="g2"><div class="fg"><label>Instagram Handle</label><input type="text" id="en_instagramHandle" placeholder="@username" /></div><div class="fg"><label>Instagram URL</label><input type="url" id="en_instagramUrl" /></div></div>
-              <div class="g2"><div class="fg"><label>YouTube Channel Name</label><input type="text" id="en_youtubeHandle" /></div><div class="fg"><label>YouTube URL</label><input type="url" id="en_youtubeUrl" /></div></div>
-              <button class="btn-save-en" id="en_saveContactBtn" onclick="_saveEN('en_saveContactBtn')">✦ EN Save</button>
-            </div>
-          </div>
-        </div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📬</span>İletişim & Sosyal Medya</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'contact','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'contact','en')">🇬🇧 English</button></div><div id="contact_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="g2"><div class="fg"><label>E-posta</label><input type="email" id="tr_email" /></div><div class="fg"><label>WhatsApp</label><input type="text" id="tr_whatsapp" /></div></div><div class="fg"><label>Telefon</label><input type="tel" id="tr_phone" /></div><div class="fg"><label>Konum</label><input type="text" id="tr_location" /></div><div class="g2"><div class="fg"><label>Instagram Kullanıcı Adı</label><input type="text" id="tr_instagramHandle" placeholder="@kullanici_adi" /></div><div class="fg"><label>Instagram URL</label><input type="url" id="tr_instagramUrl" /></div></div><div class="g2"><div class="fg"><label>YouTube Kanal Adı</label><input type="text" id="tr_youtubeHandle" /></div><div class="fg"><label>YouTube URL</label><input type="url" id="tr_youtubeUrl" /></div></div><button class="btn-save" id="tr_saveContactBtn" onclick="_saveTR('tr_saveContactBtn')">✦ TR Kaydet</button></div><div id="contact_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="g2"><div class="fg"><label>Email</label><input type="email" id="en_email" /></div><div class="fg"><label>WhatsApp</label><input type="text" id="en_whatsapp" /></div></div><div class="fg"><label>Phone</label><input type="tel" id="en_phone" /></div><div class="fg"><label>Location (HTML)</label><textarea id="en_location"></textarea></div><div class="g2"><div class="fg"><label>Instagram Handle</label><input type="text" id="en_instagramHandle" placeholder="@username" /></div><div class="fg"><label>Instagram URL</label><input type="url" id="en_instagramUrl" /></div></div><div class="g2"><div class="fg"><label>YouTube Channel Name</label><input type="text" id="en_youtubeHandle" /></div><div class="fg"><label>YouTube URL</label><input type="url" id="en_youtubeUrl" /></div></div><button class="btn-save-en" id="en_saveContactBtn" onclick="_saveEN('en_saveContactBtn')">✦ EN Save</button></div></div></div>
       </div>
 
       <!-- ══════════════ GENEL ══════════════ -->
       <div class="panel" id="p_genel">
-        <div class="card">
-          <div class="ch" onclick="tog(this)"><h3><span>⚙️</span>Navigasyon & Footer</h3><span class="arr">▾</span></div>
-          <div class="cb">
-            <div class="lang-tabs">
-              <button class="lang-tab active-tr" onclick="switchTab(this,'genel','tr')">🇹🇷 Türkçe</button>
-              <button class="lang-tab" onclick="switchTab(this,'genel','en')">🇬🇧 English</button>
-            </div>
-            <div id="genel_tr" class="lang-pane show">
-              <span class="tr-badge">TR → siteContent/main</span>
-              <div class="fg"><label>Logo Metni</label><input type="text" id="tr_navLogo" /></div>
-              <div class="fg"><label>Footer Telif</label><input type="text" id="tr_footerCopy" /></div>
-              <button class="btn-save" id="tr_saveGenelBtn" onclick="_saveTR('tr_saveGenelBtn')">✦ TR Kaydet</button>
-            </div>
-            <div id="genel_en" class="lang-pane">
-              <span class="en-badge">EN → siteContentEN/main</span>
-              <div class="fg"><label>Nav Logo Text</label><input type="text" id="en_navLogo" /></div>
-              <div class="fg"><label>Footer Copyright</label><input type="text" id="en_footerCopy" /></div>
-              <button class="btn-save-en" id="en_saveGenelBtn" onclick="_saveEN('en_saveGenelBtn')">✦ EN Save</button>
-            </div>
-          </div>
-        </div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>⚙️</span>Navigasyon & Footer</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'genel','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'genel','en')">🇬🇧 English</button></div><div id="genel_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="fg"><label>Logo Metni</label><input type="text" id="tr_navLogo" /></div><div class="fg"><label>Footer Telif</label><input type="text" id="tr_footerCopy" /></div><button class="btn-save" id="tr_saveGenelBtn" onclick="_saveTR('tr_saveGenelBtn')">✦ TR Kaydet</button></div><div id="genel_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="fg"><label>Nav Logo Text</label><input type="text" id="en_navLogo" /></div><div class="fg"><label>Footer Copyright</label><input type="text" id="en_footerCopy" /></div><button class="btn-save-en" id="en_saveGenelBtn" onclick="_saveEN('en_saveGenelBtn')">✦ EN Save</button></div></div></div>
       </div>
 
-      <!-- ══════════════ BLOG ══════════════ -->
+      <!-- ══════════════ BLOG — BİRLEŞİK PANEL ══════════════ -->
       <div class="panel" id="p_blog">
         <div class="card">
-          <div class="ch" onclick="tog(this)"><h3><span>✍️</span>Blog Yazıları</h3><span class="arr">▾</span></div>
+          <div class="ch" onclick="tog(this)"><h3><span>✍️</span>Blog Yazıları — TR 🇹🇷 &amp; EN 🇬🇧</h3><span class="arr">▾</span></div>
           <div class="cb">
-            <div class="lang-tabs">
-              <button class="lang-tab active-tr" onclick="switchTab(this,'blog_list','tr')">🇹🇷 Türkçe — blogPosts</button>
-              <button class="lang-tab" onclick="switchTab(this,'blog_list','en')">🇬🇧 English — blogPostsEN</button>
+            <p class="help-text" style="margin-bottom:12px;">Her kart sol tarafta Türkçe (<code>blogPosts</code>), sağ tarafta İngilizce (<code>blogPostsEN</code>) içeriği gösterir. Slug'lar eşleştiğinde yazılar otomatik olarak eşlenir.</p>
+            <div class="action-bar">
+              <button class="btn-new" onclick="newPostBoth()">+ Yeni Yazı</button>
+              <a class="abtn abtn-b" href="blog.html" target="_blank" style="text-decoration:none;">👁 TR Blog</a>
+              <a class="abtn abtn-b" href="blog-en.html" target="_blank" style="text-decoration:none;background:#3182ce;">👁 EN Blog</a>
             </div>
-            <div id="blog_list_tr" class="lang-pane show">
-              <div class="action-bar" style="margin-top:10px;"><button class="btn-new" onclick="newPost()">+ Yeni Yazı</button><a class="abtn abtn-b" href="blog.html" target="_blank" style="text-decoration:none;">👁 TR Blog</a></div>
-              <div id="blogPostList"></div>
-            </div>
-            <div id="blog_list_en" class="lang-pane">
-              <div class="action-bar" style="margin-top:10px;"><button class="btn-new-en" onclick="newPostEN()">+ New Post</button><a class="abtn abtn-b" href="blog-en.html" target="_blank" style="text-decoration:none;">👁 EN Blog</a></div>
-              <div id="blogPostListEN"></div>
-            </div>
+            <div id="blogPostList"></div>
           </div>
         </div>
 
-        <!-- TR post form -->
-        <div id="tr_postFormWrap">
-          <div class="card" style="border-color:rgba(138,106,26,.3);">
-            <div class="ch" onclick="tog(this)"><h3 id="tr_postFormTitle"><span>✏</span>Yeni Yazı (TR)</h3><span class="arr">▾</span></div>
-            <div class="cb">
-              <span class="tr-badge">TR → blogPosts</span>
-              <div class="g2" style="margin-top:8px;"><div class="fg"><label>Başlık *</label><input type="text" id="tr_bp_title" /></div><div class="fg"><label>Slug</label><input type="text" id="tr_bp_slug" /><p class="slug-preview">blog.html#/<span id="tr_slugPreview">…</span></p></div></div>
-              <div class="g2"><div class="fg"><label>Kategori</label><input type="text" id="tr_bp_category" list="trCatList" /><datalist id="trCatList"><option value="Astroloji" /><option value="QHHT" /><option value="Karmik Astroloji" /><option value="Bilinçaltı" /></datalist></div><div class="fg"><label>Emoji</label><input type="text" id="tr_bp_emoji" maxlength="4" /></div></div>
-              <div class="fg"><label>Özet</label><textarea id="tr_bp_excerpt"></textarea></div>
-              <div class="fg"><label>Kapak Görseli</label><div class="irow"><img id="tr_prev_bpCover" class="iprev rect" alt="" /><input type="file" id="tr_f_bpCover" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('tr_f_bpCover','tr_prev_bpCover','tr_bp_coverUrl',this)">Yükle</button></div><input type="url" id="tr_bp_coverUrl" /></div>
-              <div class="fg"><label>İçerik</label>
-                <div class="rte-wrap">
-                  <div class="rte-toolbar">
-                    <select class="rte-sel" onchange="rte('formatBlock',this.value,'tr_richEditor');this.value=''" ><option value="">¶ Para</option><option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option><option value="blockquote">Alıntı</option></select>
-                    <div class="rte-sep"></div>
-                    <button onclick="rte('bold',null,'tr_richEditor')"><b>B</b></button>
-                    <button onclick="rte('italic',null,'tr_richEditor')"><i>i</i></button>
-                    <button onclick="rte('underline',null,'tr_richEditor')"><u>U</u></button>
-                    <div class="rte-sep"></div>
-                    <button onclick="rte('insertUnorderedList',null,'tr_richEditor')">• —</button>
-                    <button onclick="rte('insertOrderedList',null,'tr_richEditor')">1.</button>
-                    <div class="rte-sep"></div>
-                    <button onclick="rteLink('tr_richEditor')">🔗</button>
-                    <button onclick="rteImage('tr_richEditor')">🖼</button>
-                    <button onclick="document.getElementById('tr_rteFile').click()">📤</button>
-                    <button onclick="rte('removeFormat',null,'tr_richEditor')" style="color:#e53e3e;">✕</button>
-                    <input type="file" id="tr_rteFile" accept="image/*" style="display:none" onchange="rteUpload(this,'tr_richEditor')" />
-                  </div>
-                  <div id="tr_richEditor" class="rich-editor" contenteditable="true" spellcheck="false"></div>
-                </div>
+        <!-- Unified TR + EN Post Form -->
+        <div id="bothPostFormWrap" style="display:none;">
+          <div class="card" style="border:2px solid rgba(138,106,26,.25);">
+            <div class="ch" onclick="tog(this)">
+              <h3 id="bothPostFormTitle"><span>✏</span>Yeni Yazı</h3>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <button class="btn-cancel" style="margin-top:0;font-size:.65rem;" onclick="cancelBothPost()">✕ Kapat</button>
+                <span class="arr">▾</span>
               </div>
-              <div class="g2"><div class="fg"><label>Etiketler (virgülle)</label><input type="text" id="tr_bp_tags" /></div><div class="fg"><label>Okuma Süresi (dk)</label><input type="number" id="tr_bp_readingTime" min="1" /></div></div>
-              <div class="g2"><div class="fg"><label>Yazar</label><input type="text" id="tr_bp_authorName" /></div><div class="fg"><label>SEO Meta</label><input type="text" id="tr_bp_metaDesc" maxlength="160" /></div></div>
-              <div class="toggle-row"><input type="checkbox" id="tr_bp_published" checked /><label class="toggle-label" for="tr_bp_published">Hemen yayınla</label></div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn-save" id="tr_savePostBtn" onclick="_savePost()">✦ TR Kaydet</button><button class="btn-cancel" onclick="cancelPost()">İptal</button></div>
             </div>
-          </div>
-        </div>
+            <div class="cb" style="padding:0;">
+              <div class="both-form-grid">
 
-        <!-- EN post form -->
-        <div id="en_postFormWrap">
-          <div class="card" style="border-color:rgba(49,130,206,.3);">
-            <div class="ch" onclick="tog(this)"><h3 id="en_postFormTitle"><span>✏</span>New Post (EN)</h3><span class="arr">▾</span></div>
-            <div class="cb">
-              <span class="en-badge">EN → blogPostsEN</span>
-              <div class="g2" style="margin-top:8px;"><div class="fg"><label>Title *</label><input type="text" id="en_bp_title" /></div><div class="fg"><label>Slug</label><input type="text" id="en_bp_slug" /><p class="slug-preview">blog-en.html#/<span id="en_slugPreview">…</span></p></div></div>
-              <div class="g2"><div class="fg"><label>Category</label><input type="text" id="en_bp_category" list="enCatList" /><datalist id="enCatList"><option value="Astrology" /><option value="QHHT" /><option value="Karmic Astrology" /><option value="Spiritual Growth" /></datalist></div><div class="fg"><label>Emoji</label><input type="text" id="en_bp_emoji" maxlength="4" /></div></div>
-              <div class="fg"><label>Excerpt</label><textarea id="en_bp_excerpt"></textarea></div>
-              <div class="fg"><label>Cover Image</label><div class="irow"><img id="en_prev_bpCover" class="iprev rect" alt="" /><input type="file" id="en_f_bpCover" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('en_f_bpCover','en_prev_bpCover','en_bp_coverUrl',this)">Upload</button></div><input type="url" id="en_bp_coverUrl" /></div>
-              <div class="fg"><label>Content</label>
-                <div class="rte-wrap">
-                  <div class="rte-toolbar">
-                    <select class="rte-sel" onchange="rte('formatBlock',this.value,'en_richEditor');this.value=''"><option value="">¶ Para</option><option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option><option value="blockquote">Quote</option></select>
-                    <div class="rte-sep"></div>
-                    <button onclick="rte('bold',null,'en_richEditor')"><b>B</b></button>
-                    <button onclick="rte('italic',null,'en_richEditor')"><i>i</i></button>
-                    <button onclick="rte('underline',null,'en_richEditor')"><u>U</u></button>
-                    <div class="rte-sep"></div>
-                    <button onclick="rte('insertUnorderedList',null,'en_richEditor')">• —</button>
-                    <button onclick="rte('insertOrderedList',null,'en_richEditor')">1.</button>
-                    <div class="rte-sep"></div>
-                    <button onclick="rteLink('en_richEditor')">🔗</button>
-                    <button onclick="rteImage('en_richEditor')">🖼</button>
-                    <button onclick="document.getElementById('en_rteFile').click()">📤</button>
-                    <button onclick="rte('removeFormat',null,'en_richEditor')" style="color:#e53e3e;">✕</button>
-                    <input type="file" id="en_rteFile" accept="image/*" style="display:none" onchange="rteUpload(this,'en_richEditor')" />
+                <!-- ── SOL: TÜRKÇE ── -->
+                <div class="both-col both-col-tr">
+                  <div class="both-col-head">
+                    <span class="tr-badge" style="margin:0;">🇹🇷 Türkçe — blogPosts</span>
                   </div>
-                  <div id="en_richEditor" class="rich-editor" contenteditable="true" spellcheck="false"></div>
+                  <div class="both-col-body">
+                    <div class="fg"><label>Başlık *</label><input type="text" id="tr_bp_title" /></div>
+                    <div class="fg"><label>Slug</label><input type="text" id="tr_bp_slug" /><p class="slug-preview">blog.html#/<span id="tr_slugPreview">…</span></p></div>
+                    <div class="g2"><div class="fg"><label>Kategori</label><input type="text" id="tr_bp_category" list="trCatList" /><datalist id="trCatList"><option value="Astroloji" /><option value="QHHT" /><option value="Karmik Astroloji" /><option value="Bilinçaltı" /></datalist></div><div class="fg"><label>Emoji</label><input type="text" id="tr_bp_emoji" maxlength="4" /></div></div>
+                    <div class="fg"><label>Özet</label><textarea id="tr_bp_excerpt"></textarea></div>
+                    <div class="fg"><label>Kapak Görseli</label><div class="irow"><img id="tr_prev_bpCover" class="iprev rect" alt="" /><input type="file" id="tr_f_bpCover" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('tr_f_bpCover','tr_prev_bpCover','tr_bp_coverUrl',this)">Yükle</button></div><input type="url" id="tr_bp_coverUrl" /></div>
+                    <div class="fg"><label>İçerik</label>
+                      <div class="rte-wrap">
+                        <div class="rte-toolbar">
+                          <select class="rte-sel" onchange="rte('formatBlock',this.value,'tr_richEditor');this.value=''"><option value="">¶ Para</option><option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option><option value="blockquote">Alıntı</option></select>
+                          <div class="rte-sep"></div>
+                          <button onclick="rte('bold',null,'tr_richEditor')"><b>B</b></button>
+                          <button onclick="rte('italic',null,'tr_richEditor')"><i>i</i></button>
+                          <button onclick="rte('underline',null,'tr_richEditor')"><u>U</u></button>
+                          <div class="rte-sep"></div>
+                          <button onclick="rte('insertUnorderedList',null,'tr_richEditor')">• —</button>
+                          <button onclick="rte('insertOrderedList',null,'tr_richEditor')">1.</button>
+                          <div class="rte-sep"></div>
+                          <button onclick="rteLink('tr_richEditor')">🔗</button>
+                          <button onclick="rteImage('tr_richEditor')">🖼</button>
+                          <button onclick="document.getElementById('tr_rteFile').click()">📤</button>
+                          <button onclick="rte('removeFormat',null,'tr_richEditor')" style="color:#e53e3e;">✕</button>
+                          <input type="file" id="tr_rteFile" accept="image/*" style="display:none" onchange="rteUpload(this,'tr_richEditor')" />
+                        </div>
+                        <div id="tr_richEditor" class="rich-editor" contenteditable="true" spellcheck="false"></div>
+                      </div>
+                    </div>
+                    <div class="g2"><div class="fg"><label>Etiketler (virgülle)</label><input type="text" id="tr_bp_tags" /></div><div class="fg"><label>Okuma Süresi (dk)</label><input type="number" id="tr_bp_readingTime" min="1" /></div></div>
+                    <div class="g2"><div class="fg"><label>Yazar</label><input type="text" id="tr_bp_authorName" /></div><div class="fg"><label>SEO Meta</label><input type="text" id="tr_bp_metaDesc" maxlength="160" /></div></div>
+                    <div class="toggle-row"><input type="checkbox" id="tr_bp_published" checked /><label class="toggle-label" for="tr_bp_published">Hemen yayınla</label></div>
+                    <button class="btn-save" id="tr_savePostBtn" style="width:100%;" onclick="_savePost()">✦ Türkçe Kaydet</button>
+                  </div>
                 </div>
-              </div>
-              <div class="g2"><div class="fg"><label>Tags (comma separated)</label><input type="text" id="en_bp_tags" /></div><div class="fg"><label>Reading Time (min)</label><input type="number" id="en_bp_readingTime" min="1" /></div></div>
-              <div class="g2"><div class="fg"><label>Author</label><input type="text" id="en_bp_authorName" /></div><div class="fg"><label>SEO Meta</label><input type="text" id="en_bp_metaDesc" maxlength="160" /></div></div>
-              <div class="toggle-row"><input type="checkbox" id="en_bp_published" checked /><label class="toggle-label" for="en_bp_published">Publish immediately</label></div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn-save-en" id="en_savePostBtn" onclick="_savePostEN()">✦ EN Save</button><button class="btn-cancel" onclick="cancelPostEN()">Cancel</button></div>
+
+                <!-- ── SAĞ: İNGİLİZCE ── -->
+                <div class="both-col both-col-en">
+                  <div class="both-col-head">
+                    <span class="en-badge" style="margin:0;">🇬🇧 English — blogPostsEN</span>
+                  </div>
+                  <div class="both-col-body">
+                    <div class="fg"><label>Title *</label><input type="text" id="en_bp_title" /></div>
+                    <div class="fg"><label>Slug</label><input type="text" id="en_bp_slug" /><p class="slug-preview">blog-en.html#/<span id="en_slugPreview">…</span></p></div>
+                    <div class="g2"><div class="fg"><label>Category</label><input type="text" id="en_bp_category" list="enCatList" /><datalist id="enCatList"><option value="Astrology" /><option value="QHHT" /><option value="Karmic Astrology" /><option value="Spiritual Growth" /></datalist></div><div class="fg"><label>Emoji</label><input type="text" id="en_bp_emoji" maxlength="4" /></div></div>
+                    <div class="fg"><label>Excerpt</label><textarea id="en_bp_excerpt"></textarea></div>
+                    <div class="fg"><label>Cover Image</label><div class="irow"><img id="en_prev_bpCover" class="iprev rect" alt="" /><input type="file" id="en_f_bpCover" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('en_f_bpCover','en_prev_bpCover','en_bp_coverUrl',this)">Upload</button></div><input type="url" id="en_bp_coverUrl" /></div>
+                    <div class="fg"><label>Content</label>
+                      <div class="rte-wrap">
+                        <div class="rte-toolbar">
+                          <select class="rte-sel" onchange="rte('formatBlock',this.value,'en_richEditor');this.value=''"><option value="">¶ Para</option><option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option><option value="blockquote">Quote</option></select>
+                          <div class="rte-sep"></div>
+                          <button onclick="rte('bold',null,'en_richEditor')"><b>B</b></button>
+                          <button onclick="rte('italic',null,'en_richEditor')"><i>i</i></button>
+                          <button onclick="rte('underline',null,'en_richEditor')"><u>U</u></button>
+                          <div class="rte-sep"></div>
+                          <button onclick="rte('insertUnorderedList',null,'en_richEditor')">• —</button>
+                          <button onclick="rte('insertOrderedList',null,'en_richEditor')">1.</button>
+                          <div class="rte-sep"></div>
+                          <button onclick="rteLink('en_richEditor')">🔗</button>
+                          <button onclick="rteImage('en_richEditor')">🖼</button>
+                          <button onclick="document.getElementById('en_rteFile').click()">📤</button>
+                          <button onclick="rte('removeFormat',null,'en_richEditor')" style="color:#e53e3e;">✕</button>
+                          <input type="file" id="en_rteFile" accept="image/*" style="display:none" onchange="rteUpload(this,'en_richEditor')" />
+                        </div>
+                        <div id="en_richEditor" class="rich-editor" contenteditable="true" spellcheck="false"></div>
+                      </div>
+                    </div>
+                    <div class="g2"><div class="fg"><label>Tags (comma separated)</label><input type="text" id="en_bp_tags" /></div><div class="fg"><label>Reading Time (min)</label><input type="number" id="en_bp_readingTime" min="1" /></div></div>
+                    <div class="g2"><div class="fg"><label>Author</label><input type="text" id="en_bp_authorName" /></div><div class="fg"><label>SEO Meta</label><input type="text" id="en_bp_metaDesc" maxlength="160" /></div></div>
+                    <div class="toggle-row"><input type="checkbox" id="en_bp_published" checked /><label class="toggle-label" for="en_bp_published">Publish immediately</label></div>
+                    <button class="btn-save-en" id="en_savePostBtn" style="width:100%;" onclick="_savePostEN()">✦ English Save</button>
+                  </div>
+                </div>
+
+              </div><!-- /both-form-grid -->
             </div>
           </div>
         </div>
@@ -964,24 +975,62 @@
       <!-- ══════════════ INSTAGRAM ══════════════ -->
       <div class="panel" id="p_instagram">
         <div class="card">
-          <div class="ch" onclick="tog(this)"><h3><span>📸</span>Instagram Gönderileri</h3><span class="arr">▾</span></div>
+          <div class="ch" onclick="tog(this)"><h3><span>📸</span>Instagram Gönderileri — TR 🇹🇷 &amp; EN 🇬🇧</h3><span class="arr">▾</span></div>
           <div class="cb">
-            <p class="help-text" style="margin-bottom:10px;">Bu gönderiler hem TR hem EN sitesinde (instagramPosts koleksiyonu) gösterilir. Profil linkleri İletişim & Sosyal panelinden ayarlanır.</p>
-            <div class="action-bar"><button class="btn-new" onclick="newIgPost()">+ Yeni Gönderi</button></div>
+            <p class="help-text" style="margin-bottom:12px;">TR: <code>instagramPosts</code> · EN: <code>instagramPostsEN</code> · Slug eşleşmesiyle otomatik eşlenir.</p>
+            <div class="action-bar"><button class="btn-new" onclick="newIgBoth()">+ Yeni Gönderi</button></div>
             <div id="igPostList"></div>
           </div>
         </div>
-        <div id="igFormWrap">
-          <div class="card" style="border-color:rgba(238,42,123,.25);">
-            <div class="ch" onclick="tog(this)"><h3 id="igFormTitle"><span>📸</span>Gönderi</h3><span class="arr">▾</span></div>
-            <div class="cb">
-              <div class="fg"><label>Görsel</label><div class="irow"><img id="prev_igImg" class="iprev rect" alt="" /><input type="file" id="f_igImg" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('f_igImg','prev_igImg','ig_imgUrl',this)">Yükle</button></div><input type="url" id="ig_imgUrl" placeholder="https://…" /></div>
-              <div class="g2"><div class="fg"><label>Emoji (görsel yoksa)</label><input type="text" id="ig_emoji" maxlength="4" /></div><div class="fg"><label>Kategori</label><input type="text" id="ig_category" /></div></div>
-              <div class="fg"><label>Başlık / Açıklama</label><textarea id="ig_caption"></textarea></div>
-              <div class="fg"><label>SEO Slug</label><input type="text" id="ig_slug" /><p class="slug-preview">instagram.html#/<span id="igSlugPreview">…</span></p></div>
-              <div class="g2"><div class="fg"><label>Instagram Gönderi URL</label><input type="url" id="ig_url" /></div><div class="fg"><label>Beğeni Sayısı</label><input type="text" id="ig_likes" /></div></div>
-              <div class="g2"><div class="fg"><label>Sıra</label><input type="number" id="ig_order" value="0" min="0" /></div><div class="toggle-row" style="margin-top:20px;"><input type="checkbox" id="ig_visible" checked /><label class="toggle-label" for="ig_visible">Görünür</label></div></div>
-              <div style="display:flex;gap:8px;"><button class="btn-save" id="saveIgBtn" onclick="_saveIgPost()">✦ Kaydet</button><button class="btn-cancel" onclick="cancelIgPost()">İptal</button></div>
+
+        <!-- Unified IG Form -->
+        <div id="igBothFormWrap" style="display:none;">
+          <div class="card" style="border:2px solid rgba(238,42,123,.2);">
+            <div class="ch" onclick="tog(this)">
+              <h3 id="igBothFormTitle"><span>📸</span>Yeni Gönderi</h3>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <button class="btn-cancel" style="margin-top:0;font-size:.65rem;" onclick="cancelIgPost()">✕ Kapat</button>
+                <span class="arr">▾</span>
+              </div>
+            </div>
+            <div class="cb" style="padding:0;">
+              <div class="both-form-grid">
+
+                <!-- SOL: TR -->
+                <div class="both-col both-col-tr">
+                  <div class="both-col-head"><span class="tr-badge" style="margin:0;">🇹🇷 TR — instagramPosts</span></div>
+                  <div class="both-col-body">
+                    <div class="fg"><label>Görsel</label>
+                      <div class="irow"><img id="ig_tr_prev" class="iprev rect" alt="" /><input type="file" id="ig_tr_file" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('ig_tr_file','ig_tr_prev','ig_tr_imgUrl',this)">Yükle</button></div>
+                      <input type="url" id="ig_tr_imgUrl" placeholder="https://…" />
+                    </div>
+                    <div class="g2"><div class="fg"><label>Emoji (görsel yoksa)</label><input type="text" id="ig_tr_emoji" maxlength="4" /></div><div class="fg"><label>Kategori</label><input type="text" id="ig_tr_category" /></div></div>
+                    <div class="fg"><label>Başlık / Açıklama</label><textarea id="ig_tr_caption"></textarea></div>
+                    <div class="fg"><label>SEO Slug</label><input type="text" id="ig_tr_slug" /><p class="slug-preview"><span id="ig_tr_slugPreview">…</span></p></div>
+                    <div class="g2"><div class="fg"><label>Instagram Gönderi URL</label><input type="url" id="ig_tr_url" /></div><div class="fg"><label>Beğeni Sayısı</label><input type="text" id="ig_tr_likes" /></div></div>
+                    <div class="g2"><div class="fg"><label>Sıra</label><input type="number" id="ig_tr_order" value="0" min="0" /></div><div class="toggle-row" style="margin-top:20px;"><input type="checkbox" id="ig_tr_visible" checked /><label class="toggle-label" for="ig_tr_visible">Görünür</label></div></div>
+                    <button class="btn-save" id="ig_tr_saveBtn" style="width:100%;" onclick="_saveIgTR()">✦ Türkçe Kaydet</button>
+                  </div>
+                </div>
+
+                <!-- SAĞ: EN -->
+                <div class="both-col both-col-en">
+                  <div class="both-col-head"><span class="en-badge" style="margin:0;">🇬🇧 EN — instagramPostsEN</span></div>
+                  <div class="both-col-body">
+                    <div class="fg"><label>Image</label>
+                      <div class="irow"><img id="ig_en_prev" class="iprev rect" alt="" /><input type="file" id="ig_en_file" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('ig_en_file','ig_en_prev','ig_en_imgUrl',this)">Upload</button></div>
+                      <input type="url" id="ig_en_imgUrl" placeholder="https://…" />
+                    </div>
+                    <div class="g2"><div class="fg"><label>Emoji (if no image)</label><input type="text" id="ig_en_emoji" maxlength="4" /></div><div class="fg"><label>Category</label><input type="text" id="ig_en_category" /></div></div>
+                    <div class="fg"><label>Caption / Description</label><textarea id="ig_en_caption"></textarea></div>
+                    <div class="fg"><label>SEO Slug</label><input type="text" id="ig_en_slug" /><p class="slug-preview"><span id="ig_en_slugPreview">…</span></p></div>
+                    <div class="g2"><div class="fg"><label>Instagram Post URL</label><input type="url" id="ig_en_url" /></div><div class="fg"><label>Likes</label><input type="text" id="ig_en_likes" /></div></div>
+                    <div class="g2"><div class="fg"><label>Order</label><input type="number" id="ig_en_order" value="0" min="0" /></div><div class="toggle-row" style="margin-top:20px;"><input type="checkbox" id="ig_en_visible" checked /><label class="toggle-label" for="ig_en_visible">Visible</label></div></div>
+                    <button class="btn-save-en" id="ig_en_saveBtn" style="width:100%;" onclick="_saveIgEN()">✦ English Save</button>
+                  </div>
+                </div>
+
+              </div>
             </div>
           </div>
         </div>
@@ -990,25 +1039,62 @@
       <!-- ══════════════ YOUTUBE ══════════════ -->
       <div class="panel" id="p_youtube">
         <div class="card">
-          <div class="ch" onclick="tog(this)"><h3><span>▶️</span>YouTube Videoları</h3><span class="arr">▾</span></div>
+          <div class="ch" onclick="tog(this)"><h3><span>▶️</span>YouTube Videoları — TR 🇹🇷 &amp; EN 🇬🇧</h3><span class="arr">▾</span></div>
           <div class="cb">
-            <p class="help-text" style="margin-bottom:10px;">Bu videolar hem TR hem EN sitesinde (youtubePosts koleksiyonu) gösterilir. Kanal linkleri İletişim & Sosyal panelinden ayarlanır.</p>
-            <div class="action-bar"><button class="btn-new" onclick="newYtPost()">+ Yeni Video</button></div>
+            <p class="help-text" style="margin-bottom:12px;">TR: <code>youtubePosts</code> · EN: <code>youtubePostsEN</code> · Slug eşleşmesiyle otomatik eşlenir.</p>
+            <div class="action-bar"><button class="btn-new" onclick="newYtBoth()">+ Yeni Video</button></div>
             <div id="ytPostList"></div>
           </div>
         </div>
-        <div id="ytFormWrap">
-          <div class="card" style="border-color:rgba(255,0,0,.2);">
-            <div class="ch" onclick="tog(this)"><h3 id="ytFormTitle"><span>▶️</span>Video</h3><span class="arr">▾</span></div>
-            <div class="cb">
-              <div class="fg"><label>YouTube Video URL *</label><input type="url" id="yt_videoUrl" /><p class="help-text">URL'yi girin ve alandan çıkın — thumbnail otomatik yüklenir.</p></div>
-              <div class="fg"><label>Thumbnail</label><div class="irow"><img id="prev_ytThumb" class="iprev" style="width:120px;height:68px;border-radius:5px;" alt="" /><input type="url" id="yt_thumbnail" /></div></div>
-              <div class="g2"><div class="fg"><label>Başlık *</label><input type="text" id="yt_title" /></div><div class="fg"><label>Kategori</label><input type="text" id="yt_category" /></div></div>
-              <div class="fg"><label>SEO Slug</label><input type="text" id="yt_slug" /><p class="slug-preview">youtube.html#/<span id="ytSlugPreview">…</span></p></div>
-              <div class="fg"><label>Açıklama</label><textarea id="yt_description"></textarea></div>
-              <div class="g2"><div class="fg"><label>Tarih Etiketi</label><input type="text" id="yt_dateLabel" /></div><div class="fg"><label>Sıra</label><input type="number" id="yt_order" value="0" min="0" /></div></div>
-              <div class="toggle-row"><input type="checkbox" id="yt_visible" checked /><label class="toggle-label" for="yt_visible">Görünür</label></div>
-              <div style="display:flex;gap:8px;"><button class="btn-save" id="saveYtBtn" onclick="_saveYtPost()">✦ Kaydet</button><button class="btn-cancel" onclick="cancelYtPost()">İptal</button></div>
+
+        <!-- Unified YT Form -->
+        <div id="ytBothFormWrap" style="display:none;">
+          <div class="card" style="border:2px solid rgba(255,0,0,.2);">
+            <div class="ch" onclick="tog(this)">
+              <h3 id="ytBothFormTitle"><span>▶️</span>Yeni Video</h3>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <button class="btn-cancel" style="margin-top:0;font-size:.65rem;" onclick="cancelYtPost()">✕ Kapat</button>
+                <span class="arr">▾</span>
+              </div>
+            </div>
+            <div class="cb" style="padding:0;">
+              <div class="both-form-grid">
+
+                <!-- SOL: TR -->
+                <div class="both-col both-col-tr">
+                  <div class="both-col-head"><span class="tr-badge" style="margin:0;">🇹🇷 TR — youtubePosts</span></div>
+                  <div class="both-col-body">
+                    <div class="fg"><label>YouTube Video URL *</label><input type="url" id="yt_tr_videoUrl" /><p class="help-text">URL'yi girin ve alandan çıkın — thumbnail otomatik yüklenir.</p></div>
+                    <div class="fg"><label>Thumbnail</label>
+                      <div class="irow"><img id="yt_tr_thumbPrev" class="iprev" style="width:120px;height:68px;border-radius:5px;" alt="" /><input type="url" id="yt_tr_thumbnail" /></div>
+                    </div>
+                    <div class="g2"><div class="fg"><label>Başlık *</label><input type="text" id="yt_tr_title" /></div><div class="fg"><label>Kategori</label><input type="text" id="yt_tr_category" /></div></div>
+                    <div class="fg"><label>SEO Slug</label><input type="text" id="yt_tr_slug" /><p class="slug-preview"><span id="yt_tr_slugPreview">…</span></p></div>
+                    <div class="fg"><label>Açıklama</label><textarea id="yt_tr_description"></textarea></div>
+                    <div class="g2"><div class="fg"><label>Tarih Etiketi</label><input type="text" id="yt_tr_dateLabel" /></div><div class="fg"><label>Sıra</label><input type="number" id="yt_tr_order" value="0" min="0" /></div></div>
+                    <div class="toggle-row"><input type="checkbox" id="yt_tr_visible" checked /><label class="toggle-label" for="yt_tr_visible">Görünür</label></div>
+                    <button class="btn-save" id="yt_tr_saveBtn" style="width:100%;" onclick="_saveYtTR()">✦ Türkçe Kaydet</button>
+                  </div>
+                </div>
+
+                <!-- SAĞ: EN -->
+                <div class="both-col both-col-en">
+                  <div class="both-col-head"><span class="en-badge" style="margin:0;">🇬🇧 EN — youtubePostsEN</span></div>
+                  <div class="both-col-body">
+                    <div class="fg"><label>YouTube Video URL *</label><input type="url" id="yt_en_videoUrl" /><p class="help-text">Enter URL and blur — thumbnail auto-fills.</p></div>
+                    <div class="fg"><label>Thumbnail</label>
+                      <div class="irow"><img id="yt_en_thumbPrev" class="iprev" style="width:120px;height:68px;border-radius:5px;" alt="" /><input type="url" id="yt_en_thumbnail" /></div>
+                    </div>
+                    <div class="g2"><div class="fg"><label>Title *</label><input type="text" id="yt_en_title" /></div><div class="fg"><label>Category</label><input type="text" id="yt_en_category" /></div></div>
+                    <div class="fg"><label>SEO Slug</label><input type="text" id="yt_en_slug" /><p class="slug-preview"><span id="yt_en_slugPreview">…</span></p></div>
+                    <div class="fg"><label>Description</label><textarea id="yt_en_description"></textarea></div>
+                    <div class="g2"><div class="fg"><label>Date Label</label><input type="text" id="yt_en_dateLabel" /></div><div class="fg"><label>Order</label><input type="number" id="yt_en_order" value="0" min="0" /></div></div>
+                    <div class="toggle-row"><input type="checkbox" id="yt_en_visible" checked /><label class="toggle-label" for="yt_en_visible">Visible</label></div>
+                    <button class="btn-save-en" id="yt_en_saveBtn" style="width:100%;" onclick="_saveYtEN()">✦ English Save</button>
+                  </div>
+                </div>
+
+              </div>
             </div>
           </div>
         </div>
@@ -1016,42 +1102,12 @@
 
       <!-- ══════════════ YORUMLAR ══════════════ -->
       <div class="panel" id="p_yorumlar">
-        <div class="card">
-          <div class="ch" onclick="tog(this)"><h3><span>💬</span>Yorumlar</h3><span class="arr">▾</span></div>
-          <div class="cb">
-            <div class="lang-tabs">
-              <button class="lang-tab active-tr" onclick="switchTab(this,'reviews','tr')">🇹🇷 Türkçe — reviews</button>
-              <button class="lang-tab" onclick="switchTab(this,'reviews','en')">🇬🇧 English — reviewsEN</button>
-            </div>
-            <div id="reviews_tr" class="lang-pane show" style="margin-top:10px;">
-              <p style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">Onayladığınız yorumlar Türkçe sitede görünür.</p>
-              <div id="reviewList"></div>
-            </div>
-            <div id="reviews_en" class="lang-pane" style="margin-top:10px;">
-              <p style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">Approved reviews appear on the English site.</p>
-              <div id="reviewListEN"></div>
-            </div>
-          </div>
-        </div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>💬</span>Yorumlar</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'reviews','tr')">🇹🇷 Türkçe — reviews</button><button class="lang-tab" onclick="switchTab(this,'reviews','en')">🇬🇧 English — reviewsEN</button></div><div id="reviews_tr" class="lang-pane show" style="margin-top:10px;"><p style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">Onayladığınız yorumlar Türkçe sitede görünür.</p><div id="reviewList"></div></div><div id="reviews_en" class="lang-pane" style="margin-top:10px;"><p style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">Approved reviews appear on the English site.</p><div id="reviewListEN"></div></div></div></div>
       </div>
 
       <!-- ══════════════ RANDEVULAR ══════════════ -->
       <div class="panel" id="p_randevular">
-        <div class="card">
-          <div class="ch" onclick="tog(this)"><h3><span>📅</span>Randevu Talepleri</h3><span class="arr">▾</span></div>
-          <div class="cb">
-            <div class="lang-tabs">
-              <button class="lang-tab active-tr" onclick="switchTab(this,'appts','tr')">🇹🇷 Türkçe — appointments</button>
-              <button class="lang-tab" onclick="switchTab(this,'appts','en')">🇬🇧 English — appointmentsEN</button>
-            </div>
-            <div id="appts_tr" class="lang-pane show" style="margin-top:10px;">
-              <div id="apptList"></div>
-            </div>
-            <div id="appts_en" class="lang-pane" style="margin-top:10px;">
-              <div id="apptListEN"></div>
-            </div>
-          </div>
-        </div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📅</span>Randevu Talepleri</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'appts','tr')">🇹🇷 Türkçe — appointments</button><button class="lang-tab" onclick="switchTab(this,'appts','en')">🇬🇧 English — appointmentsEN</button></div><div id="appts_tr" class="lang-pane show" style="margin-top:10px;"><div id="apptList"></div></div><div id="appts_en" class="lang-pane" style="margin-top:10px;"><div id="apptListEN"></div></div></div></div>
       </div>
 
     </div><!-- /content -->
@@ -1061,19 +1117,20 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  /* ── PANEL ── */
-  const PAGES={hero:'Hero & Arkaplan',hakkimda:'Hakkımda',iletisim:'İletişim & Sosyal',genel:'Genel Ayarlar',blog:'Blog Yazıları',instagram:'Instagram',youtube:'YouTube',yorumlar:'Yorumlar',randevular:'Randevular'};
+  /* ── PANEL NAVİGASYON ── */
+  const PAGES={hero:'Hero & Arkaplan',hakkimda:'Hakkımda',iletisim:'İletişim & Sosyal',genel:'Genel Ayarlar',blog:'Blog (TR + EN)',instagram:'Instagram',youtube:'YouTube',yorumlar:'Yorumlar',randevular:'Randevular'};
   function go(key){
     document.querySelectorAll('.nb').forEach(b=>b.classList.toggle('on',b.dataset.p===key));
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
     document.getElementById('p_'+key).classList.add('on');
     document.getElementById('tbTitle').textContent=PAGES[key]||key;
-    document.getElementById('tbBadge').textContent=key==='instagram'||key==='youtube'?'Ortak İçerik':'Site İçeriği';
+    const badge=key==='blog'?'TR & EN Blog':key==='instagram'?'TR & EN Instagram':key==='youtube'?'TR & EN YouTube':'Site İçeriği';
+    document.getElementById('tbBadge').textContent=badge;
   }
   function tog(head){head.closest('.card').classList.toggle('cl');}
 
   /* ── DİL SEKME ── */
-  function switchTab(btn, group, lang){
+  function switchTab(btn,group,lang){
     const card=btn.closest('.cb');
     card.querySelectorAll('.lang-tab').forEach(t=>{t.classList.remove('active-tr','active-en');});
     btn.classList.add(lang==='tr'?'active-tr':'active-en');
@@ -1093,16 +1150,12 @@
     catch(e){alert('Yüklenemedi: '+e.message);}
     input.value='';
   }
-  /* Paste */
   document.addEventListener('DOMContentLoaded',()=>{
     ['tr_richEditor','en_richEditor'].forEach(id=>{
       const ed=document.getElementById(id);
       if(ed)ed.addEventListener('paste',e=>{if(e.shiftKey)return;e.preventDefault();const html=(e.clipboardData||window.clipboardData).getData('text/html');const text=(e.clipboardData||window.clipboardData).getData('text/plain');document.execCommand('insertHTML',false,html||text.replace(/\n/g,'<br>'));});
     });
   });
-
-  /* ── GİZLİ ADMİN ERİŞİMİ ── */
-  (function(){let c=0,t;const el=document.querySelector('.lcard h1');if(!el)return;el.addEventListener('click',()=>{c++;clearTimeout(t);if(c>=5){c=0;window.location.href='admin.html';}else t=setTimeout(()=>{c=0;},2000);});})();
 </script>
 </body>
 </html>
