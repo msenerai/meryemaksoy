@@ -602,6 +602,48 @@
       gap:10px;
     }
 
+    /* ── SITE İÇERİĞİ YAN YANA ── */
+    .sc-two-col{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:0;
+    }
+    .sc-col{
+      padding:16px;
+    }
+    .sc-col-tr{
+      background:var(--tr-bg);
+      border-right:1px solid var(--tr-border);
+      border-radius:0 0 0 8px;
+    }
+    .sc-col-en{
+      background:var(--en-bg);
+      border-radius:0 0 8px 0;
+    }
+    .sc-col .tr-badge,.sc-col .en-badge{
+      display:block;
+      margin-bottom:12px;
+    }
+    /* Gelen kutusu liste kolonları */
+    .sc-two-col-list .sc-col{
+      padding:0;
+    }
+    .sc-col-head{
+      display:flex;align-items:center;gap:8px;
+      padding:10px 14px;
+      border-bottom:1px solid var(--border);
+    }
+    .sc-col-tr .sc-col-head{background:var(--tr-bg);}
+    .sc-col-en .sc-col-head{background:var(--en-bg);}
+    .sc-col-hint{
+      font-size:.68rem;color:var(--muted);
+    }
+    @media(max-width:800px){
+      .sc-two-col{grid-template-columns:1fr;}
+      .sc-col-tr{border-right:none;border-bottom:1px solid var(--tr-border);border-radius:0;}
+      .sc-col-en{border-radius:0 0 8px 8px;}
+    }
+
     /* ── TWO TABLE LAYOUT ── */
     .cm-two-tables{
       display:grid;
@@ -1086,26 +1128,61 @@
 
       <!-- ══════════ HERO ══════════ -->
       <div class="panel on" id="p_hero">
-        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>🖼</span>Arka Plan Görseli</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'hero_bg','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'hero_bg','en')">🇬🇧 English</button></div><div id="hero_bg_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="irow"><img id="tr_prev_heroBg" class="iprev wide" alt="" /><input type="file" id="tr_f_heroBg" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('tr_f_heroBg','tr_prev_heroBg','tr_heroBg',this)">Yükle</button></div><div class="fg"><label>URL</label><input type="text" id="tr_heroBg" placeholder="https://..." /></div></div><div id="hero_bg_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="irow"><img id="en_prev_heroBg" class="iprev wide" alt="" /><input type="file" id="en_f_heroBg" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('en_f_heroBg','en_prev_heroBg','en_heroBg',this)">Upload</button></div><div class="fg"><label>URL</label><input type="text" id="en_heroBg" placeholder="https://..." /></div></div></div></div>
-        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>✏️</span>Hero Metinleri</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'hero_text','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'hero_text','en')">🇬🇧 English</button></div><div id="hero_text_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="fg"><label>Üst Etiket</label><input type="text" id="tr_heroEyebrow" /></div><div class="fg"><label>Başlık (HTML)</label><textarea id="tr_heroTitle"></textarea></div><div class="fg"><label>Alt Başlık</label><textarea id="tr_heroSubtitle"></textarea></div><button class="btn-save" id="tr_saveHeroBtn" onclick="_saveTR('tr_saveHeroBtn')">✦ TR Kaydet</button></div><div id="hero_text_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="fg"><label>Eyebrow Label</label><input type="text" id="en_heroEyebrow" /></div><div class="fg"><label>Title (HTML)</label><textarea id="en_heroTitle"></textarea></div><div class="fg"><label>Subtitle</label><textarea id="en_heroSubtitle"></textarea></div><button class="btn-save-en" id="en_saveHeroBtn" onclick="_saveEN('en_saveHeroBtn')">✦ EN Save</button></div></div></div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>🖼</span>Arka Plan Görseli</h3><span class="arr">▾</span></div><div class="cb">
+          <div class="sc-two-col">
+            <div class="sc-col sc-col-tr"><span class="tr-badge">🇹🇷 TR → siteContent/main</span><div class="irow"><img id="tr_prev_heroBg" class="iprev wide" alt="" /><input type="file" id="tr_f_heroBg" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('tr_f_heroBg','tr_prev_heroBg','tr_heroBg',this)">Yükle</button></div><div class="fg"><label>URL</label><input type="text" id="tr_heroBg" placeholder="https://..." /></div></div>
+            <div class="sc-col sc-col-en"><span class="en-badge">🇬🇧 EN → siteContentEN/main</span><div class="irow"><img id="en_prev_heroBg" class="iprev wide" alt="" /><input type="file" id="en_f_heroBg" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('en_f_heroBg','en_prev_heroBg','en_heroBg',this)">Upload</button></div><div class="fg"><label>URL</label><input type="text" id="en_heroBg" placeholder="https://..." /></div></div>
+          </div>
+        </div></div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>✏️</span>Hero Metinleri</h3><span class="arr">▾</span></div><div class="cb">
+          <div class="sc-two-col">
+            <div class="sc-col sc-col-tr"><span class="tr-badge">🇹🇷 TR → siteContent/main</span><div class="fg"><label>Üst Etiket</label><input type="text" id="tr_heroEyebrow" /></div><div class="fg"><label>Başlık (HTML)</label><textarea id="tr_heroTitle"></textarea></div><div class="fg"><label>Alt Başlık</label><textarea id="tr_heroSubtitle"></textarea></div><button class="btn-save" id="tr_saveHeroBtn" onclick="_saveTR('tr_saveHeroBtn')">✦ TR Kaydet</button></div>
+            <div class="sc-col sc-col-en"><span class="en-badge">🇬🇧 EN → siteContentEN/main</span><div class="fg"><label>Eyebrow Label</label><input type="text" id="en_heroEyebrow" /></div><div class="fg"><label>Title (HTML)</label><textarea id="en_heroTitle"></textarea></div><div class="fg"><label>Subtitle</label><textarea id="en_heroSubtitle"></textarea></div><button class="btn-save-en" id="en_saveHeroBtn" onclick="_saveEN('en_saveHeroBtn')">✦ EN Save</button></div>
+          </div>
+        </div></div>
       </div>
 
       <!-- ══════════ HAKKIMDA ══════════ -->
       <div class="panel" id="p_hakkimda">
-        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📷</span>Profil Fotoğrafı</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'pp','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'pp','en')">🇬🇧 English</button></div><div id="pp_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="irow"><img id="tr_prev_pp" class="iprev circ" alt="" /><input type="file" id="tr_f_pp" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('tr_f_pp','tr_prev_pp','tr_profilePhoto',this)">Yükle</button></div><div class="fg"><label>URL</label><input type="text" id="tr_profilePhoto" /></div></div><div id="pp_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="irow"><img id="en_prev_pp" class="iprev circ" alt="" /><input type="file" id="en_f_pp" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('en_f_pp','en_prev_pp','en_profilePhoto',this)">Upload</button></div><div class="fg"><label>URL</label><input type="text" id="en_profilePhoto" /></div></div></div></div>
-        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>👤</span>Profil Bilgileri</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'about_info','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'about_info','en')">🇬🇧 English</button></div><div id="about_info_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="g2"><div class="fg"><label>İsim / Unvan</label><input type="text" id="tr_aboutName" /></div><div class="fg"><label>Konum</label><input type="text" id="tr_aboutTitle" /></div></div><div class="fg"><label>Alıntı</label><textarea id="tr_aboutQuote"></textarea></div><div class="fg"><label>1. Paragraf (HTML)</label><textarea id="tr_aboutText1"></textarea></div><div class="fg"><label>2. Paragraf (HTML)</label><textarea id="tr_aboutText2"></textarea></div><button class="btn-save" id="tr_saveAboutBtn" onclick="_saveTR('tr_saveAboutBtn')">✦ TR Kaydet</button></div><div id="about_info_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="g2"><div class="fg"><label>Name / Title</label><input type="text" id="en_aboutName" /></div><div class="fg"><label>Location</label><input type="text" id="en_aboutTitle" /></div></div><div class="fg"><label>Quote</label><textarea id="en_aboutQuote"></textarea></div><div class="fg"><label>1st Paragraph (HTML)</label><textarea id="en_aboutText1"></textarea></div><div class="fg"><label>2nd Paragraph (HTML)</label><textarea id="en_aboutText2"></textarea></div><button class="btn-save-en" id="en_saveAboutBtn" onclick="_saveEN('en_saveAboutBtn')">✦ EN Save</button></div></div></div>
-        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📊</span>İstatistikler</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'stats','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'stats','en')">🇬🇧 English</button></div><div id="stats_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="g3"><div><div class="fg"><label>1. Sayı</label><input type="text" id="tr_stat1Number" /></div><div class="fg"><label>1. Etiket</label><input type="text" id="tr_stat1Label" /></div></div><div><div class="fg"><label>2. Sayı</label><input type="text" id="tr_stat2Number" /></div><div class="fg"><label>2. Etiket</label><input type="text" id="tr_stat2Label" /></div></div><div><div class="fg"><label>3. Sayı</label><input type="text" id="tr_stat3Number" /></div><div class="fg"><label>3. Etiket</label><input type="text" id="tr_stat3Label" /></div></div></div><button class="btn-save" id="tr_saveStatsBtn" onclick="_saveTR('tr_saveStatsBtn')">✦ TR Kaydet</button></div><div id="stats_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="g3"><div><div class="fg"><label>Stat 1 #</label><input type="text" id="en_stat1Number" /></div><div class="fg"><label>Stat 1 Label</label><input type="text" id="en_stat1Label" /></div></div><div><div class="fg"><label>Stat 2 #</label><input type="text" id="en_stat2Number" /></div><div class="fg"><label>Stat 2 Label</label><input type="text" id="en_stat2Label" /></div></div><div><div class="fg"><label>Stat 3 #</label><input type="text" id="en_stat3Number" /></div><div class="fg"><label>Stat 3 Label</label><input type="text" id="en_stat3Label" /></div></div></div><button class="btn-save-en" id="en_saveStatsBtn" onclick="_saveEN('en_saveStatsBtn')">✦ EN Save</button></div></div></div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📷</span>Profil Fotoğrafı</h3><span class="arr">▾</span></div><div class="cb">
+          <div class="sc-two-col">
+            <div class="sc-col sc-col-tr"><span class="tr-badge">🇹🇷 TR → siteContent/main</span><div class="irow"><img id="tr_prev_pp" class="iprev circ" alt="" /><input type="file" id="tr_f_pp" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('tr_f_pp','tr_prev_pp','tr_profilePhoto',this)">Yükle</button></div><div class="fg"><label>URL</label><input type="text" id="tr_profilePhoto" /></div></div>
+            <div class="sc-col sc-col-en"><span class="en-badge">🇬🇧 EN → siteContentEN/main</span><div class="irow"><img id="en_prev_pp" class="iprev circ" alt="" /><input type="file" id="en_f_pp" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('en_f_pp','en_prev_pp','en_profilePhoto',this)">Upload</button></div><div class="fg"><label>URL</label><input type="text" id="en_profilePhoto" /></div></div>
+          </div>
+        </div></div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>👤</span>Profil Bilgileri</h3><span class="arr">▾</span></div><div class="cb">
+          <div class="sc-two-col">
+            <div class="sc-col sc-col-tr"><span class="tr-badge">🇹🇷 TR → siteContent/main</span><div class="g2"><div class="fg"><label>İsim / Unvan</label><input type="text" id="tr_aboutName" /></div><div class="fg"><label>Konum</label><input type="text" id="tr_aboutTitle" /></div></div><div class="fg"><label>Alıntı</label><textarea id="tr_aboutQuote"></textarea></div><div class="fg"><label>1. Paragraf (HTML)</label><textarea id="tr_aboutText1"></textarea></div><div class="fg"><label>2. Paragraf (HTML)</label><textarea id="tr_aboutText2"></textarea></div><button class="btn-save" id="tr_saveAboutBtn" onclick="_saveTR('tr_saveAboutBtn')">✦ TR Kaydet</button></div>
+            <div class="sc-col sc-col-en"><span class="en-badge">🇬🇧 EN → siteContentEN/main</span><div class="g2"><div class="fg"><label>Name / Title</label><input type="text" id="en_aboutName" /></div><div class="fg"><label>Location</label><input type="text" id="en_aboutTitle" /></div></div><div class="fg"><label>Quote</label><textarea id="en_aboutQuote"></textarea></div><div class="fg"><label>1st Paragraph (HTML)</label><textarea id="en_aboutText1"></textarea></div><div class="fg"><label>2nd Paragraph (HTML)</label><textarea id="en_aboutText2"></textarea></div><button class="btn-save-en" id="en_saveAboutBtn" onclick="_saveEN('en_saveAboutBtn')">✦ EN Save</button></div>
+          </div>
+        </div></div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📊</span>İstatistikler</h3><span class="arr">▾</span></div><div class="cb">
+          <div class="sc-two-col">
+            <div class="sc-col sc-col-tr"><span class="tr-badge">🇹🇷 TR → siteContent/main</span><div class="g3"><div><div class="fg"><label>1. Sayı</label><input type="text" id="tr_stat1Number" /></div><div class="fg"><label>1. Etiket</label><input type="text" id="tr_stat1Label" /></div></div><div><div class="fg"><label>2. Sayı</label><input type="text" id="tr_stat2Number" /></div><div class="fg"><label>2. Etiket</label><input type="text" id="tr_stat2Label" /></div></div><div><div class="fg"><label>3. Sayı</label><input type="text" id="tr_stat3Number" /></div><div class="fg"><label>3. Etiket</label><input type="text" id="tr_stat3Label" /></div></div></div><button class="btn-save" id="tr_saveStatsBtn" onclick="_saveTR('tr_saveStatsBtn')">✦ TR Kaydet</button></div>
+            <div class="sc-col sc-col-en"><span class="en-badge">🇬🇧 EN → siteContentEN/main</span><div class="g3"><div><div class="fg"><label>Stat 1 #</label><input type="text" id="en_stat1Number" /></div><div class="fg"><label>Stat 1 Label</label><input type="text" id="en_stat1Label" /></div></div><div><div class="fg"><label>Stat 2 #</label><input type="text" id="en_stat2Number" /></div><div class="fg"><label>Stat 2 Label</label><input type="text" id="en_stat2Label" /></div></div><div><div class="fg"><label>Stat 3 #</label><input type="text" id="en_stat3Number" /></div><div class="fg"><label>Stat 3 Label</label><input type="text" id="en_stat3Label" /></div></div></div><button class="btn-save-en" id="en_saveStatsBtn" onclick="_saveEN('en_saveStatsBtn')">✦ EN Save</button></div>
+          </div>
+        </div></div>
         <div class="card"><div class="ch" onclick="tog(this)"><h3><span>🎓</span>Sertifikalar & Eğitimler</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'certs','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'certs','en')">🇬🇧 English</button></div><div id="certs_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main (certItems)</span><div class="fg"><textarea id="tr_certItems" style="min-height:130px;font-family:monospace;font-size:.8rem;" placeholder="🎓|QHHT Level II Sertifikası — Dolores Cannon&#10;⭐|Karmik Astroloji Uzmanlığı"></textarea><p class="help-text">Her satır: <code>emoji|metin</code></p></div><button class="btn-save" id="tr_saveCertBtn" onclick="_saveTR('tr_saveCertBtn')">✦ TR Kaydet</button></div><div id="certs_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main (certItems)</span><div class="fg"><textarea id="en_certItems" style="min-height:130px;font-family:monospace;font-size:.8rem;" placeholder="🎓|QHHT Level II Certification — Dolores Cannon&#10;⭐|Karmic Astrology Specialisation"></textarea><p class="help-text">Each line: <code>emoji|text</code></p></div><button class="btn-save-en" id="en_saveCertBtn" onclick="_saveEN('en_saveCertBtn')">✦ EN Save</button></div></div></div>
       </div>
 
       <!-- ══════════ İLETİŞİM ══════════ -->
       <div class="panel" id="p_iletisim">
-        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📬</span>İletişim & Sosyal Medya</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'contact','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'contact','en')">🇬🇧 English</button></div><div id="contact_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="g2"><div class="fg"><label>E-posta</label><input type="email" id="tr_email" /></div><div class="fg"><label>WhatsApp</label><input type="text" id="tr_whatsapp" /></div></div><div class="fg"><label>Telefon</label><input type="tel" id="tr_phone" /></div><div class="fg"><label>Konum</label><input type="text" id="tr_location" /></div><div class="g2"><div class="fg"><label>Instagram Kullanıcı Adı</label><input type="text" id="tr_instagramHandle" placeholder="@kullanici_adi" /></div><div class="fg"><label>Instagram URL</label><input type="url" id="tr_instagramUrl" /></div></div><div class="g2"><div class="fg"><label>YouTube Kanal Adı</label><input type="text" id="tr_youtubeHandle" /></div><div class="fg"><label>YouTube URL</label><input type="url" id="tr_youtubeUrl" /></div></div><button class="btn-save" id="tr_saveContactBtn" onclick="_saveTR('tr_saveContactBtn')">✦ TR Kaydet</button></div><div id="contact_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="g2"><div class="fg"><label>Email</label><input type="email" id="en_email" /></div><div class="fg"><label>WhatsApp</label><input type="text" id="en_whatsapp" /></div></div><div class="fg"><label>Phone</label><input type="tel" id="en_phone" /></div><div class="fg"><label>Location (HTML)</label><textarea id="en_location"></textarea></div><div class="g2"><div class="fg"><label>Instagram Handle</label><input type="text" id="en_instagramHandle" placeholder="@username" /></div><div class="fg"><label>Instagram URL</label><input type="url" id="en_instagramUrl" /></div></div><div class="g2"><div class="fg"><label>YouTube Channel Name</label><input type="text" id="en_youtubeHandle" /></div><div class="fg"><label>YouTube URL</label><input type="url" id="en_youtubeUrl" /></div></div><button class="btn-save-en" id="en_saveContactBtn" onclick="_saveEN('en_saveContactBtn')">✦ EN Save</button></div></div></div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📬</span>İletişim & Sosyal Medya</h3><span class="arr">▾</span></div><div class="cb">
+          <div class="sc-two-col">
+            <div class="sc-col sc-col-tr"><span class="tr-badge">🇹🇷 TR → siteContent/main</span><div class="g2"><div class="fg"><label>E-posta</label><input type="email" id="tr_email" /></div><div class="fg"><label>WhatsApp</label><input type="text" id="tr_whatsapp" /></div></div><div class="fg"><label>Telefon</label><input type="tel" id="tr_phone" /></div><div class="fg"><label>Konum</label><input type="text" id="tr_location" /></div><div class="g2"><div class="fg"><label>Instagram Kullanıcı Adı</label><input type="text" id="tr_instagramHandle" placeholder="@kullanici_adi" /></div><div class="fg"><label>Instagram URL</label><input type="url" id="tr_instagramUrl" /></div></div><div class="g2"><div class="fg"><label>YouTube Kanal Adı</label><input type="text" id="tr_youtubeHandle" /></div><div class="fg"><label>YouTube URL</label><input type="url" id="tr_youtubeUrl" /></div></div><button class="btn-save" id="tr_saveContactBtn" onclick="_saveTR('tr_saveContactBtn')">✦ TR Kaydet</button></div>
+            <div class="sc-col sc-col-en"><span class="en-badge">🇬🇧 EN → siteContentEN/main</span><div class="g2"><div class="fg"><label>Email</label><input type="email" id="en_email" /></div><div class="fg"><label>WhatsApp</label><input type="text" id="en_whatsapp" /></div></div><div class="fg"><label>Phone</label><input type="tel" id="en_phone" /></div><div class="fg"><label>Location (HTML)</label><textarea id="en_location"></textarea></div><div class="g2"><div class="fg"><label>Instagram Handle</label><input type="text" id="en_instagramHandle" placeholder="@username" /></div><div class="fg"><label>Instagram URL</label><input type="url" id="en_instagramUrl" /></div></div><div class="g2"><div class="fg"><label>YouTube Channel Name</label><input type="text" id="en_youtubeHandle" /></div><div class="fg"><label>YouTube URL</label><input type="url" id="en_youtubeUrl" /></div></div><button class="btn-save-en" id="en_saveContactBtn" onclick="_saveEN('en_saveContactBtn')">✦ EN Save</button></div>
+          </div>
+        </div></div>
       </div>
 
       <!-- ══════════ GENEL ══════════ -->
       <div class="panel" id="p_genel">
-        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>⚙️</span>Navigasyon & Footer</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'genel','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'genel','en')">🇬🇧 English</button></div><div id="genel_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="fg"><label>Logo Metni</label><input type="text" id="tr_navLogo" /></div><div class="fg"><label>Footer Telif</label><input type="text" id="tr_footerCopy" /></div><button class="btn-save" id="tr_saveGenelBtn" onclick="_saveTR('tr_saveGenelBtn')">✦ TR Kaydet</button></div><div id="genel_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="fg"><label>Nav Logo Text</label><input type="text" id="en_navLogo" /></div><div class="fg"><label>Footer Copyright</label><input type="text" id="en_footerCopy" /></div><button class="btn-save-en" id="en_saveGenelBtn" onclick="_saveEN('en_saveGenelBtn')">✦ EN Save</button></div></div></div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>⚙️</span>Navigasyon & Footer</h3><span class="arr">▾</span></div><div class="cb">
+          <div class="sc-two-col">
+            <div class="sc-col sc-col-tr"><span class="tr-badge">🇹🇷 TR → siteContent/main</span><div class="fg"><label>Logo Metni</label><input type="text" id="tr_navLogo" /></div><div class="fg"><label>Footer Telif</label><input type="text" id="tr_footerCopy" /></div><button class="btn-save" id="tr_saveGenelBtn" onclick="_saveTR('tr_saveGenelBtn')">✦ TR Kaydet</button></div>
+            <div class="sc-col sc-col-en"><span class="en-badge">🇬🇧 EN → siteContentEN/main</span><div class="fg"><label>Nav Logo Text</label><input type="text" id="en_navLogo" /></div><div class="fg"><label>Footer Copyright</label><input type="text" id="en_footerCopy" /></div><button class="btn-save-en" id="en_saveGenelBtn" onclick="_saveEN('en_saveGenelBtn')">✦ EN Save</button></div>
+          </div>
+        </div></div>
       </div>
 
       <!-- ══════════ BLOG ══════════ -->
@@ -1160,12 +1237,34 @@
 
       <!-- ══════════ YORUMLAR ══════════ -->
       <div class="panel" id="p_yorumlar">
-        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>💬</span>Yorumlar</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'reviews','tr')">🇹🇷 Türkçe — reviews</button><button class="lang-tab" onclick="switchTab(this,'reviews','en')">🇬🇧 English — reviewsEN</button></div><div id="reviews_tr" class="lang-pane show" style="margin-top:10px;"><p style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">Onayladığınız yorumlar Türkçe sitede görünür.</p><div id="reviewList"></div></div><div id="reviews_en" class="lang-pane" style="margin-top:10px;"><p style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">Approved reviews appear on the English site.</p><div id="reviewListEN"></div></div></div></div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>💬</span>Yorumlar</h3><span class="arr">▾</span></div><div class="cb">
+          <div class="sc-two-col sc-two-col-list">
+            <div class="sc-col sc-col-tr">
+              <div class="sc-col-head"><span class="cm-lang-tag tr-tag">🇹🇷 TR — reviews</span><span class="sc-col-hint">Onaylananlar sitede görünür</span></div>
+              <div id="reviewList"></div>
+            </div>
+            <div class="sc-col sc-col-en">
+              <div class="sc-col-head"><span class="cm-lang-tag en-tag">🇬🇧 EN — reviewsEN</span><span class="sc-col-hint">Approved ones appear on site</span></div>
+              <div id="reviewListEN"></div>
+            </div>
+          </div>
+        </div></div>
       </div>
 
       <!-- ══════════ RANDEVULAR ══════════ -->
       <div class="panel" id="p_randevular">
-        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📅</span>Randevu Talepleri</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'appts','tr')">🇹🇷 Türkçe — appointments</button><button class="lang-tab" onclick="switchTab(this,'appts','en')">🇬🇧 English — appointmentsEN</button></div><div id="appts_tr" class="lang-pane show" style="margin-top:10px;"><div id="apptList"></div></div><div id="appts_en" class="lang-pane" style="margin-top:10px;"><div id="apptListEN"></div></div></div></div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📅</span>Randevu Talepleri</h3><span class="arr">▾</span></div><div class="cb">
+          <div class="sc-two-col sc-two-col-list">
+            <div class="sc-col sc-col-tr">
+              <div class="sc-col-head"><span class="cm-lang-tag tr-tag">🇹🇷 TR — appointments</span></div>
+              <div id="apptList"></div>
+            </div>
+            <div class="sc-col sc-col-en">
+              <div class="sc-col-head"><span class="cm-lang-tag en-tag">🇬🇧 EN — appointmentsEN</span></div>
+              <div id="apptListEN"></div>
+            </div>
+          </div>
+        </div></div>
       </div>
 
     </div><!-- /content -->
