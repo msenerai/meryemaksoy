@@ -1,6 +1,47 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Yıllık Öngörü Analizi",
+  "alternateName": "Annual Astrology Forecast",
+  "serviceType": "Astrolojik Danışmanlık",
+  "description": "Solar dönüş haritası ve güncel transit analiziyle önünüzdeki 12 ayın önemli dönemlerini ve fırsatlarını aktaran 60 dakikalık seans. Yılın kritik dönüm noktaları, fırsatlar ve dikkat edilmesi gereken dönemler detaylı biçimde aktarılır.",
+  "url": "https://ageofvibration.com/yillikongoru.html",
+  "provider": {
+    "@type": "Person",
+    "name": "Age of Vibration",
+    "url": "https://ageofvibration.com",
+    "telephone": "+905334154982"
+  },
+  "availableChannel": {
+    "@type": "ServiceChannel",
+    "serviceType": "Online",
+    "availableLanguage": ["Turkish", "English"],
+    "serviceUrl": "https://ageofvibration.com/#iletisim"
+  },
+  "offers": {
+    "@type": "Offer",
+    "availability": "https://schema.org/InStock",
+    "priceCurrency": "TRY",
+    "url": "https://ageofvibration.com/yillikongoru.html"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://ageofvibration.com" },
+    { "@type": "ListItem", "position": 2, "name": "Astroloji", "item": "https://ageofvibration.com/astroloji.html" },
+    { "@type": "ListItem", "position": 3, "name": "Yıllık Öngörü", "item": "https://ageofvibration.com/yillikongoru.html" }
+  ]
+}
+</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Yıllık Öngörü | QHHT & Astroloji</title>
@@ -272,4 +313,5 @@
   document.querySelectorAll('.accordion-trigger').forEach(btn=>{btn.addEventListener('click',()=>{const item=btn.closest('.accordion-item');const panel=item.querySelector('.accordion-panel');const isOpen=item.classList.contains('active');document.querySelectorAll('.accordion-item.active').forEach(o=>{o.classList.remove('active');o.querySelector('.accordion-panel').classList.remove('open');o.querySelector('.accordion-trigger').setAttribute('aria-expanded',false);});if(!isOpen){item.classList.add('active');panel.classList.add('open');btn.setAttribute('aria-expanded',true);}});});
 </script>
 </body>
+
 </html>
