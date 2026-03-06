@@ -87,7 +87,7 @@
         "itemOffered": {
           "@type": "Service",
           "name": "QHHT Seansı",
-          "url": "https://ageofvibration.com/qhht.html"
+          "url": "https://ageofvibration.com/qhht"
         }
       },
       {
@@ -95,7 +95,7 @@
         "itemOffered": {
           "@type": "Service",
           "name": "Doğum Haritası Analizi",
-          "url": "https://ageofvibration.com/dogumharitasianalizi.html"
+          "url": "https://ageofvibration.com/dogumharitasianalizi"
         }
       },
       {
@@ -103,7 +103,7 @@
         "itemOffered": {
           "@type": "Service",
           "name": "İlişki Uyumu — Sinastri",
-          "url": "https://ageofvibration.com/sinastri.html"
+          "url": "https://ageofvibration.com/sinastri"
         }
       },
       {
@@ -111,7 +111,7 @@
         "itemOffered": {
           "@type": "Service",
           "name": "Yıllık Öngörü",
-          "url": "https://ageofvibration.com/yillikongoru.html"
+          "url": "https://ageofvibration.com/yillikongoru"
         }
       },
       {
@@ -119,7 +119,7 @@
         "itemOffered": {
           "@type": "Service",
           "name": "Karmik Astroloji",
-          "url": "https://ageofvibration.com/karmikastroloji.html"
+          "url": "https://ageofvibration.com/karmikastroloji"
         }
       },
       {
@@ -127,7 +127,7 @@
         "itemOffered": {
           "@type": "Service",
           "name": "Meslek Göstergeleri",
-          "url": "https://ageofvibration.com/meslekgostergeleri.html"
+          "url": "https://ageofvibration.com/meslekgostergeleri"
         }
       }
     ]
@@ -157,7 +157,7 @@
     "@type": "SearchAction",
     "target": {
       "@type": "EntryPoint",
-      "urlTemplate": "https://ageofvibration.com/blog.html?q={search_term_string}"
+      "urlTemplate": "https://ageofvibration.com/blog?q={search_term_string}"
     },
     "query-input": "required name=search_term_string"
   }
@@ -455,7 +455,7 @@
           const excerpt = p.excerpt || (p.content || '').replace(/<[^>]+>/g, '').slice(0, 130);
 
           const card = document.createElement('a');
-          card.href = 'blog.html#/' + slug;
+          card.href = 'blog#/' + slug;
           card.className = 'blog-card reveal';
           card.innerHTML =
             '<div class="blog-card-thumb">' +
@@ -1144,7 +1144,7 @@
     <li><a href="#qhht">QHHT</a></li>
     <li><a href="#astroloji">Astroloji</a></li>
     <li><a href="#surec">Seans</a></li>
-    <li><a href="blog.html" target="_blank">Blog</a></li>
+    <li><a href="blog" target="_blank">Blog</a></li>
     <li><a href="#sss">SSS</a></li>
     <li><a href="#iletisim" class="nav-cta">Randevu Al</a></li>
   </ul>
@@ -1154,7 +1154,7 @@
       <img class="lang-flag" src="https://flagcdn.com/w40/tr.png" alt="Türk Bayrağı" /> TR
     </span>
     <div class="lang-divider" aria-hidden="true"></div>
-    <a href="indexen.html" class="lang-btn" aria-label="Switch to English">
+    <a href="indexen" class="lang-btn" aria-label="Switch to English">
       <img class="lang-flag" src="https://flagcdn.com/w40/gb.png" alt="British Flag" /> EN
     </a>
   </div>
@@ -1169,13 +1169,13 @@
   <a href="#qhht"     onclick="closeMobileMenu()">QHHT</a>
   <a href="#astroloji" onclick="closeMobileMenu()">Astroloji</a>
   <a href="#surec"    onclick="closeMobileMenu()">Seans Süreci</a>
-  <a href="blog.html" target="_blank" onclick="closeMobileMenu()">Blog</a>
+  <a href="blog" target="_blank" onclick="closeMobileMenu()">Blog</a>
   <a href="#sss"      onclick="closeMobileMenu()">SSS</a>
   <a href="#iletisim" onclick="closeMobileMenu()">Randevu Al</a>
   <!-- Mobil dil seçici -->
   <div class="mobile-lang">
     <span class="lang-btn active"><img class="lang-flag" src="https://flagcdn.com/w40/tr.png" alt="Türk Bayrağı" /> TR</span>
-    <a href="indexen.html" class="lang-btn" onclick="closeMobileMenu()"><img class="lang-flag" src="https://flagcdn.com/w40/gb.png" alt="British Flag" /> EN</a>
+    <a href="indexen" class="lang-btn" onclick="closeMobileMenu()"><img class="lang-flag" src="https://flagcdn.com/w40/gb.png" alt="British Flag" /> EN</a>
   </div>
 </div>
 
@@ -1253,7 +1253,7 @@
             <div class="stat-card reveal"><div class="stat-number">10+</div><div class="stat-label">Yıl Deneyim</div></div>
           </div>
           <div class="reveal" style="margin-top: 8px;">
-            <a href="hakkimda.html" class="section-more-btn">✦ Daha Fazlası →</a>
+            <a href="hakkimda" class="section-more-btn">✦ Daha Fazlası →</a>
           </div>
         </div>
       </div>
@@ -1279,7 +1279,7 @@
             </div>
           </div>
           <div class="sosyal-feed" id="igDynamicFeed"></div>
-          <a href="instagram.html" class="sosyal-more-btn">✦ Instagram Galerisini Gör →</a>
+          <a href="instagram" class="sosyal-more-btn">✦ Instagram Galerisini Gör →</a>
           <a href="#" class="sosyal-cta" data-social="instagram" id="igFollowBtn">📸 Instagram'da Takip Et →</a>
         </div>
         <div class="sosyal-col reveal">
@@ -1291,7 +1291,7 @@
             </div>
           </div>
           <div class="sosyal-feed sosyal-feed--yt" id="ytDynamicFeed"></div>
-          <a href="youtube.html" class="sosyal-more-btn">✦ Tüm Videoları Gör →</a>
+          <a href="youtube" class="sosyal-more-btn">✦ Tüm Videoları Gör →</a>
           <a href="#" class="sosyal-cta" data-social="youtube" id="ytSubscribeBtn">▶️ YouTube'da Abone Ol →</a>
         </div>
       </div>
@@ -1332,7 +1332,7 @@
         </article>
       </div>
       <div class="section-more-wrap reveal">
-        <a href="qhht.html" class="section-more-btn">✦ QHHT Hakkında Daha Fazlası →</a>
+        <a href="qhht" class="section-more-btn">✦ QHHT Hakkında Daha Fazlası →</a>
       </div>
     </div>
   </section>
@@ -1352,35 +1352,35 @@
           <h3 class="service-title">Doğum Haritası Analizi</h3>
           <p class="service-desc">Doğum anınızdaki gezegen konumlarını detaylı biçimde analiz eder, güçlü yanlarınızı, yeteneğinizi ve olası engellerinizi ortaya koyarız. Kapsamlı yazılı rapor dahildir.</p>
           <span class="service-tag">90 Dakika</span>
-          <a href="dogumharitasianalizi.html" class="service-more-btn">Daha Fazlası →</a>
+          <a href="dogumharitasianalizi" class="service-more-btn">Daha Fazlası →</a>
         </article>
         <article class="service-card reveal" tabindex="0">
           <span class="service-icon" aria-hidden="true">💞</span>
           <h3 class="service-title">İlişki Uyumu — Sinastri</h3>
           <p class="service-desc">İki kişi arasındaki enerjetik uyum ve gerilim noktaları sinastri ve kompozit harita ile incelenir. Sağlıklı ilişki dinamikleri için rehberlik sunulur.</p>
           <span class="service-tag">75 Dakika</span>
-          <a href="sinastri.html" class="service-more-btn">Daha Fazlası →</a>
+          <a href="sinastri" class="service-more-btn">Daha Fazlası →</a>
         </article>
         <article class="service-card reveal" tabindex="0">
           <span class="service-icon" aria-hidden="true">🔭</span>
           <h3 class="service-title">Yıllık Öngörü</h3>
           <p class="service-desc">Solar dönüş haritası ve güncel transit analiziyle önünüzdeki 12 ayın önemli dönemleri ve fırsatları detaylı şekilde aktarılır.</p>
           <span class="service-tag">60 Dakika</span>
-          <a href="yillikongoru.html" class="service-more-btn">Daha Fazlası →</a>
+          <a href="yillikongoru" class="service-more-btn">Daha Fazlası →</a>
         </article>
         <article class="service-card reveal" tabindex="0">
           <span class="service-icon" aria-hidden="true">♾️</span>
           <h3 class="service-title">Karmik Astroloji</h3>
           <p class="service-desc">Kuzey Düğüm, Güney Düğüm ve Chiron gibi noktalar üzerinden ruhun bu yaşamdaki amacı ve geçmiş yaşam örüntüleri derinlemesine incelenir.</p>
           <span class="service-tag">90 Dakika</span>
-          <a href="karmikastroloji.html" class="service-more-btn">Daha Fazlası →</a>
+          <a href="karmikastroloji" class="service-more-btn">Daha Fazlası →</a>
         </article>
         <article class="service-card reveal" tabindex="0">
           <span class="service-icon" aria-hidden="true">🧭</span>
           <h3 class="service-title">Meslek Göstergeleri</h3>
           <p class="service-desc">Doğum haritasındaki 10. ev, Midheaven (MC), Saturn ve güçlü gezegen açıları aracılığıyla ruhunuzun bu yaşamda hangi mesleki alanlarda parlamak için geldiği ve kariyer yolunuzdaki fırsatlar ile engeller derinlemesine analiz edilir.</p>
           <span class="service-tag">60 Dakika</span>
-          <a href="meslekgostergeleri.html" class="service-more-btn">Daha Fazlası →</a>
+          <a href="meslekgostergeleri" class="service-more-btn">Daha Fazlası →</a>
         </article>
       </div>
     </div>
@@ -1422,7 +1422,7 @@
         </div>
       </div>
       <div class="section-more-wrap reveal">
-        <a href="seans.html" class="section-more-btn">✦ Seans Süreci Hakkında Daha Fazlası →</a>
+        <a href="seans" class="section-more-btn">✦ Seans Süreci Hakkında Daha Fazlası →</a>
       </div>
     </div>
   </section>
@@ -1438,7 +1438,7 @@
       </div>
       <div class="blog-grid" id="blogPreviewGrid"></div>
       <div class="blog-all-btn reveal">
-        <a href="blog.html" class="btn-secondary">Tüm Yazıları Gör →</a>
+        <a href="blog" class="btn-secondary">Tüm Yazıları Gör →</a>
       </div>
     </div>
   </section>
@@ -1585,7 +1585,7 @@
             <div class="contact-icon-wrap" aria-hidden="true">📧</div>
             <div>
               <p class="contact-item-title">E-posta</p>
-              <p class="contact-item-val"><a id="contactEmail" href="/cdn-cgi/l/email-protection#1e777078715e7b667f736e727b307d7173"><span class="__cf_email__" data-cfemail="85ecebe3eac5e0fde4e8f5e9e0abe6eae8">[email&#160;protected]</span></a></p>
+              <p class="contact-item-val"><a id="contactEmail" href="mailto:info@ageofvibration.com">info@ageofvibration.com</a></p>
             </div>
           </div>
           <div class="contact-item reveal">
@@ -1685,7 +1685,7 @@
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
   /* YILDIZ KANVASİ */
   (function initStars() {
     const canvas = document.getElementById('star-canvas');
@@ -1929,15 +1929,10 @@
     footerCopy.addEventListener('click', function() {
       clickCount++;
       clearTimeout(clickTimer);
-      if (clickCount >= 5) { clickCount = 0; window.location.href = 'admin.html'; }
+      if (clickCount >= 5) { clickCount = 0; window.location.href = 'admin'; }
       else { clickTimer = setTimeout(() => { clickCount = 0; }, 2000); }
     });
   })();
 </script>
 </body>
 </html>
-
-
-
-
-
