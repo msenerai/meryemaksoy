@@ -468,40 +468,56 @@
     .lang-switcher {
       display: flex;
       align-items: center;
-      gap: 2px;
+      gap: 3px;
       background: rgba(138,106,26,0.07);
       border: 1px solid rgba(138,106,26,0.22);
-      border-radius: 30px;
-      padding: 4px 5px;
-      margin-left: 10px;
+      border-radius: 40px;
+      padding: 5px 6px;
+      margin-left: 12px;
       flex-shrink: 0;
     }
     .lang-btn {
       font-family: var(--font-sans);
-      font-size: 0.67rem;
+      font-size: 0.78rem;
       font-weight: 400;
-      letter-spacing: 0.13em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--white-dim);
       background: transparent;
       border: none;
-      padding: 5px 11px;
-      border-radius: 22px;
+      padding: 7px 14px;
+      border-radius: 28px;
       cursor: pointer;
       text-decoration: none;
       transition: var(--transition);
       line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+    .lang-flag {
+      width: 20px;
+      height: 14px;
+      border-radius: 3px;
+      object-fit: cover;
+      flex-shrink: 0;
       display: inline-block;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+    }
+    .mobile-lang .lang-flag {
+      width: 26px;
+      height: 18px;
     }
     .lang-btn.active {
       background: linear-gradient(135deg, var(--gold-light), var(--gold));
       color: var(--navy-deep);
       font-weight: 500;
-      box-shadow: 0 2px 8px rgba(138,106,26,0.22);
+      box-shadow: 0 2px 10px rgba(138,106,26,0.25);
     }
-    .lang-btn:not(.active):hover { color: var(--gold-light); }
+    .lang-btn:not(.active):hover { color: var(--gold-light); background: rgba(138,106,26,0.06); }
     .lang-divider {
-      width: 1px; height: 11px;
+      width: 1px; height: 14px;
       background: rgba(138,106,26,0.22);
       flex-shrink: 0;
     }
@@ -524,13 +540,15 @@
     .mobile-menu.open { display: flex; }
     .mobile-menu a { font-family: var(--font-serif); font-size: 2rem; font-weight: 300; color: var(--white); text-decoration: none; transition: color 0.3s; }
     .mobile-menu a:hover { color: var(--gold); }
-    .mobile-lang { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+    .mobile-lang { display: flex; align-items: center; gap: 14px; margin-top: 8px; }
     .mobile-lang a, .mobile-lang span {
-      font-family: var(--font-sans); font-size: 0.85rem; font-weight: 400;
-      letter-spacing: 0.2em; text-transform: uppercase; color: var(--white-dim);
-      text-decoration: none; padding: 8px 20px; border: 1px solid rgba(138,106,26,0.25);
-      border-radius: 30px; transition: var(--transition);
+      font-family: var(--font-sans); font-size: 0.9rem; font-weight: 400;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--white-dim);
+      text-decoration: none; padding: 10px 22px; border: 1px solid rgba(138,106,26,0.25);
+      border-radius: 40px; transition: var(--transition);
+      display: inline-flex; align-items: center; gap: 8px;
     }
+    .mobile-lang .lang-flag { font-size: 1.3rem; line-height: 1; }
     .mobile-lang .active { background: linear-gradient(135deg, var(--gold-light), var(--gold)); color: var(--navy-deep); border-color: transparent; font-weight: 500; }
     .mobile-lang a:not(.active):hover { color: var(--gold); border-color: rgba(138,106,26,0.5); }
 
@@ -899,9 +917,13 @@
   </ul>
   <!-- ── DİL SEÇİCİ ── -->
   <div class="lang-switcher" role="navigation" aria-label="Dil seçici">
-    <span class="lang-btn active" aria-current="page" aria-label="Türkçe — aktif dil">TR</span>
+    <span class="lang-btn active" aria-current="page" aria-label="Türkçe — aktif dil">
+      <img class="lang-flag" src="https://flagcdn.com/w40/tr.png" alt="Türk Bayrağı" /> TR
+    </span>
     <div class="lang-divider" aria-hidden="true"></div>
-    <a href="indexen.html" class="lang-btn" aria-label="Switch to English">EN</a>
+    <a href="indexen.html" class="lang-btn" aria-label="Switch to English">
+      <img class="lang-flag" src="https://flagcdn.com/w40/gb.png" alt="British Flag" /> EN
+    </a>
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menüyü aç/kapat" aria-expanded="false">
     <span></span><span></span><span></span>
@@ -919,8 +941,8 @@
   <a href="#iletisim" onclick="closeMobileMenu()">Randevu Al</a>
   <!-- Mobil dil seçici -->
   <div class="mobile-lang">
-    <span class="lang-btn active">TR</span>
-    <a href="indexen.html" class="lang-btn" onclick="closeMobileMenu()">EN</a>
+    <span class="lang-btn active"><img class="lang-flag" src="https://flagcdn.com/w40/tr.png" alt="Türk Bayrağı" /> TR</span>
+    <a href="indexen.html" class="lang-btn" onclick="closeMobileMenu()"><img class="lang-flag" src="https://flagcdn.com/w40/gb.png" alt="British Flag" /> EN</a>
   </div>
 </div>
 
@@ -1330,7 +1352,7 @@
             <div class="contact-icon-wrap" aria-hidden="true">📧</div>
             <div>
               <p class="contact-item-title">E-posta</p>
-              <p class="contact-item-val"><a id="contactEmail" href="mailto:info@example.com">info@example.com</a></p>
+              <p class="contact-item-val"><a id="contactEmail" href="/cdn-cgi/l/email-protection#1e777078715e7b667f736e727b307d7173"><span class="__cf_email__" data-cfemail="85ecebe3eac5e0fde4e8f5e9e0abe6eae8">[email&#160;protected]</span></a></p>
             </div>
           </div>
           <div class="contact-item reveal">
@@ -1430,7 +1452,7 @@
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   /* YILDIZ KANVASİ */
   (function initStars() {
     const canvas = document.getElementById('star-canvas');
