@@ -1,6 +1,47 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Karmik Astroloji Analizi",
+  "alternateName": "Karmic Astrology Reading",
+  "serviceType": "Astrolojik Danışmanlık",
+  "description": "Kuzey Düğüm, Güney Düğüm ve Chiron gibi noktalar üzerinden ruhun bu yaşamdaki amacını ve geçmiş yaşam örüntülerini derinlemesine inceleyen 90 dakikalık seans. Karmik bloklar, ruhsal görevler ve yaşam amacı netleştirilir.",
+  "url": "https://ageofvibration.com/karmikastroloji.html",
+  "provider": {
+    "@type": "Person",
+    "name": "Age of Vibration",
+    "url": "https://ageofvibration.com",
+    "telephone": "+905334154982"
+  },
+  "availableChannel": {
+    "@type": "ServiceChannel",
+    "serviceType": "Online",
+    "availableLanguage": ["Turkish", "English"],
+    "serviceUrl": "https://ageofvibration.com/#iletisim"
+  },
+  "offers": {
+    "@type": "Offer",
+    "availability": "https://schema.org/InStock",
+    "priceCurrency": "TRY",
+    "url": "https://ageofvibration.com/karmikastroloji.html"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://ageofvibration.com" },
+    { "@type": "ListItem", "position": 2, "name": "Astroloji", "item": "https://ageofvibration.com/astroloji.html" },
+    { "@type": "ListItem", "position": 3, "name": "Karmik Astroloji", "item": "https://ageofvibration.com/karmikastroloji.html" }
+  ]
+}
+</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Karmik Astroloji | QHHT & Astroloji</title>
@@ -262,4 +303,5 @@
   document.querySelectorAll('.accordion-trigger').forEach(btn=>{btn.addEventListener('click',()=>{const item=btn.closest('.accordion-item');const panel=item.querySelector('.accordion-panel');const isOpen=item.classList.contains('active');document.querySelectorAll('.accordion-item.active').forEach(o=>{o.classList.remove('active');o.querySelector('.accordion-panel').classList.remove('open');o.querySelector('.accordion-trigger').setAttribute('aria-expanded',false);});if(!isOpen){item.classList.add('active');panel.classList.add('open');btn.setAttribute('aria-expanded',true);}});});
 </script>
 </body>
+
 </html>
