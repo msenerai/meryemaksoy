@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YouTube — QHHT & Astrology</title>
+  <meta name="description" content="QHHT, astrology and spiritual growth videos. Explore my YouTube channel." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.elifyildiz.com/youtube-en.html" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, query, orderBy }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const db = getFirestore(initializeApp({
+      apiKey:            "AIzaSyBsAZj0Swtn77HvsGxpsgispuluvIEIcvU",
+      authDomain:        "meryemaksoy1-45ce5.firebaseapp.com",
+      projectId:         "meryemaksoy1-45ce5",
+      storageBucket:     "meryemaksoy1-45ce5.firebasestorage.app",
+      messagingSenderId: "212318615377",
+      appId:             "1:212318615377:web:b28387f101a4c42ad34570"
+    }));
+
+    const YT_API_KEY = 'AIzaSyDPFz-gzWWAhgZN3N69FBP7PYWLSgjcDnQ';
+
+    function getYtId(url) {
+      if (!url) return null;
+      const m = url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+      return m ? m[1] : null;
+    }
+
+    async function loadPage() {
+      // Site general info — pull from siteContentEN
+      try {
+        const snap = await getDoc(doc(db, "siteContentEN", "main"));
+        if (snap.exists()) {
+          const d = snap.data();
+          if (d.youtubeHandle) {
+            document.getElementById('ytHandle').textContent = d.youtubeHandle;
+          }
+          if (d.youtubeUrl) {
+            document.querySelectorAll('.yt-subscribe-btn').forEach(el => {
+              el.href = d.youtubeUrl;
+            });
+          }
+          if (d.profilePhoto) {
+            const av = document.getElementById('profileAvatarYt');
+            if (av) av.innerHTML = `<img src="${d.profilePhoto}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+          }
+          if (d.aboutName) {
+            document.getElementById('profileNameYt').textContent = d.aboutName;
+          }
+        }
+      } catch(e) { console.warn(e); }
+
+      // YouTube videos — pull from youtubePostsEN
+      const grid = document.getElementById('ytGrid');
+      try {
+        const snap = await getDocs(query(collection(db, 'youtubePostsEN'), orderBy('order', 'asc')));
+        const posts = [];
+        snap.forEach(d => { if (d.data().visible !== false) posts.push({ id: d.id, ...d.data() }); });
+
+        if (posts.length === 0) {
+          grid.innerHTML = '<p class="empty-msg">No videos added yet.</p>';
+          return;
+        }
+
+        grid.innerHTML = '';
+
+        // Enrich with YouTube API
+        const enriched = await Promise.all(posts.map(async p => {
+          const ytId = getYtId(p.videoUrl);
+          if (!ytId) return p;
+
+          if (!p.thumbnail) p.thumbnail = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+
+          try {
+            const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?id=${ytId}&part=snippet,contentDetails&key=${YT_API_KEY}`);
+            if (res.ok) {
+              const data = await res.json();
+              const item = data.items?.[0];
+              if (item) {
+                if (!p.title) p.title = item.snippet.title;
+                const th = item.snippet.thumbnails;
+                p.thumbnail = (th.maxres || th.standard || th.high || th.medium || th.default)?.url || p.thumbnail;
+                const dur = item.contentDetails?.duration;
+                if (dur) {
+                  const m = dur.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+                  if (m) {
+                    const h = parseInt(m[1]||0), min = parseInt(m[2]||0), s = parseInt(m[3]||0);
+                    p.duration = h > 0 ? `${h}:${String(min).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${min}:${String(s).padStart(2,'0')}`;
+                  }
+                }
+              }
+            }
+          } catch(_) {}
+          return p;
+        }));
+
+        window._ytPosts = enriched;
+        buildYtFilter(enriched);
+        renderYtCards(enriched, grid);
+
+      } catch(e) {
+        grid.innerHTML = `<p class="empty-msg">Error loading: ${e.message}</p>`;
+      }
+    }
+
+    function buildYtFilter(posts) {
+      const cats = ['All', ...new Set(posts.map(p => p.category).filter(Boolean))];
+      const bar = document.getElementById('ytFilterBar');
+      bar.innerHTML = cats.map((c, i) =>
+        `<button class="filter-btn${i===0?' active':''}" data-cat="${c}" onclick="filterYT('${c}',this)">${c}</button>`
+      ).join('');
+    }
+
+    window.filterYT = function(cat, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const items = document.querySelectorAll('.yt-card');
+      items.forEach(item => {
+        const idx = parseInt(item.dataset.idx);
+        const p = window._ytPosts[idx];
+        const show = cat === 'All' || p.category === cat;
+        item.style.display = show ? '' : 'none';
+      });
+    };
+
+    function renderYtCards(posts, grid) {
+      grid.innerHTML = '';
+      posts.forEach((p, idx) => {
+        const card = document.createElement('div');
+        card.className = 'yt-card';
+        card.dataset.idx = idx;
+        card.innerHTML = `
+          <div class="yt-thumb" onclick="openVideoModal(${idx})">
+            ${p.thumbnail
+              ? `<img src="${p.thumbnail}" alt="${p.title||''}" loading="lazy" />`
+              : `<div class="yt-thumb-empty">▶️</div>`}
+            <div class="yt-play-btn"><span>▶</span></div>
+            ${p.duration ? `<span class="yt-duration">${p.duration}</span>` : ''}
+          </div>
+          <div class="yt-card-body">
+            ${p.category ? `<span class="yt-cat">${p.category}</span>` : ''}
+            <h3 class="yt-title">${p.title || 'Video'}</h3>
+            ${p.description ? `<p class="yt-desc">${p.description}</p>` : ''}
+            <div class="yt-card-footer">
+              ${p.postedAt?.toDate ? `<span class="yt-date">${p.postedAt.toDate().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</span>` : (p.dateLabel ? `<span class="yt-date">${p.dateLabel}</span>` : '')}
+              ${p.videoUrl ? `<a href="${p.videoUrl}" target="_blank" rel="noopener" class="yt-ext-link">Watch on YouTube →</a>` : ''}
+            </div>
+          </div>`;
+        grid.appendChild(card);
+      });
+    }
+
+    window.openVideoModal = function(idx) {
+      const p = window._ytPosts[idx];
+      const ytId = getYtId(p.videoUrl);
+      if (!ytId) { window.open(p.videoUrl, '_blank'); return; }
+      window._modalIdx = idx;
+
+      document.getElementById('modalIframe').src = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`;
+      document.getElementById('modalTitle').textContent = p.title || '';
+      document.getElementById('modalDesc').textContent = p.description || '';
+      document.getElementById('modalCat').textContent = p.category || '';
+      const mlnk = document.getElementById('modalLink');
+      if (mlnk) mlnk.href = p.videoUrl || '#';
+      document.getElementById('videoModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+
+      if (p.slug) {
+        history.replaceState(null, '', '#/' + p.slug);
+        const pageTitle = (p.title || p.category || 'Video') + ' — YouTube | QHHT & Astrology';
+        document.title = pageTitle;
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', p.description ? p.description.slice(0,155) : pageTitle);
+        const canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) canonical.setAttribute('href', location.origin + location.pathname + '#/' + p.slug);
+        const ogTitle = document.querySelector('meta[property="og:title"]');
+        if (ogTitle) ogTitle.setAttribute('content', pageTitle);
+        const ogDesc = document.querySelector('meta[property="og:description"]');
+        if (ogDesc) ogDesc.setAttribute('content', p.description ? p.description.slice(0,155) : pageTitle);
+        if (p.thumbnail) {
+          let ogImg = document.querySelector('meta[property="og:image"]');
+          if (!ogImg) { ogImg = document.createElement('meta'); ogImg.setAttribute('property','og:image'); document.head.appendChild(ogImg); }
+          ogImg.setAttribute('content', p.thumbnail);
+        }
+        let ogUrl = document.querySelector('meta[property="og:url"]');
+        if (!ogUrl) { ogUrl = document.createElement('meta'); ogUrl.setAttribute('property','og:url'); document.head.appendChild(ogUrl); }
+        ogUrl.setAttribute('content', location.origin + location.pathname + '#/' + p.slug);
+        let ld = document.getElementById('yt-ld');
+        if (!ld) { ld = document.createElement('script'); ld.id='yt-ld'; ld.type='application/ld+json'; document.head.appendChild(ld); }
+        const ytIdVal = getYtId(p.videoUrl);
+        ld.textContent = JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "VideoObject",
+          "name": p.title || (p.category || 'Video'),
+          "description": p.description || '',
+          "thumbnailUrl": p.thumbnail || (ytIdVal ? `https://img.youtube.com/vi/${ytIdVal}/hqdefault.jpg` : ''),
+          "uploadDate": p.createdAt?.toDate ? p.createdAt.toDate().toISOString() : '',
+          "embedUrl": ytIdVal ? `https://www.youtube.com/embed/${ytIdVal}` : '',
+          "url": location.origin + location.pathname + '#/' + p.slug,
+          "keywords": p.category || ''
+        });
+      }
+    };
+
+    window.openBySlug = function(slug) {
+      const posts = window._ytPosts;
+      if (!posts) return;
+      const idx = posts.findIndex(p => p.slug === slug);
+      if (idx !== -1) window.openVideoModal(idx);
+    };
+
+    window.closeVideoModal = function() {
+      document.getElementById('videoModal').classList.remove('open');
+      document.getElementById('modalIframe').src = '';
+      document.body.style.overflow = '';
+      history.replaceState(null, '', location.pathname);
+      document.title = 'YouTube — QHHT & Astrology';
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', 'QHHT, astrology and spiritual growth videos. Explore my YouTube channel.');
+      const canonical = document.querySelector('link[rel="canonical"]');
+      if (canonical) canonical.setAttribute('href', 'https://www.elifyildiz.com/youtube-en.html');
+    };
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeVideoModal();
+    });
+
+    async function initHashRouting() {
+      await loadPage();
+      const hash = location.hash;
+      if (hash && hash.startsWith('#/')) {
+        const slug = hash.slice(2);
+        if (slug) window.openBySlug(slug);
+      }
+    }
+
+    window.addEventListener('hashchange', () => {
+      const hash = location.hash;
+      if (!hash || !hash.startsWith('#/')) { window.closeVideoModal(); return; }
+      const slug = hash.slice(2);
+      if (slug && window._ytPosts) window.openBySlug(slug);
+    });
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initHashRouting);
+    } else { initHashRouting(); }
+  </script>
+
+  <style>
+    :root {
+      --bg:         #f0ece4;
+      --gold:       #8a6a1a;
+      --gold-light: #9e7b22;
+      --text:       #2c2535;
+      --text-dim:   rgba(44,37,53,0.6);
+      --border:     rgba(138,106,26,0.15);
+      --radius:     12px;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans:  'Jost', sans-serif;
+      --transition: all 0.35s cubic-bezier(0.25,0.8,0.25,1);
+      --max-width:  1200px;
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-thumb { background:linear-gradient(var(--gold),#7c5cbf); border-radius:3px; }
+    body { font-family:var(--font-sans); background:var(--bg); color:var(--text); overflow-x:hidden; }
+
+    /* NAV */
+    nav { position:sticky; top:0; z-index:50; background:rgba(240,236,228,.95); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:14px 40px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-logo { font-family:var(--font-serif); font-size:1.4rem; font-weight:400; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:8px; }
+    .nav-links { display:flex; gap:28px; list-style:none; }
+    .nav-links a { font-family:var(--font-sans); font-size:.78rem; font-weight:300; letter-spacing:.12em; text-transform:uppercase; color:var(--text-dim); text-decoration:none; transition:color .3s; }
+    .nav-links a:hover, .nav-links a.active { color:var(--gold-light); }
+    .nav-cta { color:var(--gold)!important; border:1px solid var(--gold); padding:7px 18px; border-radius:40px; }
+    .nav-cta:hover { background:var(--gold); color:#faf8f5!important; }
+    .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; background:none; border:none; padding:4px; }
+    .hamburger span { display:block; width:22px; height:1.5px; background:var(--gold); transition:var(--transition); }
+    .hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity:0; }
+    .hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+    .mobile-menu { display:none; position:fixed; inset:0; background:rgba(240,236,228,.98); z-index:99; flex-direction:column; align-items:center; justify-content:center; gap:36px; }
+    .mobile-menu.open { display:flex; }
+    .mobile-menu a { font-family:var(--font-serif); font-size:1.8rem; font-weight:300; color:var(--text); text-decoration:none; }
+    .mobile-menu a:hover { color:var(--gold); }
+
+    /* PAGE HERO */
+    .page-hero { padding:60px 40px 50px; background:linear-gradient(180deg,rgba(255,0,0,.03) 0%,transparent 100%); }
+    .hero-inner-yt { max-width:var(--max-width); margin:0 auto; display:flex; align-items:center; gap:40px; flex-wrap:wrap; }
+    .yt-channel-icon { width:90px; height:90px; border-radius:50%; background:#ff0000; display:flex; align-items:center; justify-content:center; font-size:2.2rem; flex-shrink:0; overflow:hidden; box-shadow:0 8px 32px rgba(255,0,0,.25); }
+    .yt-channel-icon img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+    .profile-info { flex:1; }
+    .section-label { font-family:var(--font-sans); font-size:.68rem; font-weight:400; letter-spacing:.35em; text-transform:uppercase; color:var(--gold); display:block; margin-bottom:8px; }
+    .page-title-big { font-family:var(--font-serif); font-size:clamp(1.8rem,4vw,2.8rem); font-weight:300; color:var(--text); line-height:1.15; margin-bottom:6px; }
+    .page-title-big span { color:var(--gold-light); font-style:italic; }
+    .yt-handle { font-family:var(--font-sans); font-size:.85rem; font-weight:300; color:var(--text-dim); margin-bottom:16px; }
+    .yt-subscribe-btn { display:inline-flex; align-items:center; gap:8px; background:#ff0000; color:#fff; font-family:var(--font-sans); font-size:.75rem; font-weight:500; letter-spacing:.1em; text-transform:uppercase; text-decoration:none; padding:10px 24px; border-radius:40px; transition:var(--transition); box-shadow:0 4px 20px rgba(255,0,0,.2); }
+    .yt-subscribe-btn:hover { background:#cc0000; transform:translateY(-2px); box-shadow:0 8px 32px rgba(255,0,0,.3); }
+
+    /* FILTER */
+    .filter-wrap { max-width:var(--max-width); margin:0 auto; padding:0 24px 32px; display:flex; gap:10px; flex-wrap:wrap; }
+    .filter-btn { font-family:var(--font-sans); font-size:.7rem; font-weight:400; letter-spacing:.15em; text-transform:uppercase; color:var(--text-dim); background:transparent; border:1px solid rgba(44,37,53,.14); padding:7px 18px; border-radius:40px; cursor:pointer; transition:var(--transition); }
+    .filter-btn:hover, .filter-btn.active { background:rgba(138,106,26,.08); border-color:var(--gold); color:var(--gold); }
+
+    /* YT GRID */
+    .yt-grid-wrap { max-width:var(--max-width); margin:0 auto; padding:0 24px 80px; }
+    #ytGrid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+    .yt-card { background:linear-gradient(160deg,rgba(232,226,216,.8),rgba(245,241,234,.95)); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; transition:var(--transition); }
+    .yt-card:hover { transform:translateY(-5px); box-shadow:0 20px 48px rgba(0,0,0,.08); border-color:rgba(138,106,26,.3); }
+    .yt-thumb { position:relative; aspect-ratio:16/9; background:#111; cursor:pointer; overflow:hidden; }
+    .yt-thumb img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .4s; }
+    .yt-card:hover .yt-thumb img { transform:scale(1.04); }
+    .yt-thumb-empty { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:3rem; opacity:.3; }
+    .yt-play-btn { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.2); opacity:0; transition:opacity .3s; }
+    .yt-card:hover .yt-play-btn { opacity:1; }
+    .yt-play-btn span { width:56px; height:56px; background:rgba(255,0,0,.9); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:#fff; box-shadow:0 4px 20px rgba(255,0,0,.4); }
+    .yt-duration { position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,.8); color:#fff; font-family:var(--font-sans); font-size:.68rem; font-weight:500; padding:3px 7px; border-radius:4px; }
+    .yt-card-body { padding:18px 20px 20px; display:flex; flex-direction:column; gap:8px; }
+    .yt-cat { font-family:var(--font-sans); font-size:.6rem; font-weight:400; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); border:1px solid rgba(138,106,26,.25); padding:3px 10px; border-radius:20px; align-self:flex-start; }
+    .yt-title { font-family:var(--font-serif); font-size:1.1rem; font-weight:400; color:var(--text); line-height:1.35; }
+    .yt-desc { font-family:var(--font-sans); font-size:.8rem; font-weight:300; color:var(--text-dim); line-height:1.6; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .yt-card-footer { display:flex; justify-content:space-between; align-items:center; margin-top:4px; padding-top:10px; border-top:1px solid rgba(138,106,26,.1); }
+    .yt-date { font-family:var(--font-sans); font-size:.7rem; font-weight:300; color:var(--text-dim); }
+    .yt-ext-link { font-family:var(--font-sans); font-size:.7rem; font-weight:400; color:var(--gold); text-decoration:none; transition:gap .3s; display:inline-flex; align-items:center; gap:4px; }
+    .yt-ext-link:hover { gap:8px; }
+
+    /* VIDEO MODAL */
+    #videoModal { position:fixed; inset:0; z-index:200; background:rgba(15,10,25,.94); backdrop-filter:blur(20px); display:none; align-items:center; justify-content:center; padding:20px; }
+    #videoModal.open { display:flex; }
+    .modal-wrap { max-width:900px; width:100%; background:var(--bg); border-radius:16px; overflow:hidden; box-shadow:0 40px 120px rgba(0,0,0,.5); }
+    .modal-video { position:relative; aspect-ratio:16/9; background:#000; }
+    .modal-video iframe { width:100%; height:100%; border:none; display:block; }
+    .modal-close { position:absolute; top:12px; right:12px; z-index:10; background:rgba(255,255,255,.15); border:none; color:#fff; width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center; transition:var(--transition); }
+    .modal-close:hover { background:rgba(255,255,255,.3); }
+    .modal-info { padding:22px 24px; display:flex; flex-direction:column; gap:10px; }
+    .modal-cat { font-family:var(--font-sans); font-size:.6rem; font-weight:400; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); border:1px solid rgba(138,106,26,.3); padding:3px 10px; border-radius:20px; align-self:flex-start; }
+    .modal-title { font-family:var(--font-serif); font-size:1.35rem; font-weight:400; color:var(--text); line-height:1.3; }
+    .modal-desc { font-family:var(--font-sans); font-size:.85rem; font-weight:300; color:var(--text-dim); line-height:1.7; }
+    .modal-link { display:inline-flex; align-items:center; gap:8px; font-family:var(--font-sans); font-size:.7rem; font-weight:400; letter-spacing:.1em; text-transform:uppercase; color:#ff0000; border:1px solid rgba(255,0,0,.3); padding:7px 16px; border-radius:40px; text-decoration:none; transition:var(--transition); align-self:flex-start; }
+    .modal-link:hover { background:rgba(255,0,0,.06); border-color:#ff0000; }
+
+    /* FOOTER */
+    footer { background:rgba(232,226,216,.95); border-top:1px solid var(--border); padding:40px; }
+    .footer-inner { max-width:var(--max-width); margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+    .footer-logo { font-family:var(--font-serif); font-size:1.4rem; font-weight:400; color:var(--text); text-decoration:none; }
+    .footer-logo span { color:var(--gold); }
+    .footer-copy { font-family:var(--font-sans); font-size:.75rem; font-weight:300; color:rgba(44,37,53,.4); }
+
+    .empty-msg { grid-column:1/-1; text-align:center; font-family:var(--font-serif); font-style:italic; color:var(--text-dim); padding:60px 20px; font-size:1.1rem; }
+
+    @media (max-width:768px) {
+      nav { padding:14px 20px; }
+      .nav-links { display:none; }
+      .hamburger { display:flex; }
+      .page-hero { padding:50px 20px 36px; }
+      #ytGrid { grid-template-columns:1fr 1fr; gap:16px; }
+    }
+    @media (max-width:480px) {
+      #ytGrid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index-en.html" class="nav-logo">✦ QHHT & Astrology</a>
+  <ul class="nav-links">
+    <li><a href="index-en.html#about">About</a></li>
+    <li><a href="index-en.html#qhht">QHHT</a></li>
+    <li><a href="index-en.html#astrology">Astrology</a></li>
+    <li><a href="blog-en.html">Blog</a></li>
+    <li><a href="youtube-en.html" class="active">YouTube</a></li>
+    <li><a href="instagram-en.html">Instagram</a></li>
+    <li><a href="index-en.html#contact" class="nav-cta">Book a Session</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index-en.html" onclick="closeMM()">Home</a>
+  <a href="blog-en.html" onclick="closeMM()">Blog</a>
+  <a href="youtube-en.html" onclick="closeMM()">YouTube</a>
+  <a href="instagram-en.html" onclick="closeMM()">Instagram</a>
+  <a href="index-en.html#contact" onclick="closeMM()">Book a Session</a>
+</div>
+
+<div class="page-hero">
+  <div class="hero-inner-yt">
+    <div class="yt-channel-icon" id="profileAvatarYt">▶️</div>
+    <div class="profile-info">
+      <span class="section-label">Social Media</span>
+      <h1 class="page-title-big">YouTube <span>Channel</span></h1>
+      <p class="yt-handle" id="ytHandle" id="profileNameYt">YouTube Channel</p>
+      <a href="#" class="yt-subscribe-btn" target="_blank" rel="noopener">▶ Subscribe</a>
+    </div>
+  </div>
+</div>
+
+<div class="filter-wrap" id="ytFilterBar"></div>
+
+<div class="yt-grid-wrap">
+  <div id="ytGrid">
+    <p class="empty-msg">Loading…</p>
+  </div>
+</div>
+
+<!-- VIDEO MODAL -->
+<div id="videoModal" onclick="if(event.target===this)closeVideoModal()">
+  <div class="modal-wrap">
+    <div class="modal-video">
+      <iframe id="modalIframe" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      <button class="modal-close" onclick="closeVideoModal()">✕</button>
+    </div>
+    <div class="modal-info">
+      <span class="modal-cat" id="modalCat"></span>
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <p class="modal-desc" id="modalDesc"></p>
+      <a href="#" class="modal-link" id="modalLink" target="_blank" rel="noopener">▶ Watch on YouTube</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <a href="index-en.html" class="footer-logo">QHHT <span>✦</span> Astrology</a>
+    <p class="footer-copy">© 2025 QHHT & Astrology</p>
+  </div>
+</footer>
+
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => {
+    const o = mobileMenu.classList.toggle('open');
+    hamburger.classList.toggle('open', o);
+    document.body.style.overflow = o ? 'hidden' : '';
+  });
+  function closeMM() {
+    mobileMenu.classList.remove('open');
+    hamburger.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+</script>
+</body>
+</html>
