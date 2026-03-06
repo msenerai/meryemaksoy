@@ -24,13 +24,11 @@
     });
     const db = getFirestore(app);
 
-    /* ── SESSION ── */
     const isLoggedIn = () => sessionStorage.getItem('adm') === '1';
     document.addEventListener('DOMContentLoaded', () => { isLoggedIn() ? showAdmin() : showLogin(); });
     function showAdmin() { document.getElementById('loginWrap').style.display='none'; document.getElementById('app').style.display='grid'; loadAll(); }
     function showLogin() { document.getElementById('loginWrap').style.display='flex'; document.getElementById('app').style.display='none'; }
 
-    /* ── LOGIN ── */
     window._login = async function() {
       const u=document.getElementById('lu').value.trim(), p=document.getElementById('lp').value;
       const errEl=document.getElementById('lerr'), btn=document.getElementById('lbtn');
@@ -46,7 +44,6 @@
     };
     window._logout=()=>{sessionStorage.removeItem('adm');showLogin();};
 
-    /* ── CLOUDINARY ── */
     window._upload = async function(file) {
       const fd=new FormData(); fd.append('file',file); fd.append('upload_preset','ml_default');
       const r=await fetch('https://api.cloudinary.com/v1_1/dognk1md5/image/upload',{method:'POST',body:fd});
@@ -66,13 +63,11 @@
       finally{btn.textContent='Yükle';btn.disabled=false;}
     };
 
-    /* ── SLUG ── */
     window._makeSlug=function(title){
       const map={'ç':'c','ğ':'g','ı':'i','ö':'o','ş':'s','ü':'u','Ç':'c','Ğ':'g','İ':'i','Ö':'o','Ş':'s','Ü':'u'};
       return title.toLowerCase().replace(/[çğışöüÇĞİŞÖÜ]/g,c=>map[c]||c).replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-');
     };
 
-    /* ── LOAD ALL ── */
     async function loadAll(){
       loadSiteContent();
       loadReviews(); loadReviewsEN();
@@ -81,9 +76,6 @@
       loadIgPosts(); loadYtPosts();
     }
 
-    /* ════════════════════════════════════════════════════════
-       SİTE İÇERİĞİ
-       ════════════════════════════════════════════════════════ */
     const TR_FIELDS=['navLogo','heroBg','heroEyebrow','heroTitle','heroSubtitle',
       'aboutName','aboutTitle','profilePhoto','aboutQuote','aboutText1','aboutText2',
       'stat1Number','stat1Label','stat2Number','stat2Label','stat3Number','stat3Label',
@@ -114,9 +106,6 @@
       try{const data={};EN_FIELDS.forEach(f=>{const el=document.getElementById('en_'+f);if(el)data[f]=el.value.trim();});const certEl=document.getElementById('en_certItems');if(certEl){data.certItems=certEl.value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{const s=l.indexOf('|');return s>=0?{icon:l.slice(0,s).trim(),text:l.slice(s+1).trim()}:{icon:'✦',text:l};});}await setDoc(doc(db,'siteContentEN','main'),{...data,updatedAt:serverTimestamp()},{merge:true});toast('✦ EN kaydedildi');}catch(e){toast(e.message,true);}finally{btn.textContent='Save';btn.disabled=false;}
     };
 
-    /* ════════════════════════════════════════════════════════
-       YORUMLAR
-       ════════════════════════════════════════════════════════ */
     async function loadReviews(){const list=document.getElementById('reviewList');list.innerHTML='<p class="empty">Yükleniyor…</p>';try{const snap=await getDocs(query(collection(db,'reviews'),orderBy('createdAt','desc')));if(snap.empty){list.innerHTML='<p class="empty">Henüz yorum yok.</p>';return;}list.innerHTML='';snap.forEach(d=>{const r=d.data(),dt=r.createdAt?.toDate?r.createdAt.toDate().toLocaleDateString('tr-TR'):'—';const card=document.createElement('div');card.className='dcard '+(r.approved?'ok':'wait');card.innerHTML=`<div class="dcard-top"><div class="dcard-name">${r.name} <span class="pill ${r.approved?'pill-g':'pill-y'}">${r.approved?'Onaylı':'Bekliyor'}</span></div><div class="dcard-meta">${r.service||'—'} · ${'★'.repeat(r.stars||5)} · ${dt}</div></div><p class="dcard-body">"${r.text}"</p><div class="dcard-actions">${!r.approved?`<button class="abtn abtn-g" onclick="approveR('${d.id}',this)">✓ Onayla</button>`:`<button class="abtn abtn-gray" onclick="unapproveR('${d.id}',this)">↩ Geri Al</button>`}<button class="abtn abtn-r" onclick="deleteR('${d.id}',this)">✕ Sil</button></div>`;list.appendChild(card);});}catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}}
     window.approveR=async(id,btn)=>{btn.disabled=true;await updateDoc(doc(db,'reviews',id),{approved:true});loadReviews();toast('Onaylandı');};
     window.unapproveR=async(id,btn)=>{btn.disabled=true;await updateDoc(doc(db,'reviews',id),{approved:false});loadReviews();toast('Onay kaldırıldı');};
@@ -126,9 +115,6 @@
     window.unapproveREN=async(id,btn)=>{btn.disabled=true;await updateDoc(doc(db,'reviewsEN',id),{approved:false});loadReviewsEN();toast('Approval removed');};
     window.deleteREN=async(id,btn)=>{if(!confirm('Delete?'))return;btn.disabled=true;await deleteDoc(doc(db,'reviewsEN',id));loadReviewsEN();toast('Deleted');};
 
-    /* ════════════════════════════════════════════════════════
-       RANDEVULAR
-       ════════════════════════════════════════════════════════ */
     async function loadAppointments(){const list=document.getElementById('apptList');list.innerHTML='<p class="empty">Yükleniyor…</p>';try{const snap=await getDocs(query(collection(db,'appointments'),orderBy('createdAt','desc')));if(snap.empty){list.innerHTML='<p class="empty">Henüz randevu yok.</p>';return;}list.innerHTML='<div class="appt-table-wrap"><table class="appt-table"><thead><tr><th>Ad Soyad</th><th>E-posta</th><th>Telefon</th><th>Hizmet</th><th>Mesaj</th><th>Tarih</th><th>Durum</th><th>İşlem</th></tr></thead><tbody id="apptTbody"></tbody></table></div>';const tb=document.getElementById('apptTbody');snap.forEach(d=>{const a=d.data(),dt=a.createdAt?.toDate?a.createdAt.toDate().toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';const isNew=a.status!=='read';const tr=document.createElement('tr');tr.className=isNew?'appt-row-new':'';tr.innerHTML='<td class="appt-name">'+(a.firstName||'')+' '+(a.lastName||'')+'</td><td class="appt-email"><a href="mailto:'+(a.email||'')+'">'+(a.email||'—')+'</a></td><td class="appt-phone">'+(a.phone?'<a href="tel:'+a.phone+'">'+a.phone+'</a>':'—')+'</td><td class="appt-service">'+(a.service||'—')+'</td><td class="appt-msg-cell">'+(a.message||'')+'</td><td class="appt-date">'+dt+'</td><td><span class="pill '+(isNew?'pill-y':'pill-g')+'">'+(isNew?'Yeni':'Okundu')+'</span></td><td class="appt-actions">'+(isNew?'<button class="abtn abtn-g" onclick="markRead(\''+d.id+'\',this)">✓ Okundu</button>':'')+'<button class="abtn abtn-r" onclick="deleteA(\''+d.id+'\',this)">✕ Sil</button></td>';tb.appendChild(tr);});}catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}}
     window.markRead=async(id,btn)=>{btn.disabled=true;await updateDoc(doc(db,'appointments',id),{status:'read'});loadAppointments();toast('Okundu');};
     window.deleteA=async(id,btn)=>{if(!confirm('Silinsin mi?'))return;btn.disabled=true;await deleteDoc(doc(db,'appointments',id));loadAppointments();toast('Silindi');};
@@ -136,16 +122,25 @@
     window.markReadEN=async(id,btn)=>{btn.disabled=true;await updateDoc(doc(db,'appointmentsEN',id),{status:'read'});loadAppointmentsEN();toast('Marked as read');};
     window.deleteAEN=async(id,btn)=>{if(!confirm('Delete?'))return;btn.disabled=true;await deleteDoc(doc(db,'appointmentsEN',id));loadAppointmentsEN();toast('Deleted');};
 
-    /* ════════════════════════════════════════════════════════
-       BLOG — BİRLEŞİK PANEL (TR: blogPosts | EN: blogPostsEN)
-       ════════════════════════════════════════════════════════ */
+    /* ════ BLOG ════ */
     let _editTR=null, _editEN=null;
     let _trPosts=[], _enPosts=[];
 
-    /* ── LISTE: Her yazı için TR + EN kartı birlikte göster ── */
+    function _makeBlogRow(p, lang){
+      const isTR = lang==='tr';
+      const dt = p.publishedAt?.toDate ? p.publishedAt.toDate().toLocaleDateString(isTR?'tr-TR':'en-GB') : '—';
+      const live = p.published!==false;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td class="tbl-thumb-cell">${p.coverImage?`<img src="${p.coverImage}" class="tbl-thumb" alt="" />`:`<div class="tbl-thumb tbl-thumb-empty">${p.emoji||'✍️'}</div>`}</td>
+        <td><div class="tbl-title">${p.title||'(Başlıksız)'}</div><div class="tbl-meta">${p.category?`<span class="cm-tag">${p.category}</span>`:''}<span class="cm-date">${dt}</span></div>${p.excerpt?`<div class="tbl-excerpt">${p.excerpt.slice(0,70)}…</div>`:''}</td>
+        <td><span class="cm-status-dot ${live?'dot-live':'dot-draft'}"></span></td>
+        <td class="tbl-actions">${isTR?`<a class="cm-btn-icon" href="blog.html#/${p.slug||''}" target="_blank">👁</a><button class="cm-btn-icon" onclick="editPost('${p.id}')">✏️</button><button class="cm-btn-icon cm-btn-toggle" onclick="togglePublish('${p.id}',${live},this)">${live?'⏸':'▶'}</button><button class="cm-btn-icon cm-btn-danger" onclick="deletePost('${p.id}',this)">🗑</button>`:`<a class="cm-btn-icon" href="blog-en.html#/${p.slug||''}" target="_blank">👁</a><button class="cm-btn-icon" onclick="editPostEN('${p.id}')">✏️</button><button class="cm-btn-icon cm-btn-toggle" onclick="togglePublishEN('${p.id}',${live},this)">${live?'⏸':'▶'}</button><button class="cm-btn-icon cm-btn-danger" onclick="deletePostEN('${p.id}',this)">🗑</button>`}</td>`;
+      return tr;
+    }
+
     async function loadBlogPosts(){
       const list=document.getElementById('blogPostList');
-      list.innerHTML='<p class="empty">Yükleniyor…</p>';
+      list.innerHTML='<div class="cm-loading"><div class="cm-spinner"></div><span>Yükleniyor…</span></div>';
       try{
         const [trSnap,enSnap]=await Promise.all([
           getDocs(query(collection(db,'blogPosts'),orderBy('publishedAt','desc'))),
@@ -154,100 +149,42 @@
         _trPosts=[]; _enPosts=[];
         trSnap.forEach(d=>_trPosts.push({id:d.id,...d.data()}));
         enSnap.forEach(d=>_enPosts.push({id:d.id,...d.data()}));
-
-        if(_trPosts.length===0 && _enPosts.length===0){
-          list.innerHTML='<p class="empty">Henüz blog yazısı yok.</p>';return;
-        }
-
+        if(_trPosts.length===0&&_enPosts.length===0){list.innerHTML='<div class="cm-empty"><div class="cm-empty-icon">✍️</div><p>Henüz blog yazısı yok.</p></div>';return;}
         list.innerHTML='';
-
-        /* TR'de olan her yazıyı göster, yanına EN eşleşmesini bağla */
-        const usedEN=new Set();
-        _trPosts.forEach(p=>{
-          const enMatch=_enPosts.find(e=>e.slug===p.slug || e.enLinkedSlug===p.slug);
-          if(enMatch)usedEN.add(enMatch.id);
-          list.appendChild(makePairCard(p,enMatch||null));
-        });
-
-        /* Sadece EN'de olanlar (TR'de karşılığı olmayanlar) */
-        _enPosts.filter(e=>!usedEN.has(e.id)).forEach(e=>{
-          list.appendChild(makePairCard(null,e));
-        });
-
-      }catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}
+        const wrap=document.createElement('div'); wrap.className='cm-two-tables';
+        const trCol=document.createElement('div'); trCol.className='cm-table-col cm-table-col-tr';
+        const enCol=document.createElement('div'); enCol.className='cm-table-col cm-table-col-en';
+        if(_trPosts.length){
+          const hd=document.createElement('div');hd.className='cm-table-head tr-head';hd.innerHTML='<span class="cm-lang-tag tr-tag">🇹🇷 TR — blogPosts</span>';
+          const tbl=document.createElement('table');tbl.className='cm-table';
+          _trPosts.forEach(p=>tbl.appendChild(_makeBlogRow(p,'tr')));
+          trCol.appendChild(hd); trCol.appendChild(tbl);
+        }
+        if(_enPosts.length){
+          const hd=document.createElement('div');hd.className='cm-table-head en-head';hd.innerHTML='<span class="cm-lang-tag en-tag">🇬🇧 EN — blogPostsEN</span>';
+          const tbl=document.createElement('table');tbl.className='cm-table';
+          _enPosts.forEach(p=>tbl.appendChild(_makeBlogRow(p,'en')));
+          enCol.appendChild(hd); enCol.appendChild(tbl);
+        }
+        if(_trPosts.length) wrap.appendChild(trCol);
+        if(_enPosts.length) wrap.appendChild(enCol);
+        list.appendChild(wrap);
+      }catch(e){list.innerHTML=`<div class="cm-empty"><span style="color:#e53e3e">✕ ${e.message}</span></div>`;}
     }
 
-    function makePairCard(tr,en){
-      const wrapper=document.createElement('div');
-      wrapper.className='pair-card';
+    function makePairCard(tr,en){ return document.createElement('div'); }
 
-      /* TR tarafı */
-      const trSide=document.createElement('div');
-      trSide.className='pair-side pair-side-tr';
-      if(tr){
-        const dt=tr.publishedAt?.toDate?tr.publishedAt.toDate().toLocaleDateString('tr-TR'):'—';
-        trSide.innerHTML=`
-          <div class="pair-lang-badge tr-badge">🇹🇷 TR — blogPosts</div>
-          <div class="pair-title">${tr.title||'(Başlıksız)'} <span class="pill ${tr.published!==false?'pill-g':'pill-y'}">${tr.published!==false?'Yayında':'Taslak'}</span>${tr.category?`<span class="pill pill-cat">${tr.category}</span>`:''}</div>
-          <div class="pair-meta">/${tr.slug||''} · ${dt}</div>
-          ${tr.excerpt?`<p class="pair-excerpt">${tr.excerpt.slice(0,100)}…</p>`:''}
-          <div class="dcard-actions">
-            <a class="abtn abtn-b" href="blog.html#/${tr.slug||''}" target="_blank">👁</a>
-            <button class="abtn abtn-g" onclick="editPost('${tr.id}')">✏ TR Düzenle</button>
-            <button class="abtn abtn-gray" onclick="togglePublish('${tr.id}',${tr.published!==false},this)">${tr.published!==false?'⏸ Taslak':'▶ Yayınla'}</button>
-            <button class="abtn abtn-r" onclick="deletePost('${tr.id}',this)">✕</button>
-          </div>`;
-      } else {
-        trSide.innerHTML=`<div class="pair-lang-badge tr-badge">🇹🇷 TR — blogPosts</div><div class="pair-empty-side">Bu yazı için Türkçe içerik eklenmemiş.<br><button class="abtn abtn-g" style="margin-top:8px;" onclick="newPostTRForSlug('${en?.slug||''}')">+ TR Ekle</button></div>`;
-      }
-
-      /* EN tarafı */
-      const enSide=document.createElement('div');
-      enSide.className='pair-side pair-side-en';
-      if(en){
-        const dt=en.publishedAt?.toDate?en.publishedAt.toDate().toLocaleDateString('en-GB'):'—';
-        enSide.innerHTML=`
-          <div class="pair-lang-badge en-badge">🇬🇧 EN — blogPostsEN</div>
-          <div class="pair-title">${en.title||'(Untitled)'} <span class="pill ${en.published!==false?'pill-g':'pill-y'}">${en.published!==false?'Live':'Draft'}</span>${en.category?`<span class="pill pill-cat">${en.category}</span>`:''}</div>
-          <div class="pair-meta">/${en.slug||''} · ${dt}</div>
-          ${en.excerpt?`<p class="pair-excerpt">${en.excerpt.slice(0,100)}…</p>`:''}
-          <div class="dcard-actions">
-            <a class="abtn abtn-b" href="blog-en.html#/${en.slug||''}" target="_blank">👁</a>
-            <button class="abtn abtn-g" onclick="editPostEN('${en.id}')">✏ EN Edit</button>
-            <button class="abtn abtn-gray" onclick="togglePublishEN('${en.id}',${en.published!==false},this)">${en.published!==false?'⏸ Draft':'▶ Publish'}</button>
-            <button class="abtn abtn-r" onclick="deletePostEN('${en.id}',this)">✕</button>
-          </div>`;
-      } else {
-        enSide.innerHTML=`<div class="pair-lang-badge en-badge">🇬🇧 EN — blogPostsEN</div><div class="pair-empty-side">No English content for this post yet.<br><button class="abtn abtn-g" style="margin-top:8px;" onclick="newPostENForSlug('${tr?.slug||''}','${(tr?.title||'').replace(/'/g,"\\'")}')">+ Add EN</button></div>`;
-      }
-
-      wrapper.appendChild(trSide);
-      wrapper.appendChild(enSide);
-      return wrapper;
-    }
-
-    /* ── TR CRUD ── */
     window.editPost=async function(id){
       const snap=await getDoc(doc(db,'blogPosts',id));if(!snap.exists())return;
       const p=snap.data();_editTR=id;
       _setForm('tr',{title:p.title,slug:p.slug,category:p.category,emoji:p.emoji,excerpt:p.excerpt,tags:(p.tags||[]).join(', '),readingTime:p.readingTime,coverUrl:p.coverImage,authorName:p.authorName,metaDesc:p.metaDesc,published:p.published!==false,content:p.content});
       const prev=document.getElementById('tr_prev_bpCover');if(p.coverImage){prev.src=p.coverImage;prev.style.display='block';}else prev.style.display='none';
-      document.getElementById('bothPostFormTitle').textContent='✏ Yazıyı Düzenle';
-      openForm('bothPostFormWrap');
+      document.getElementById('bothPostFormTitle').textContent='Yazıyı Düzenle';
+      openDrawer('bothPostDrawer');
     };
-    window.newPost=function(){
-      _editTR=null;_setForm('tr',{published:true});
-      document.getElementById('tr_prev_bpCover').style.display='none';
-      document.getElementById('bothPostFormTitle').textContent='+ Yeni Yazı';
-      openForm('bothPostFormWrap');
-    };
-    window.newPostTRForSlug=function(slug){
-      _editTR=null;_setForm('tr',{published:true,slug});
-      document.getElementById('tr_prev_bpCover').style.display='none';
-      document.getElementById('bothPostFormTitle').textContent='+ Yeni Yazı';
-      openForm('bothPostFormWrap');
-    };
-    window.cancelPost=()=>{closeForm('bothPostFormWrap');_editTR=null;};
+    window.newPost=function(){_editTR=null;_setForm('tr',{published:true});document.getElementById('tr_prev_bpCover').style.display='none';document.getElementById('bothPostFormTitle').textContent='Yeni Yazı';openDrawer('bothPostDrawer');};
+    window.newPostTRForSlug=function(slug){_editTR=null;_setForm('tr',{published:true,slug});document.getElementById('tr_prev_bpCover').style.display='none';document.getElementById('bothPostFormTitle').textContent='Yeni Yazı';openDrawer('bothPostDrawer');};
+    window.cancelPost=()=>{closeDrawer('bothPostDrawer');_editTR=null;};
     window._savePost=async function(){
       const btn=document.getElementById('tr_savePostBtn');btn.textContent='…';btn.disabled=true;
       const title=document.getElementById('tr_bp_title').value.trim();
@@ -261,29 +198,18 @@
     window.togglePublish=async(id,cur,btn)=>{btn.disabled=true;try{await updateDoc(doc(db,'blogPosts',id),{published:!cur});toast(cur?'Taslağa alındı':'Yayınlandı');loadBlogPosts();}catch(e){toast(e.message,true);btn.disabled=false;}};
     window.deletePost=async(id,btn)=>{if(!confirm('Kalıcı silinsin mi?'))return;btn.disabled=true;try{await deleteDoc(doc(db,'blogPosts',id));toast('Silindi');loadBlogPosts();}catch(e){toast(e.message,true);btn.disabled=false;}};
 
-    /* ── EN CRUD ── */
     window.editPostEN=async function(id){
       const snap=await getDoc(doc(db,'blogPostsEN',id));if(!snap.exists())return;
       const p=snap.data();_editEN=id;
       _setForm('en',{title:p.title,slug:p.slug,category:p.category,emoji:p.emoji,excerpt:p.excerpt,tags:(p.tags||[]).join(', '),readingTime:p.readingTime,coverUrl:p.coverImage,authorName:p.authorName,metaDesc:p.metaDesc,published:p.published!==false,content:p.content});
       const prev=document.getElementById('en_prev_bpCover');if(p.coverImage){prev.src=p.coverImage;prev.style.display='block';}else prev.style.display='none';
-      document.getElementById('bothPostFormTitle').textContent='✏ Yazıyı Düzenle';
-      openForm('bothPostFormWrap');
+      document.getElementById('bothPostFormTitle').textContent='Edit Post';
+      openDrawer('bothPostDrawer');
     };
-    window.newPostEN=function(){
-      _editEN=null;_setForm('en',{published:true});
-      document.getElementById('en_prev_bpCover').style.display='none';
-      document.getElementById('bothPostFormTitle').textContent='+ Yeni Yazı';
-      openForm('bothPostFormWrap');
-    };
-    window.newPostENForSlug=function(slug,trTitle){
-      _editEN=null;_setForm('en',{published:true,slug});
-      document.getElementById('en_prev_bpCover').style.display='none';
-      document.getElementById('bothPostFormTitle').textContent='+ Yeni Yazı';
-      openForm('bothPostFormWrap');
-    };
-    window.cancelBothPost=()=>{closeForm('bothPostFormWrap');_editTR=null;_editEN=null;};
-    window.cancelPostEN=()=>{closeForm('bothPostFormWrap');_editEN=null;};
+    window.newPostEN=function(){_editEN=null;_setForm('en',{published:true});document.getElementById('en_prev_bpCover').style.display='none';document.getElementById('bothPostFormTitle').textContent='New Post';openDrawer('bothPostDrawer');};
+    window.newPostENForSlug=function(slug,trTitle){_editEN=null;_setForm('en',{published:true,slug});document.getElementById('en_prev_bpCover').style.display='none';document.getElementById('bothPostFormTitle').textContent='New Post';openDrawer('bothPostDrawer');};
+    window.cancelBothPost=()=>{closeDrawer('bothPostDrawer');_editTR=null;_editEN=null;};
+    window.cancelPostEN=()=>{closeDrawer('bothPostDrawer');_editEN=null;};
     window._savePostEN=async function(){
       const btn=document.getElementById('en_savePostBtn');btn.textContent='…';btn.disabled=true;
       const title=document.getElementById('en_bp_title').value.trim();
@@ -297,21 +223,14 @@
     window.togglePublishEN=async(id,cur,btn)=>{btn.disabled=true;try{await updateDoc(doc(db,'blogPostsEN',id),{published:!cur});toast(cur?'Draft\'a alındı':'Published');loadBlogPosts();}catch(e){toast(e.message,true);btn.disabled=false;}};
     window.deletePostEN=async(id,btn)=>{if(!confirm('Permanently delete?'))return;btn.disabled=true;try{await deleteDoc(doc(db,'blogPostsEN',id));toast('Deleted');loadBlogPosts();}catch(e){toast(e.message,true);btn.disabled=false;}};
 
-    /* helpers */
-    function openForm(id){document.getElementById(id).style.display='block';document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});}
-    function closeForm(id){document.getElementById(id).style.display='none';}
-
-    /* Hem TR hem EN formu aynı anda sıfırla ve aç */
     window.newPostBoth=function(){
       _editTR=null;_editEN=null;
-      _setForm('tr',{published:true});
-      _setForm('en',{published:true});
+      _setForm('tr',{published:true});_setForm('en',{published:true});
       document.getElementById('tr_prev_bpCover').style.display='none';
       document.getElementById('en_prev_bpCover').style.display='none';
-      document.getElementById('bothPostFormTitle').textContent='+ Yeni Yazı';
-      openForm('bothPostFormWrap');
+      document.getElementById('bothPostFormTitle').textContent='Yeni Yazı';
+      openDrawer('bothPostDrawer');
     };
-
     function _setForm(lang,p){
       const g=(id)=>document.getElementById(lang+'_bp_'+id);
       if(g('title'))g('title').value=p.title||'';
@@ -329,17 +248,27 @@
       const sp=document.getElementById(lang+'_slugPreview');if(sp)sp.textContent=p.slug||'…';
     }
 
-    /* ════════════════════════════════════════════════════════
-       INSTAGRAM — TR: instagramPosts | EN: instagramPostsEN
-       ════════════════════════════════════════════════════════ */
+    /* ════ INSTAGRAM ════ */
     let _editIgTR=null, _editIgEN=null;
     let _igTRPosts=[], _igENPosts=[];
 
-    function _igThumb(p){ return p.image?`<img src="${p.image}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;" />`:`<span style="font-size:1.5rem">${p.emoji||'📸'}</span>`; }
+    function _igThumb(p){ return p.image?`<img src="${p.image}" alt="" />`:`<span class="cm-emoji-thumb">${p.emoji||'📸'}</span>`; }
+
+    function _makeIgRow(p, lang){
+      const isTR = lang==='tr';
+      const live = p.visible!==false;
+      const thumb = p.image ? `<img src="${p.image}" class="tbl-thumb" alt="" />` : `<div class="tbl-thumb tbl-thumb-empty">${p.emoji||'📸'}</div>`;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td class="tbl-thumb-cell">${thumb}</td>
+        <td><div class="tbl-title">${(p.caption||'(Açıklamasız)').slice(0,60)}</div><div class="tbl-meta">${p.category?`<span class="cm-tag">${p.category}</span>`:''}<span class="cm-date">Sıra: ${p.order??'—'}</span></div></td>
+        <td><span class="cm-status-dot ${live?'dot-live':'dot-draft'}"></span></td>
+        <td class="tbl-actions"><button class="cm-btn-icon" onclick="editIgPost('${p.id}','${lang}')" title="${isTR?'Düzenle':'Edit'}">✏️</button><button class="cm-btn-icon cm-btn-toggle" onclick="toggleIgVisible('${p.id}','${lang}',${live},this)">${live?'⏸':'▶'}</button><button class="cm-btn-icon cm-btn-danger" onclick="deleteIgPost('${p.id}','${lang}',this)">🗑</button></td>`;
+      return tr;
+    }
 
     async function loadIgPosts(){
       const list=document.getElementById('igPostList');
-      list.innerHTML='<p class="empty">Yükleniyor…</p>';
+      list.innerHTML='<div class="cm-loading"><div class="cm-spinner"></div><span>Yükleniyor…</span></div>';
       try{
         const [trSnap,enSnap]=await Promise.all([
           getDocs(query(collection(db,'instagramPosts'),orderBy('order','asc'))),
@@ -348,50 +277,28 @@
         _igTRPosts=[]; _igENPosts=[];
         trSnap.forEach(d=>_igTRPosts.push({id:d.id,...d.data()}));
         enSnap.forEach(d=>_igENPosts.push({id:d.id,...d.data()}));
-        if(!_igTRPosts.length&&!_igENPosts.length){list.innerHTML='<p class="empty">Gönderi yok.</p>';return;}
+        if(!_igTRPosts.length&&!_igENPosts.length){list.innerHTML='<div class="cm-empty"><div class="cm-empty-icon">📸</div><p>Gönderi yok.</p></div>';return;}
         list.innerHTML='';
-        const usedEN=new Set();
-        _igTRPosts.forEach(p=>{
-          const en=_igENPosts.find(e=>e.slug===p.slug);
-          if(en)usedEN.add(en.id);
-          list.appendChild(makeIgPairCard(p,en||null));
-        });
-        _igENPosts.filter(e=>!usedEN.has(e.id)).forEach(e=>list.appendChild(makeIgPairCard(null,e)));
-      }catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}
+        const wrap=document.createElement('div'); wrap.className='cm-two-tables';
+        if(_igTRPosts.length){
+          const col=document.createElement('div'); col.className='cm-table-col cm-table-col-tr';
+          const hd=document.createElement('div');hd.className='cm-table-head tr-head';hd.innerHTML='<span class="cm-lang-tag tr-tag">🇹🇷 TR — instagramPosts</span>';
+          const tbl=document.createElement('table');tbl.className='cm-table';
+          _igTRPosts.forEach(p=>tbl.appendChild(_makeIgRow(p,'tr')));
+          col.appendChild(hd); col.appendChild(tbl); wrap.appendChild(col);
+        }
+        if(_igENPosts.length){
+          const col=document.createElement('div'); col.className='cm-table-col cm-table-col-en';
+          const hd=document.createElement('div');hd.className='cm-table-head en-head';hd.innerHTML='<span class="cm-lang-tag en-tag">🇬🇧 EN — instagramPostsEN</span>';
+          const tbl=document.createElement('table');tbl.className='cm-table';
+          _igENPosts.forEach(p=>tbl.appendChild(_makeIgRow(p,'en')));
+          col.appendChild(hd); col.appendChild(tbl); wrap.appendChild(col);
+        }
+        list.appendChild(wrap);
+      }catch(e){list.innerHTML=`<div class="cm-empty"><span style="color:#e53e3e">✕ ${e.message}</span></div>`;}
     }
 
-    function makeIgPairCard(tr,en){
-      const wrap=document.createElement('div'); wrap.className='pair-card';
-      // TR
-      const ts=document.createElement('div'); ts.className='pair-side pair-side-tr';
-      if(tr){
-        ts.innerHTML=`<div class="pair-lang-badge tr-badge">🇹🇷 TR — instagramPosts</div>
-          <div class="pair-title" style="display:flex;align-items:center;gap:8px;margin:6px 0;">${_igThumb(tr)}<span>${(tr.caption||'(Açıklamasız)').slice(0,55)}</span> <span class="pill ${tr.visible!==false?'pill-g':'pill-y'}">${tr.visible!==false?'Görünür':'Gizli'}</span></div>
-          <div class="pair-meta">Sıra: ${tr.order??'—'} · ${tr.category||''}</div>
-          <div class="dcard-actions" style="margin-top:8px;">
-            <button class="abtn abtn-g" onclick="editIgPost('${tr.id}','tr')">✏ Düzenle</button>
-            <button class="abtn abtn-gray" onclick="toggleIgVisible('${tr.id}','tr',${tr.visible!==false},this)">${tr.visible!==false?'Gizle':'Göster'}</button>
-            <button class="abtn abtn-r" onclick="deleteIgPost('${tr.id}','tr',this)">✕</button>
-          </div>`;
-      } else {
-        ts.innerHTML=`<div class="pair-lang-badge tr-badge">🇹🇷 TR — instagramPosts</div><div class="pair-empty-side">TR içerik yok.<br><button class="abtn abtn-g" style="margin-top:8px;" onclick="newIgForSlug('tr','${en?.slug||''}')">+ TR Ekle</button></div>`;
-      }
-      // EN
-      const es=document.createElement('div'); es.className='pair-side pair-side-en';
-      if(en){
-        es.innerHTML=`<div class="pair-lang-badge en-badge">🇬🇧 EN — instagramPostsEN</div>
-          <div class="pair-title" style="display:flex;align-items:center;gap:8px;margin:6px 0;">${_igThumb(en)}<span>${(en.caption||'(No caption)').slice(0,55)}</span> <span class="pill ${en.visible!==false?'pill-g':'pill-y'}">${en.visible!==false?'Visible':'Hidden'}</span></div>
-          <div class="pair-meta">Order: ${en.order??'—'} · ${en.category||''}</div>
-          <div class="dcard-actions" style="margin-top:8px;">
-            <button class="abtn abtn-g" onclick="editIgPost('${en.id}','en')">✏ Edit</button>
-            <button class="abtn abtn-gray" onclick="toggleIgVisible('${en.id}','en',${en.visible!==false},this)">${en.visible!==false?'Hide':'Show'}</button>
-            <button class="abtn abtn-r" onclick="deleteIgPost('${en.id}','en',this)">✕</button>
-          </div>`;
-      } else {
-        es.innerHTML=`<div class="pair-lang-badge en-badge">🇬🇧 EN — instagramPostsEN</div><div class="pair-empty-side">No EN content.<br><button class="abtn abtn-g" style="margin-top:8px;" onclick="newIgForSlug('en','${tr?.slug||''}')">+ Add EN</button></div>`;
-      }
-      wrap.appendChild(ts); wrap.appendChild(es); return wrap;
-    }
+    function makeIgPairCard(tr,en){ return document.createElement('div'); }
 
     function _igCol(lang){ return lang==='tr'?'instagramPosts':'instagramPostsEN'; }
     function _setIgForm(lang,p){
@@ -402,56 +309,45 @@
       const prev=document.getElementById('ig_'+lang+'_prev'); if(p.image){prev.src=p.image;prev.style.display='block';}else prev.style.display='none';
       const sp=document.getElementById('ig_'+lang+'_slugPreview'); if(sp)sp.textContent=p.slug||'…';
     }
-    window.newIgBoth=function(){
-      _editIgTR=null;_editIgEN=null;
-      _setIgForm('tr',{visible:true}); _setIgForm('en',{visible:true});
-      document.getElementById('igBothFormTitle').textContent='+ Yeni Gönderi';
-      openForm('igBothFormWrap');
-    };
-    window.newIgForSlug=function(lang,slug){
-      if(lang==='tr'){_editIgTR=null;_setIgForm('tr',{visible:true,slug});}
-      else{_editIgEN=null;_setIgForm('en',{visible:true,slug});}
-      document.getElementById('igBothFormTitle').textContent='+ Yeni Gönderi';
-      openForm('igBothFormWrap');
-    };
-    window.editIgPost=async function(id,lang){
-      const snap=await getDoc(doc(db,_igCol(lang),id)); if(!snap.exists())return;
-      const p=snap.data();
-      if(lang==='tr')_editIgTR=id; else _editIgEN=id;
-      _setIgForm(lang,{caption:p.caption,slug:p.slug,category:p.category,emoji:p.emoji,url:p.url,image:p.image,likes:p.likes,order:p.order,visible:p.visible!==false});
-      document.getElementById('igBothFormTitle').textContent='✏ Gönderiyi Düzenle';
-      openForm('igBothFormWrap');
-    };
-    window.cancelIgPost=()=>{closeForm('igBothFormWrap');_editIgTR=null;_editIgEN=null;};
+    window.newIgBoth=function(){_editIgTR=null;_editIgEN=null;_setIgForm('tr',{visible:true});_setIgForm('en',{visible:true});document.getElementById('igDrawerTitle').textContent='Yeni Gönderi';openDrawer('igDrawer');};
+    window.newIgForSlug=function(lang,slug){if(lang==='tr'){_editIgTR=null;_setIgForm('tr',{visible:true,slug});}else{_editIgEN=null;_setIgForm('en',{visible:true,slug});}document.getElementById('igDrawerTitle').textContent='Yeni Gönderi';openDrawer('igDrawer');};
+    window.editIgPost=async function(id,lang){const snap=await getDoc(doc(db,_igCol(lang),id));if(!snap.exists())return;const p=snap.data();if(lang==='tr')_editIgTR=id;else _editIgEN=id;_setIgForm(lang,{caption:p.caption,slug:p.slug,category:p.category,emoji:p.emoji,url:p.url,image:p.image,likes:p.likes,order:p.order,visible:p.visible!==false});document.getElementById('igDrawerTitle').textContent='Gönderiyi Düzenle';openDrawer('igDrawer');};
+    window.cancelIgPost=()=>{closeDrawer('igDrawer');_editIgTR=null;_editIgEN=null;};
     async function _doSaveIg(lang,editId){
-      const btn=document.getElementById('ig_'+lang+'_saveBtn'); btn.textContent='…';btn.disabled=true;
+      const btn=document.getElementById('ig_'+lang+'_saveBtn');btn.textContent='…';btn.disabled=true;
       const g=id=>document.getElementById('ig_'+lang+'_'+id);
       const cap=g('caption').value.trim();
       const slug=g('slug').value.trim()||window._makeSlug(cap.slice(0,60))||('gonderi-'+Date.now());
       const payload={caption:cap,slug,category:g('category').value.trim(),emoji:g('emoji').value.trim(),url:g('url').value.trim(),image:g('imgUrl').value.trim(),likes:g('likes').value.trim(),order:parseInt(g('order').value)||0,visible:g('visible').checked,updatedAt:serverTimestamp()};
-      try{
-        if(editId){await updateDoc(doc(db,_igCol(lang),editId),payload);toast('✦ '+(lang==='tr'?'TR':'EN')+' güncellendi');}
-        else{payload.createdAt=serverTimestamp();await addDoc(collection(db,_igCol(lang)),payload);toast('✦ '+(lang==='tr'?'TR':'EN')+' eklendi');}
-        if(lang==='tr')_editIgTR=null; else _editIgEN=null;
-        loadIgPosts();
-      }catch(e){toast(e.message,true);}
-      finally{btn.textContent=lang==='tr'?'✦ Türkçe Kaydet':'✦ English Save';btn.disabled=false;}
+      try{if(editId){await updateDoc(doc(db,_igCol(lang),editId),payload);toast('✦ '+(lang==='tr'?'TR':'EN')+' güncellendi');}else{payload.createdAt=serverTimestamp();await addDoc(collection(db,_igCol(lang)),payload);toast('✦ '+(lang==='tr'?'TR':'EN')+' eklendi');}if(lang==='tr')_editIgTR=null;else _editIgEN=null;loadIgPosts();}catch(e){toast(e.message,true);}finally{btn.textContent=lang==='tr'?'✦ Türkçe Kaydet':'✦ English Save';btn.disabled=false;}
     }
     window._saveIgTR=()=>_doSaveIg('tr',_editIgTR);
     window._saveIgEN=()=>_doSaveIg('en',_editIgEN);
     window.toggleIgVisible=async(id,lang,cur,btn)=>{btn.disabled=true;await updateDoc(doc(db,_igCol(lang),id),{visible:!cur});toast(cur?'Gizlendi':'Gösterildi');loadIgPosts();};
     window.deleteIgPost=async(id,lang,btn)=>{if(!confirm('Silinsin mi?'))return;btn.disabled=true;await deleteDoc(doc(db,_igCol(lang),id));toast('Silindi');loadIgPosts();};
 
-    /* ════════════════════════════════════════════════════════
-       YOUTUBE — TR: youtubePosts | EN: youtubePostsEN
-       ════════════════════════════════════════════════════════ */
+    /* ════ YOUTUBE ════ */
     let _editYtTR=null, _editYtEN=null;
     function extractYtId(url){if(!url)return'';const m=url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);return m?m[1]:'';}
-    function _ytThumb(p){const t=p.thumbnail||(p.videoUrl?`https://img.youtube.com/vi/${extractYtId(p.videoUrl)}/hqdefault.jpg`:'');return t?`<img src="${t}" style="width:56px;height:32px;object-fit:cover;border-radius:4px;flex-shrink:0;" />`:'<span>▶️</span>';}
+    function _ytThumb(p){const t=p.thumbnail||(p.videoUrl?`https://img.youtube.com/vi/${extractYtId(p.videoUrl)}/hqdefault.jpg`:'');return t?`<img src="${t}" alt="" />`:'<span class="cm-emoji-thumb">▶️</span>';}
+
+    function _makeYtRow(p, lang){
+      const isTR = lang==='tr';
+      const live = p.visible!==false;
+      const ytId = extractYtId(p.videoUrl||'');
+      const thumb = p.thumbnail||(ytId?`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`:'');
+      const thumbEl = thumb ? `<img src="${thumb}" class="tbl-thumb tbl-thumb-wide" alt="" />` : `<div class="tbl-thumb tbl-thumb-empty">▶️</div>`;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td class="tbl-thumb-cell">${thumbEl}</td>
+        <td><div class="tbl-title">${(p.title||'(Başlıksız)').slice(0,55)}</div><div class="tbl-meta">${p.category?`<span class="cm-tag">${p.category}</span>`:''}<span class="cm-date">Sıra: ${p.order??'—'}</span></div></td>
+        <td><span class="cm-status-dot ${live?'dot-live':'dot-draft'}"></span></td>
+        <td class="tbl-actions"><button class="cm-btn-icon" onclick="editYtPost('${p.id}','${lang}')" title="${isTR?'Düzenle':'Edit'}">✏️</button><button class="cm-btn-icon cm-btn-toggle" onclick="toggleYtVisible('${p.id}','${lang}',${live},this)">${live?'⏸':'▶'}</button><button class="cm-btn-icon cm-btn-danger" onclick="deleteYtPost('${p.id}','${lang}',this)">🗑</button></td>`;
+      return tr;
+    }
 
     async function loadYtPosts(){
       const list=document.getElementById('ytPostList');
-      list.innerHTML='<p class="empty">Yükleniyor…</p>';
+      list.innerHTML='<div class="cm-loading"><div class="cm-spinner"></div><span>Yükleniyor…</span></div>';
       try{
         const [trSnap,enSnap]=await Promise.all([
           getDocs(query(collection(db,'youtubePosts'),orderBy('order','asc'))),
@@ -460,48 +356,28 @@
         const trPosts=[],enPosts=[];
         trSnap.forEach(d=>trPosts.push({id:d.id,...d.data()}));
         enSnap.forEach(d=>enPosts.push({id:d.id,...d.data()}));
-        if(!trPosts.length&&!enPosts.length){list.innerHTML='<p class="empty">Video yok.</p>';return;}
+        if(!trPosts.length&&!enPosts.length){list.innerHTML='<div class="cm-empty"><div class="cm-empty-icon">▶️</div><p>Video yok.</p></div>';return;}
         list.innerHTML='';
-        const usedEN=new Set();
-        trPosts.forEach(p=>{
-          const en=enPosts.find(e=>e.slug===p.slug);
-          if(en)usedEN.add(en.id);
-          list.appendChild(makeYtPairCard(p,en||null));
-        });
-        enPosts.filter(e=>!usedEN.has(e.id)).forEach(e=>list.appendChild(makeYtPairCard(null,e)));
-      }catch(e){list.innerHTML=`<p class="empty">${e.message}</p>`;}
+        const wrap=document.createElement('div'); wrap.className='cm-two-tables';
+        if(trPosts.length){
+          const col=document.createElement('div'); col.className='cm-table-col cm-table-col-tr';
+          const hd=document.createElement('div');hd.className='cm-table-head tr-head';hd.innerHTML='<span class="cm-lang-tag tr-tag">🇹🇷 TR — youtubePosts</span>';
+          const tbl=document.createElement('table');tbl.className='cm-table';
+          trPosts.forEach(p=>tbl.appendChild(_makeYtRow(p,'tr')));
+          col.appendChild(hd); col.appendChild(tbl); wrap.appendChild(col);
+        }
+        if(enPosts.length){
+          const col=document.createElement('div'); col.className='cm-table-col cm-table-col-en';
+          const hd=document.createElement('div');hd.className='cm-table-head en-head';hd.innerHTML='<span class="cm-lang-tag en-tag">🇬🇧 EN — youtubePostsEN</span>';
+          const tbl=document.createElement('table');tbl.className='cm-table';
+          enPosts.forEach(p=>tbl.appendChild(_makeYtRow(p,'en')));
+          col.appendChild(hd); col.appendChild(tbl); wrap.appendChild(col);
+        }
+        list.appendChild(wrap);
+      }catch(e){list.innerHTML=`<div class="cm-empty"><span style="color:#e53e3e">✕ ${e.message}</span></div>`;}
     }
 
-    function makeYtPairCard(tr,en){
-      const wrap=document.createElement('div'); wrap.className='pair-card';
-      const ts=document.createElement('div'); ts.className='pair-side pair-side-tr';
-      if(tr){
-        ts.innerHTML=`<div class="pair-lang-badge tr-badge">🇹🇷 TR — youtubePosts</div>
-          <div class="pair-title" style="display:flex;align-items:center;gap:8px;margin:6px 0;">${_ytThumb(tr)}<span>${(tr.title||'(Başlıksız)').slice(0,50)}</span> <span class="pill ${tr.visible!==false?'pill-g':'pill-y'}">${tr.visible!==false?'Görünür':'Gizli'}</span></div>
-          <div class="pair-meta">Sıra: ${tr.order??'—'} · ${tr.category||''}</div>
-          <div class="dcard-actions" style="margin-top:8px;">
-            <button class="abtn abtn-g" onclick="editYtPost('${tr.id}','tr')">✏ Düzenle</button>
-            <button class="abtn abtn-gray" onclick="toggleYtVisible('${tr.id}','tr',${tr.visible!==false},this)">${tr.visible!==false?'Gizle':'Göster'}</button>
-            <button class="abtn abtn-r" onclick="deleteYtPost('${tr.id}','tr',this)">✕</button>
-          </div>`;
-      } else {
-        ts.innerHTML=`<div class="pair-lang-badge tr-badge">🇹🇷 TR — youtubePosts</div><div class="pair-empty-side">TR içerik yok.<br><button class="abtn abtn-g" style="margin-top:8px;" onclick="newYtForSlug('tr','${en?.slug||''}')">+ TR Ekle</button></div>`;
-      }
-      const es=document.createElement('div'); es.className='pair-side pair-side-en';
-      if(en){
-        es.innerHTML=`<div class="pair-lang-badge en-badge">🇬🇧 EN — youtubePostsEN</div>
-          <div class="pair-title" style="display:flex;align-items:center;gap:8px;margin:6px 0;">${_ytThumb(en)}<span>${(en.title||'(Untitled)').slice(0,50)}</span> <span class="pill ${en.visible!==false?'pill-g':'pill-y'}">${en.visible!==false?'Visible':'Hidden'}</span></div>
-          <div class="pair-meta">Order: ${en.order??'—'} · ${en.category||''}</div>
-          <div class="dcard-actions" style="margin-top:8px;">
-            <button class="abtn abtn-g" onclick="editYtPost('${en.id}','en')">✏ Edit</button>
-            <button class="abtn abtn-gray" onclick="toggleYtVisible('${en.id}','en',${en.visible!==false},this)">${en.visible!==false?'Hide':'Show'}</button>
-            <button class="abtn abtn-r" onclick="deleteYtPost('${en.id}','en',this)">✕</button>
-          </div>`;
-      } else {
-        es.innerHTML=`<div class="pair-lang-badge en-badge">🇬🇧 EN — youtubePostsEN</div><div class="pair-empty-side">No EN content.<br><button class="abtn abtn-g" style="margin-top:8px;" onclick="newYtForSlug('en','${tr?.slug||''}')">+ Add EN</button></div>`;
-      }
-      wrap.appendChild(ts); wrap.appendChild(es); return wrap;
-    }
+    function makeYtPairCard(tr,en){ return document.createElement('div'); }
 
     function _ytCol(lang){ return lang==='tr'?'youtubePosts':'youtubePostsEN'; }
     function _setYtForm(lang,p){
@@ -515,29 +391,12 @@
       if(thumb){prev.src=thumb;prev.style.display='block';}else prev.style.display='none';
       const sp=document.getElementById('yt_'+lang+'_slugPreview'); if(sp)sp.textContent=p.slug||'…';
     }
-    window.newYtBoth=function(){
-      _editYtTR=null;_editYtEN=null;
-      _setYtForm('tr',{visible:true}); _setYtForm('en',{visible:true});
-      document.getElementById('ytBothFormTitle').textContent='+ Yeni Video';
-      openForm('ytBothFormWrap');
-    };
-    window.newYtForSlug=function(lang,slug){
-      if(lang==='tr'){_editYtTR=null;_setYtForm('tr',{visible:true,slug});}
-      else{_editYtEN=null;_setYtForm('en',{visible:true,slug});}
-      document.getElementById('ytBothFormTitle').textContent='+ Yeni Video';
-      openForm('ytBothFormWrap');
-    };
-    window.editYtPost=async function(id,lang){
-      const snap=await getDoc(doc(db,_ytCol(lang),id)); if(!snap.exists())return;
-      const p=snap.data();
-      if(lang==='tr')_editYtTR=id; else _editYtEN=id;
-      _setYtForm(lang,{title:p.title,slug:p.slug,videoUrl:p.videoUrl,category:p.category,description:p.description,dateLabel:p.dateLabel,thumbnail:p.thumbnail,order:p.order,visible:p.visible!==false});
-      document.getElementById('ytBothFormTitle').textContent='✏ Videoyu Düzenle';
-      openForm('ytBothFormWrap');
-    };
-    window.cancelYtPost=()=>{closeForm('ytBothFormWrap');_editYtTR=null;_editYtEN=null;};
+    window.newYtBoth=function(){_editYtTR=null;_editYtEN=null;_setYtForm('tr',{visible:true});_setYtForm('en',{visible:true});document.getElementById('ytDrawerTitle').textContent='Yeni Video';openDrawer('ytDrawer');};
+    window.newYtForSlug=function(lang,slug){if(lang==='tr'){_editYtTR=null;_setYtForm('tr',{visible:true,slug});}else{_editYtEN=null;_setYtForm('en',{visible:true,slug});}document.getElementById('ytDrawerTitle').textContent='Yeni Video';openDrawer('ytDrawer');};
+    window.editYtPost=async function(id,lang){const snap=await getDoc(doc(db,_ytCol(lang),id));if(!snap.exists())return;const p=snap.data();if(lang==='tr')_editYtTR=id;else _editYtEN=id;_setYtForm(lang,{title:p.title,slug:p.slug,videoUrl:p.videoUrl,category:p.category,description:p.description,dateLabel:p.dateLabel,thumbnail:p.thumbnail,order:p.order,visible:p.visible!==false});document.getElementById('ytDrawerTitle').textContent='Videoyu Düzenle';openDrawer('ytDrawer');};
+    window.cancelYtPost=()=>{closeDrawer('ytDrawer');_editYtTR=null;_editYtEN=null;};
     async function _doSaveYt(lang,editId){
-      const btn=document.getElementById('yt_'+lang+'_saveBtn'); btn.textContent='…';btn.disabled=true;
+      const btn=document.getElementById('yt_'+lang+'_saveBtn');btn.textContent='…';btn.disabled=true;
       const g=id=>document.getElementById('yt_'+lang+'_'+id);
       const videoUrl=g('videoUrl').value.trim();
       if(!videoUrl){toast('Video URL zorunlu',true);btn.textContent=lang==='tr'?'✦ Türkçe Kaydet':'✦ English Save';btn.disabled=false;return;}
@@ -545,253 +404,641 @@
       const slug=g('slug').value.trim()||window._makeSlug(title.slice(0,60))||('video-'+Date.now());
       const thumbnail=g('thumbnail').value.trim()||(videoUrl?`https://img.youtube.com/vi/${extractYtId(videoUrl)}/hqdefault.jpg`:'');
       const payload={title,slug,videoUrl,category:g('category').value.trim(),description:g('description').value.trim(),dateLabel:g('dateLabel').value.trim(),thumbnail,order:parseInt(g('order').value)||0,visible:g('visible').checked,updatedAt:serverTimestamp()};
-      try{
-        if(editId){await updateDoc(doc(db,_ytCol(lang),editId),payload);toast('✦ '+(lang==='tr'?'TR':'EN')+' video güncellendi');}
-        else{payload.createdAt=serverTimestamp();await addDoc(collection(db,_ytCol(lang)),payload);toast('✦ '+(lang==='tr'?'TR':'EN')+' video eklendi');}
-        if(lang==='tr')_editYtTR=null; else _editYtEN=null;
-        loadYtPosts();
-      }catch(e){toast(e.message,true);}
-      finally{btn.textContent=lang==='tr'?'✦ Türkçe Kaydet':'✦ English Save';btn.disabled=false;}
+      try{if(editId){await updateDoc(doc(db,_ytCol(lang),editId),payload);toast('✦ '+(lang==='tr'?'TR':'EN')+' video güncellendi');}else{payload.createdAt=serverTimestamp();await addDoc(collection(db,_ytCol(lang)),payload);toast('✦ '+(lang==='tr'?'TR':'EN')+' video eklendi');}if(lang==='tr')_editYtTR=null;else _editYtEN=null;loadYtPosts();}catch(e){toast(e.message,true);}finally{btn.textContent=lang==='tr'?'✦ Türkçe Kaydet':'✦ English Save';btn.disabled=false;}
     }
     window._saveYtTR=()=>_doSaveYt('tr',_editYtTR);
     window._saveYtEN=()=>_doSaveYt('en',_editYtEN);
     window.toggleYtVisible=async(id,lang,cur,btn)=>{btn.disabled=true;await updateDoc(doc(db,_ytCol(lang),id),{visible:!cur});toast(cur?'Gizlendi':'Gösterildi');loadYtPosts();};
-    window.deleteYtPost=async(id,lang,btn)=>{if(!confirm('Silinsin mi?'))return;btn.disabled=true;await deleteDoc(doc(db,_ytCol(lang),id));toast('Silindi');loadYtPosts()};
+    window.deleteYtPost=async(id,lang,btn)=>{if(!confirm('Silinsin mi?'))return;btn.disabled=true;await deleteDoc(doc(db,_ytCol(lang),id));toast('Silindi');loadYtPosts();};
+
+    /* ── DRAWER ── */
+    window.openDrawer=function(id){
+      const d=document.getElementById(id);
+      const ov=document.getElementById('drawerOverlay');
+      d.classList.add('open');
+      ov.classList.add('show');
+      document.body.style.overflow='hidden';
+    };
+    window.closeDrawer=function(id){
+      const d=document.getElementById(id);
+      const ov=document.getElementById('drawerOverlay');
+      d.classList.remove('open');
+      // only hide overlay if no other drawer is open
+      const anyOpen=[...document.querySelectorAll('.drawer')].some(el=>el.classList.contains('open'));
+      if(!anyOpen){ov.classList.remove('show');document.body.style.overflow='';}
+    };
 
     /* ── AUTO-WIRING ── */
     document.addEventListener('DOMContentLoaded',()=>{
-      // Blog TR slug
+      document.getElementById('drawerOverlay').addEventListener('click',()=>{
+        document.querySelectorAll('.drawer.open').forEach(d=>closeDrawer(d.id));
+      });
       const trTitle=document.getElementById('tr_bp_title'),trSlug=document.getElementById('tr_bp_slug');
       if(trTitle&&trSlug){trTitle.addEventListener('input',()=>{if(!_editTR){trSlug.value=window._makeSlug(trTitle.value);const sp=document.getElementById('tr_slugPreview');if(sp)sp.textContent=trSlug.value||'…';}});trSlug.addEventListener('input',()=>{const sp=document.getElementById('tr_slugPreview');if(sp)sp.textContent=trSlug.value||'…';});}
-      // Blog EN slug
       const enTitle=document.getElementById('en_bp_title'),enSlug=document.getElementById('en_bp_slug');
       if(enTitle&&enSlug){enTitle.addEventListener('input',()=>{if(!_editEN){enSlug.value=window._makeSlug(enTitle.value);const sp=document.getElementById('en_slugPreview');if(sp)sp.textContent=enSlug.value||'…';}});enSlug.addEventListener('input',()=>{const sp=document.getElementById('en_slugPreview');if(sp)sp.textContent=enSlug.value||'…';});}
-      // IG TR slug auto
       ['tr','en'].forEach(lang=>{
-        const cap=document.getElementById('ig_'+lang+'_caption');
-        const sl=document.getElementById('ig_'+lang+'_slug');
-        if(cap&&sl){
-          cap.addEventListener('input',()=>{
-            const isEdit=lang==='tr'?_editIgTR:_editIgEN;
-            if(!isEdit){sl.value=window._makeSlug(cap.value.slice(0,60));const sp=document.getElementById('ig_'+lang+'_slugPreview');if(sp)sp.textContent=sl.value||'…';}
-          });
-          sl.addEventListener('input',()=>{const sp=document.getElementById('ig_'+lang+'_slugPreview');if(sp)sp.textContent=sl.value||'…';});
-        }
-      });
-      // YT auto thumbnail + slug
-      ['tr','en'].forEach(lang=>{
+        const cap=document.getElementById('ig_'+lang+'_caption'),sl=document.getElementById('ig_'+lang+'_slug');
+        if(cap&&sl){cap.addEventListener('input',()=>{const isEdit=lang==='tr'?_editIgTR:_editIgEN;if(!isEdit){sl.value=window._makeSlug(cap.value.slice(0,60));const sp=document.getElementById('ig_'+lang+'_slugPreview');if(sp)sp.textContent=sl.value||'…';}});sl.addEventListener('input',()=>{const sp=document.getElementById('ig_'+lang+'_slugPreview');if(sp)sp.textContent=sl.value||'…';});}
         const urlEl=document.getElementById('yt_'+lang+'_videoUrl');
         if(urlEl){urlEl.addEventListener('blur',()=>{const id=extractYtId(urlEl.value);if(!id)return;const tf=document.getElementById('yt_'+lang+'_thumbnail'),prev=document.getElementById('yt_'+lang+'_thumbPrev');if(!tf.value){const u=`https://img.youtube.com/vi/${id}/hqdefault.jpg`;tf.value=u;if(prev){prev.src=u;prev.style.display='block';}}});}
-        const titleEl=document.getElementById('yt_'+lang+'_title');
-        const slugEl=document.getElementById('yt_'+lang+'_slug');
-        if(titleEl&&slugEl){
-          titleEl.addEventListener('input',()=>{
-            const isEdit=lang==='tr'?_editYtTR:_editYtEN;
-            if(!isEdit){slugEl.value=window._makeSlug(titleEl.value.slice(0,60));const sp=document.getElementById('yt_'+lang+'_slugPreview');if(sp)sp.textContent=slugEl.value||'…';}
-          });
-          slugEl.addEventListener('input',()=>{const sp=document.getElementById('yt_'+lang+'_slugPreview');if(sp)sp.textContent=slugEl.value||'…';});
-        }
+        const ytTitleEl=document.getElementById('yt_'+lang+'_title'),ytSlugEl=document.getElementById('yt_'+lang+'_slug');
+        if(ytTitleEl&&ytSlugEl){ytTitleEl.addEventListener('input',()=>{const isEdit=lang==='tr'?_editYtTR:_editYtEN;if(!isEdit){ytSlugEl.value=window._makeSlug(ytTitleEl.value.slice(0,60));const sp=document.getElementById('yt_'+lang+'_slugPreview');if(sp)sp.textContent=ytSlugEl.value||'…';}});ytSlugEl.addEventListener('input',()=>{const sp=document.getElementById('yt_'+lang+'_slugPreview');if(sp)sp.textContent=ytSlugEl.value||'…';});}
       });
     });
 
-    /* ── TOAST ── */
     window.toast=function(msg,err=false){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',3000);};
   </script>
 
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    :root{--gold:#8a6a1a;--gold2:#c9a84c;--bg:#f2efe9;--sb:#1a1628;--text:#2c2535;--muted:#8a8599;--border:rgba(138,106,26,.14);--r:7px;--font:'Jost',sans-serif;--serif:'Cormorant Garamond',serif;}
+    :root{
+      --gold:#8a6a1a;--gold2:#c9a84c;--gold-light:rgba(138,106,26,.08);
+      --bg:#f2efe9;--sb:#1a1628;--text:#2c2535;--muted:#8a8599;
+      --border:rgba(138,106,26,.14);--border-solid:#e4ddd0;
+      --r:8px;--font:'Jost',sans-serif;--serif:'Cormorant Garamond',serif;
+      --tr-bg:#fffdf7;--tr-accent:rgba(138,106,26,.12);--tr-border:rgba(138,106,26,.2);
+      --en-bg:#f7faff;--en-accent:rgba(49,130,206,.1);--en-border:rgba(49,130,206,.2);
+    }
     html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);font-size:15px;}
+
+    /* ── LOGIN ── */
     #loginWrap{position:fixed;inset:0;background:linear-gradient(135deg,#f0ece4,#ddd6ca);display:flex;align-items:center;justify-content:center;z-index:99;}
-    .lcard{background:#fff;border:1px solid var(--border);border-radius:12px;padding:32px 28px;width:320px;box-shadow:0 12px 40px rgba(0,0,0,.1);}
-    .lcard h1{font-family:var(--serif);font-size:1.5rem;font-weight:400;text-align:center;margin-bottom:3px;}.lcard h1 span{color:var(--gold);}.lcard .sub{font-size:.7rem;color:var(--muted);text-align:center;margin-bottom:22px;}
-    .lf{margin-bottom:10px;}.lf label{display:block;font-size:.62rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
-    .lf input{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-family:var(--font);outline:none;background:#faf8f5;transition:border-color .2s;}.lf input:focus{border-color:var(--gold);background:#fff;}
-    .btn-login{width:100%;margin-top:8px;padding:10px;background:linear-gradient(135deg,#9e7b22,#8a6a1a);color:#fff;border:none;border-radius:40px;font-family:var(--font);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;}.btn-login:hover{opacity:.88;}.btn-login:disabled{opacity:.5;cursor:not-allowed;}
+    .lcard{background:#fff;border:1px solid var(--border);border-radius:14px;padding:36px 30px;width:320px;box-shadow:0 16px 48px rgba(0,0,0,.1);}
+    .lcard h1{font-family:var(--serif);font-size:1.6rem;font-weight:400;text-align:center;margin-bottom:3px;}.lcard h1 span{color:var(--gold);}.lcard .sub{font-size:.68rem;color:var(--muted);text-align:center;margin-bottom:24px;letter-spacing:.05em;}
+    .lf{margin-bottom:12px;}.lf label{display:block;font-size:.6rem;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+    .lf input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:.88rem;font-family:var(--font);outline:none;background:#faf8f5;transition:border-color .2s;}.lf input:focus{border-color:var(--gold);background:#fff;}
+    .btn-login{width:100%;margin-top:10px;padding:11px;background:linear-gradient(135deg,#9e7b22,#8a6a1a);color:#fff;border:none;border-radius:40px;font-family:var(--font);font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;}.btn-login:hover{opacity:.88;}.btn-login:disabled{opacity:.5;}
     #lerr{font-size:.72rem;color:#e53e3e;min-height:16px;margin-top:8px;text-align:center;}
+
+    /* ── APP LAYOUT ── */
     #app{display:none;grid-template-columns:215px 1fr;min-height:100vh;}
     .sb{background:var(--sb);color:#c8c2db;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
-    .sb-brand{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.05);}
+    .sb-brand{padding:20px 16px 14px;border-bottom:1px solid rgba(255,255,255,.05);}
     .sb-brand .logo{font-family:var(--serif);font-size:1.1rem;font-weight:400;color:#fff;}.sb-brand .logo em{color:var(--gold2);font-style:normal;}
-    .sb-brand .tag{font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-top:2px;}
+    .sb-brand .tag{font-size:.56rem;letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-top:2px;}
     .sb-nav{padding:10px 8px 4px;}
-    .sb-label{font-size:.56rem;font-weight:500;letter-spacing:.25em;text-transform:uppercase;color:rgba(255,255,255,.22);padding:0 8px;margin-bottom:3px;margin-top:10px;}
-    .nb{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:5px;cursor:pointer;font-size:.84rem;font-weight:300;color:rgba(255,255,255,.5);transition:all .18s;border:none;background:none;width:100%;text-align:left;}
-    .nb .ic{font-size:.85rem;width:16px;text-align:center;flex-shrink:0;}
-    .nb:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.82);}.nb.on{background:rgba(201,168,76,.14);color:var(--gold2);font-weight:400;}
+    .sb-label{font-size:.54rem;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:0 10px;margin-bottom:3px;margin-top:12px;}
+    .nb{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:6px;cursor:pointer;font-size:.83rem;font-weight:300;color:rgba(255,255,255,.5);transition:all .16s;border:none;background:none;width:100%;text-align:left;}
+    .nb .ic{font-size:.82rem;width:16px;text-align:center;flex-shrink:0;}
+    .nb:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.8);}.nb.on{background:rgba(201,168,76,.14);color:var(--gold2);font-weight:400;}
     .sb-foot{margin-top:auto;padding:12px 8px;border-top:1px solid rgba(255,255,255,.05);}
-    .btn-out{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:5px;cursor:pointer;font-size:.74rem;color:rgba(255,255,255,.3);background:none;border:none;width:100%;transition:all .18s;}.btn-out:hover{color:#f08080;background:rgba(240,128,128,.08);}
+    .btn-out{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:5px;cursor:pointer;font-size:.72rem;color:rgba(255,255,255,.3);background:none;border:none;width:100%;transition:all .18s;}.btn-out:hover{color:#f08080;background:rgba(240,128,128,.08);}
     .main{display:flex;flex-direction:column;overflow-y:auto;}
-    .topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;height:48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;gap:12px;}
-    .tb-title{font-size:.9rem;font-weight:500;}.tb-badge{font-size:.62rem;background:rgba(138,106,26,.08);color:var(--gold);padding:3px 9px;border-radius:20px;border:1px solid var(--border);}
-    .content{padding:16px 20px;flex:1;}
+    .topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;height:50px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;gap:12px;}
+    .tb-title{font-size:.92rem;font-weight:500;}.tb-badge{font-size:.6rem;background:var(--gold-light);color:var(--gold);padding:3px 10px;border-radius:20px;border:1px solid var(--border);letter-spacing:.08em;}
+    .content{padding:18px 20px;flex:1;}
     .panel{display:none;}.panel.on{display:block;}
+
+    /* ── SITE CONTENT CARDS ── */
     .card{background:#fff;border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;}
-    .ch{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+    .ch{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
     .ch h3{font-size:.88rem;font-weight:500;color:var(--text);display:flex;align-items:center;gap:7px;}
     .ch .arr{font-size:.65rem;color:var(--muted);transition:transform .18s;}
     .card.cl .arr{transform:rotate(-90deg);}.card.cl .cb{display:none;}
-    .cb{padding:12px 14px;}
-    .lang-tabs{display:flex;gap:0;margin-bottom:14px;border:1px solid var(--border);border-radius:6px;overflow:hidden;}
-    .lang-tab{flex:1;padding:8px 0;text-align:center;font-size:.72rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border:none;background:#faf8f5;color:var(--muted);transition:all .18s;}
+    .cb{padding:14px 16px;}
+    .lang-tabs{display:flex;gap:0;margin-bottom:14px;border:1px solid var(--border);border-radius:7px;overflow:hidden;}
+    .lang-tab{flex:1;padding:8px 0;text-align:center;font-size:.7rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border:none;background:#faf8f5;color:var(--muted);transition:all .16s;}
     .lang-tab.active-tr{background:linear-gradient(135deg,#9e7b22,#8a6a1a);color:#fff;}
     .lang-tab.active-en{background:linear-gradient(135deg,#2b6cb0,#3182ce);color:#fff;}
     .lang-pane{display:none;}.lang-pane.show{display:block;}
-    .en-badge{display:inline-block;font-size:.6rem;background:rgba(49,130,206,.12);color:#3182ce;border:1px solid rgba(49,130,206,.25);padding:2px 8px;border-radius:20px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
-    .tr-badge{display:inline-block;font-size:.6rem;background:rgba(138,106,26,.1);color:var(--gold);border:1px solid rgba(138,106,26,.25);padding:2px 8px;border-radius:20px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
-    .fg{margin-bottom:9px;}
-    .fg label{display:block;font-size:.72rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
-    .fg input,.fg textarea,.fg select{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:5px;font-size:.92rem;font-family:var(--font);color:var(--text);background:#faf8f5;outline:none;transition:border-color .2s;}
+    .en-badge{display:inline-block;font-size:.58rem;background:rgba(49,130,206,.1);color:#3182ce;border:1px solid rgba(49,130,206,.22);padding:2px 9px;border-radius:20px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
+    .tr-badge{display:inline-block;font-size:.58rem;background:rgba(138,106,26,.08);color:var(--gold);border:1px solid rgba(138,106,26,.22);padding:2px 9px;border-radius:20px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
+    .fg{margin-bottom:10px;}
+    .fg label{display:block;font-size:.68rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+    .fg input,.fg textarea,.fg select{width:100%;padding:8px 11px;border:1.5px solid var(--border);border-radius:6px;font-size:.9rem;font-family:var(--font);color:var(--text);background:#faf8f5;outline:none;transition:border-color .2s;}
     .fg input:focus,.fg textarea:focus{border-color:var(--gold);background:#fff;}
     .fg textarea{min-height:58px;resize:vertical;}
-    .g2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
-    .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;}
-    .toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
-    .toggle-label{font-size:.82rem;font-weight:300;}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+    .toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+    .toggle-label{font-size:.84rem;font-weight:300;}
     input[type="checkbox"]{width:36px;height:20px;cursor:pointer;accent-color:var(--gold);}
     .irow{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
-    .iprev{width:56px;height:56px;object-fit:cover;border-radius:5px;border:1px solid var(--border);display:none;background:#e6dfd4;flex-shrink:0;}
+    .iprev{width:56px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--border);display:none;background:#e6dfd4;flex-shrink:0;}
     .iprev.circ{border-radius:50%;}.iprev.wide{width:88px;height:48px;}.iprev.rect{width:120px;height:68px;}
     .fpick{font-size:.72rem;color:var(--muted);flex:1;min-width:0;}
-    .btn-up{padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:20px;font-size:.68rem;cursor:pointer;white-space:nowrap;}.btn-up:disabled{opacity:.4;cursor:not-allowed;}
-    .slug-preview{font-size:.72rem;color:var(--muted);margin-top:3px;font-family:monospace;}
-    .action-bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
-    .btn-save{padding:8px 24px;background:linear-gradient(135deg,#9e7b22,#8a6a1a);color:#fff;border:none;border-radius:40px;font-family:var(--font);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;margin-top:4px;transition:opacity .2s;}.btn-save:hover{opacity:.88;}.btn-save:disabled{opacity:.5;cursor:not-allowed;}
-    .btn-save-en{padding:8px 24px;background:linear-gradient(135deg,#2b6cb0,#3182ce);color:#fff;border:none;border-radius:40px;font-family:var(--font);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;margin-top:4px;transition:opacity .2s;}.btn-save-en:hover{opacity:.88;}.btn-save-en:disabled{opacity:.5;cursor:not-allowed;}
-    .btn-cancel{padding:8px 20px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:40px;font-family:var(--font);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;margin-top:4px;}
-    .btn-new{padding:8px 20px;background:rgba(138,106,26,.08);color:var(--gold);border:1px solid rgba(138,106,26,.3);border-radius:40px;font-family:var(--font);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;}.btn-new:hover{background:rgba(138,106,26,.14);}
-    .btn-new-en{padding:8px 20px;background:rgba(49,130,206,.08);color:#3182ce;border:1px solid rgba(49,130,206,.3);border-radius:40px;font-family:var(--font);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;}.btn-new-en:hover{background:rgba(49,130,206,.14);}
-    .dcard{background:#faf8f5;border:1px solid var(--border);border-left:3px solid;border-radius:var(--r);padding:10px 12px;margin-bottom:8px;}
+    .btn-up{padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:20px;font-size:.68rem;cursor:pointer;white-space:nowrap;}.btn-up:disabled{opacity:.4;}
+    .slug-preview{font-size:.7rem;color:var(--muted);margin-top:4px;font-family:monospace;}
+    .action-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+    .btn-save{padding:8px 24px;background:linear-gradient(135deg,#9e7b22,#8a6a1a);color:#fff;border:none;border-radius:40px;font-family:var(--font);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;margin-top:4px;transition:opacity .2s;}.btn-save:hover{opacity:.88;}.btn-save:disabled{opacity:.5;}
+    .btn-save-en{padding:8px 24px;background:linear-gradient(135deg,#2b6cb0,#3182ce);color:#fff;border:none;border-radius:40px;font-family:var(--font);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;margin-top:4px;transition:opacity .2s;}.btn-save-en:hover{opacity:.88;}.btn-save-en:disabled{opacity:.5;}
+    .btn-cancel{padding:8px 20px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:40px;font-family:var(--font);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;margin-top:4px;}
+    .btn-new{padding:8px 20px;background:var(--gold-light);color:var(--gold);border:1px solid var(--tr-border);border-radius:40px;font-family:var(--font);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:background .18s;}.btn-new:hover{background:rgba(138,106,26,.16);}
+    .load-status{font-size:.72rem;padding:6px 10px;border-radius:6px;background:rgba(0,0,0,.03);border:1px solid var(--border);margin-bottom:14px;display:block;}
+    .help-text{font-size:.68rem;color:var(--muted);margin-top:3px;line-height:1.5;}
+
+    /* ── REVIEWS & APPOINTMENTS ── */
+    .dcard{background:#faf8f5;border:1px solid var(--border);border-left:3px solid;border-radius:var(--r);padding:10px 13px;margin-bottom:8px;}
     .dcard.ok{border-left-color:#38a169;}.dcard.wait{border-left-color:#d69e2e;}
     .dcard-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;flex-wrap:wrap;gap:3px;}
-    .dcard-name{font-size:.92rem;font-weight:500;}.dcard-meta{font-size:.78rem;color:var(--muted);}
-    .dcard-body{font-size:.86rem;color:#555;line-height:1.6;font-style:italic;margin:6px 0 10px;}
+    .dcard-name{font-size:.9rem;font-weight:500;}.dcard-meta{font-size:.76rem;color:var(--muted);}
+    .dcard-body{font-size:.85rem;color:#555;line-height:1.6;font-style:italic;margin:6px 0 10px;}
     .dcard-actions{display:flex;gap:6px;flex-wrap:wrap;}
-    .pill{display:inline-block;font-size:.56rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:20px;margin-left:5px;}
+    .pill{display:inline-block;font-size:.54rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:20px;margin-left:5px;}
     .pill-g{background:#c6f6d5;color:#276749;}.pill-y{background:#fefcbf;color:#975a16;}
-    .pill-cat{background:rgba(124,58,237,.12);color:#7c3aed;}
-    .abtn{padding:5px 13px;border:none;border-radius:20px;font-size:.78rem;cursor:pointer;transition:opacity .18s;}.abtn:disabled{opacity:.4;cursor:not-allowed;}
+    .abtn{padding:5px 13px;border:none;border-radius:20px;font-size:.76rem;cursor:pointer;transition:opacity .18s;}.abtn:disabled{opacity:.4;}
     .abtn-g{background:#38a169;color:#fff;}.abtn-b{background:#3182ce;color:#fff;text-decoration:none;display:inline-flex;align-items:center;}
     .abtn-gray{background:#718096;color:#fff;}.abtn-r{background:#e53e3e;color:#fff;}
     .abtn:hover:not(:disabled){opacity:.8;}
-    .empty{color:var(--muted);font-style:italic;text-align:center;padding:24px;font-size:.82rem;}
-    .load-status{font-size:.75rem;padding:6px 10px;border-radius:5px;background:rgba(0,0,0,.03);border:1px solid var(--border);margin-bottom:12px;display:block;}
-    .help-text{font-size:.68rem;color:var(--muted);margin-top:3px;line-height:1.5;}
-    .toast{position:fixed;bottom:20px;right:20px;background:#1a1628;color:#f0ece4;padding:9px 18px;border-radius:6px;font-size:.76rem;z-index:999;opacity:0;transform:translateY(8px);transition:all .22s;pointer-events:none;}
-    .toast.show{opacity:1;transform:none;}.toast.err{background:#c53030;}
-
-    /* ── PAIR CARDS (Blog) ── */
-    .pair-card {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      overflow: hidden;
-      margin-bottom: 12px;
-      background: #fff;
-    }
-    .pair-side {
-      padding: 12px 14px;
-    }
-    .pair-side-tr {
-      border-right: 1px solid var(--border);
-      background: #fffdf7;
-    }
-    .pair-side-en {
-      background: #f7faff;
-    }
-    .pair-lang-badge {
-      display: inline-block;
-      font-size: .6rem;
-      font-weight: 500;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      padding: 2px 8px;
-      border-radius: 20px;
-      margin-bottom: 6px;
-    }
-    .pair-lang-badge.tr-badge { background: rgba(138,106,26,.1); color: var(--gold); border: 1px solid rgba(138,106,26,.25); }
-    .pair-lang-badge.en-badge { background: rgba(49,130,206,.1); color: #3182ce; border: 1px solid rgba(49,130,206,.25); }
-    .pair-title { font-size: .9rem; font-weight: 500; margin-bottom: 3px; line-height: 1.3; }
-    .pair-meta { font-size: .72rem; color: var(--muted); margin-bottom: 6px; }
-    .pair-excerpt { font-size: .78rem; color: #666; font-style: italic; margin-bottom: 8px; line-height: 1.5; }
-    .pair-empty-side {
-      font-size: .82rem; color: var(--muted); font-style: italic;
-      padding: 16px 0; text-align: center;
-    }
-
-    /* Rich editor */
-    .rte-wrap{border:1px solid var(--border);border-radius:5px;overflow:hidden;}
-    .rte-toolbar{display:flex;flex-wrap:wrap;gap:2px;padding:6px 8px;background:#f7f4ef;border-bottom:1px solid var(--border);align-items:center;}
-    .rte-toolbar button{border:none;background:transparent;border-radius:4px;cursor:pointer;font-size:.78rem;font-family:var(--font);color:var(--text);padding:4px 8px;transition:background .15s;line-height:1.2;min-width:28px;}.rte-toolbar button:hover{background:rgba(138,106,26,.12);}
-    .rte-sep{width:1px;height:20px;background:var(--border);margin:0 3px;flex-shrink:0;}
-    .rte-sel{border:1px solid var(--border);background:#faf8f5;border-radius:4px;font-family:var(--font);font-size:.75rem;color:var(--text);padding:3px 6px;cursor:pointer;outline:none;max-width:110px;}
-    .rich-editor{min-height:280px;max-height:550px;overflow-y:auto;padding:14px 16px;outline:none;font-family:var(--font);font-size:.95rem;line-height:1.8;color:var(--text);background:#fff;}
-    .rich-editor:focus{box-shadow:inset 0 0 0 2px rgba(138,106,26,.2);}
-    .rich-editor h1{font-family:var(--serif);font-size:2rem;font-weight:400;margin:16px 0 8px;}
-    .rich-editor h2{font-family:var(--serif);font-size:1.5rem;font-weight:400;margin:14px 0 6px;}
-    .rich-editor h3{font-family:var(--serif);font-size:1.2rem;font-weight:500;margin:12px 0 5px;}
-    .rich-editor p{margin:0 0 10px;}
-    .rich-editor blockquote{border-left:3px solid var(--gold);padding:8px 16px;margin:12px 0;background:rgba(138,106,26,.05);font-style:italic;}
-    .rich-editor ul,.rich-editor ol{padding-left:22px;margin:8px 0;}
-    .rich-editor a{color:var(--gold);text-decoration:underline;}
-    .rich-editor img{max-width:100%;border-radius:6px;margin:8px 0;}
-
-    /* Appointments */
     .appt-table-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border);}
     .appt-table{width:100%;border-collapse:collapse;font-size:.82rem;}
     .appt-table thead tr{background:#f0ece4;border-bottom:2px solid var(--border);}
-    .appt-table th{padding:9px 12px;text-align:left;font-size:.62rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);white-space:nowrap;}
-    .appt-table td{padding:10px 12px;border-bottom:1px solid rgba(138,106,26,.08);vertical-align:top;}
+    .appt-table th{padding:9px 12px;text-align:left;font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);white-space:nowrap;}
+    .appt-table td{padding:10px 12px;border-bottom:1px solid rgba(138,106,26,.07);vertical-align:top;}
     .appt-table tbody tr:last-child td{border-bottom:none;}
     .appt-table tbody tr:hover{background:rgba(138,106,26,.03);}
     .appt-row-new{background:rgba(254,252,191,.25);}
     .appt-name{font-weight:600;white-space:nowrap;}
     .appt-email a,.appt-phone a{color:var(--gold);text-decoration:none;font-weight:500;}
     .appt-email a:hover,.appt-phone a:hover{text-decoration:underline;}
-    .appt-date{font-size:.75rem;color:var(--muted);white-space:nowrap;}
+    .appt-date{font-size:.74rem;color:var(--muted);white-space:nowrap;}
     .appt-msg-cell{font-size:.8rem;color:#666;font-style:italic;max-width:220px;line-height:1.5;}
     .appt-actions{display:flex;gap:5px;white-space:nowrap;}
+    .empty{color:var(--muted);font-style:italic;text-align:center;padding:24px;font-size:.82rem;}
 
-    /* ── BİRLEŞİK YAZI FORMU (yan yana) ── */
-    .both-form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      min-height: 400px;
+    /* ════════════════════════════════════════
+       CONTENT MANAGEMENT — NEW STYLES
+       ════════════════════════════════════════ */
+
+    /* Section header bar */
+    .cm-section-bar{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:16px 20px;
+      background:#fff;border:1px solid var(--border);border-radius:var(--r);
+      margin-bottom:16px;
     }
-    .both-col {
-      display: flex;
-      flex-direction: column;
+    .cm-section-title{
+      display:flex;align-items:center;gap:10px;
     }
-    .both-col-tr { border-right: 2px solid rgba(138,106,26,.2); }
-    .both-col-head {
-      padding: 10px 14px 8px;
-      border-bottom: 1px solid var(--border);
-      background: #fffdf7;
-      display: flex;
-      align-items: center;
+    .cm-section-title h3{font-size:1rem;font-weight:500;}
+    .cm-section-subtitle{font-size:.72rem;color:var(--muted);margin-top:2px;}
+    .cm-section-actions{display:flex;gap:8px;align-items:center;}
+
+    /* Primary action button */
+    .cm-btn-primary{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:9px 20px;
+      background:linear-gradient(135deg,#9e7b22,#8a6a1a);color:#fff;
+      border:none;border-radius:40px;
+      font-family:var(--font);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;
+      cursor:pointer;transition:opacity .18s;white-space:nowrap;
     }
-    .both-col-en .both-col-head { background: #f7faff; }
-    .both-col-body {
-      padding: 14px;
-      flex: 1;
-      overflow-y: auto;
+    .cm-btn-primary:hover{opacity:.88;}
+    .cm-btn-secondary{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:8px 16px;
+      background:#fff;color:var(--text);
+      border:1px solid var(--border);border-radius:40px;
+      font-family:var(--font);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+      cursor:pointer;transition:all .16s;white-space:nowrap;
     }
-    .both-col-tr .both-col-body { background: #fffdf7; }
-    .both-col-en .both-col-body { background: #f7faff; }
-    @media(max-width:960px){
-      .both-form-grid{grid-template-columns:1fr;}
-      .both-col-tr{border-right:none;border-bottom:2px solid rgba(138,106,26,.2);}
+    .cm-btn-secondary:hover{background:var(--gold-light);border-color:var(--tr-border);color:var(--gold);}
+
+    /* Grid of pair cards */
+    .cm-grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
     }
 
-    @media(max-width:900px){.pair-card{grid-template-columns:1fr;}.pair-side-tr{border-right:none;border-bottom:1px solid var(--border);}}
-    @media(max-width:640px){#app{grid-template-columns:1fr;}.sb{display:none;}.g2,.g3{grid-template-columns:1fr;}}
+    /* ── TWO TABLE LAYOUT ── */
+    .cm-two-tables{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      align-items:start;
+    }
+    .cm-table-col{
+      border-radius:10px;
+      overflow:hidden;
+      border:1px solid var(--border);
+    }
+    .cm-table-head{
+      padding:10px 14px;
+      display:flex;align-items:center;
+      border-bottom:1px solid var(--border);
+    }
+    .tr-head{background:var(--tr-bg);}
+    .en-head{background:var(--en-bg);}
+    .cm-table{
+      width:100%;
+      border-collapse:collapse;
+      background:#fff;
+    }
+    .cm-table tr{
+      border-bottom:1px solid rgba(138,106,26,.07);
+      transition:background .12s;
+    }
+    .cm-table tr:last-child{border-bottom:none;}
+    .cm-table tr:hover{background:rgba(138,106,26,.03);}
+    .cm-table-col-en .cm-table tr:hover{background:rgba(49,130,206,.03);}
+    .tbl-thumb-cell{
+      padding:10px 0 10px 12px;
+      width:72px;
+      vertical-align:middle;
+    }
+    .tbl-thumb{
+      width:60px;height:60px;object-fit:cover;
+      border-radius:6px;display:block;
+    }
+    .tbl-thumb-wide{height:40px!important;}
+    .tbl-thumb-empty{
+      width:60px;height:60px;
+      background:linear-gradient(135deg,#f0ece4,#e4ddd0);
+      border-radius:6px;display:flex;align-items:center;justify-content:center;
+      font-size:1.3rem;
+    }
+    .tbl-title{
+      font-size:.87rem;font-weight:500;
+      line-height:1.3;margin-bottom:4px;
+      color:var(--text);
+    }
+    .tbl-meta{
+      display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+    }
+    .tbl-excerpt{
+      font-size:.72rem;color:#888;font-style:italic;margin-top:3px;
+    }
+    .tbl-actions{
+      padding:0 12px 0 8px;
+      white-space:nowrap;
+      vertical-align:middle;
+      text-align:right;
+    }
+    .tbl-actions .cm-btn-icon{
+      width:28px;height:28px;font-size:.76rem;
+    }
+    @media(max-width:900px){
+      .cm-two-tables{grid-template-columns:1fr;}
+    }
+
+
+    /* Individual pair card */
+    .cm-pair-card{
+      display:grid;grid-template-columns:1fr 1fr;
+      border:1px solid var(--border);border-radius:10px;
+      overflow:hidden;background:#fff;
+      transition:box-shadow .18s;
+    }
+    
+    .cm-pair-card:hover{box-shadow:0 4px 20px rgba(138,106,26,.1);}
+
+    .cm-side{
+      padding:14px;display:flex;flex-direction:column;gap:10px;
+    }
+    .cm-side-tr{background:var(--tr-bg);border-right:1px solid var(--border);grid-column:1;}
+    .cm-side-en{background:var(--en-bg);grid-column:2;}
+
+    .cm-side-header{
+      display:flex;align-items:center;justify-content:space-between;
+    }
+
+    /* Status dot */
+    .cm-status-dot{
+      width:8px;height:8px;border-radius:50%;flex-shrink:0;
+    }
+    .dot-live{background:#48bb78;box-shadow:0 0 0 2px rgba(72,187,120,.2);}
+    .dot-draft{background:#ecc94b;box-shadow:0 0 0 2px rgba(236,201,75,.2);}
+
+    /* Language tags */
+    .cm-lang-tag{
+      font-size:.58rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+      padding:2px 9px;border-radius:20px;
+    }
+    .tr-tag{background:var(--tr-accent);color:var(--gold);border:1px solid var(--tr-border);}
+    .en-tag{background:var(--en-accent);color:#3182ce;border:1px solid var(--en-border);}
+
+    /* Thumbnail */
+    .cm-thumb{
+      border-radius:6px;overflow:hidden;background:#e8e2d9;
+      display:flex;align-items:center;justify-content:center;
+      flex-shrink:0;
+    }
+    .cm-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+    .cm-thumb-empty{background:linear-gradient(135deg,#f0ece4,#e4ddd0);font-size:1.5rem;}
+    .cm-thumb{height:80px;}
+    .cm-thumb-sq{height:80px;}
+    .cm-thumb-wide{height:64px;}
+
+    .cm-emoji-thumb{display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:1.6rem;}
+
+    /* Card body */
+    .cm-card-body{flex:1;}
+    .cm-card-title{font-size:.88rem;font-weight:500;line-height:1.3;margin-bottom:5px;color:var(--text);}
+    .cm-card-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+    .cm-tag{font-size:.6rem;background:rgba(124,58,237,.1);color:#7c3aed;border-radius:20px;padding:2px 7px;}
+    .cm-date{font-size:.68rem;color:var(--muted);}
+    .cm-excerpt{font-size:.76rem;color:#777;font-style:italic;line-height:1.5;margin-top:5px;}
+
+    /* Card actions */
+    .cm-card-actions{
+      display:flex;gap:5px;align-items:center;border-top:1px solid rgba(0,0,0,.06);
+      padding-top:10px;margin-top:auto;
+    }
+    .cm-btn-icon{
+      display:inline-flex;align-items:center;justify-content:center;
+      width:32px;height:32px;border-radius:7px;border:1px solid var(--border);
+      background:#fff;cursor:pointer;font-size:.82rem;
+      transition:all .15s;text-decoration:none;color:var(--text);
+    }
+    .cm-btn-icon:hover{background:var(--gold-light);border-color:var(--tr-border);}
+    .cm-btn-toggle:hover{background:rgba(49,130,206,.08);border-color:rgba(49,130,206,.3);}
+    .cm-btn-danger:hover{background:rgba(229,62,62,.08);border-color:rgba(229,62,62,.3);}
+    .cm-btn-icon:disabled{opacity:.4;cursor:not-allowed;}
+
+    /* Empty side */
+    .cm-side-empty{
+      flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:16px 8px;text-align:center;gap:8px;
+    }
+    .cm-side-empty-icon{font-size:1.4rem;opacity:.4;}
+    .cm-side-empty p{font-size:.78rem;color:var(--muted);font-style:italic;}
+    .cm-btn-add{
+      padding:5px 14px;background:transparent;
+      border:1px dashed var(--border);border-radius:20px;
+      font-size:.68rem;color:var(--muted);cursor:pointer;
+      transition:all .15s;
+    }
+    .cm-btn-add:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-light);}
+
+    /* Loading state */
+    .cm-loading{
+      display:flex;align-items:center;gap:10px;padding:24px;
+      color:var(--muted);font-size:.82rem;justify-content:center;
+    }
+    .cm-spinner{
+      width:18px;height:18px;border:2px solid var(--border);
+      border-top-color:var(--gold);border-radius:50%;
+      animation:spin .7s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* Empty state */
+    .cm-empty{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:40px 20px;gap:12px;text-align:center;
+      background:#fff;border:1px dashed var(--border);border-radius:10px;
+    }
+    .cm-empty-icon{font-size:2.2rem;opacity:.3;}
+    .cm-empty p{font-size:.84rem;color:var(--muted);}
+
+    /* ════ DRAWER ════ */
+    .drawer-overlay{
+      position:fixed;inset:0;background:rgba(20,16,32,.45);
+      backdrop-filter:blur(2px);z-index:100;
+      opacity:0;pointer-events:none;transition:opacity .25s;
+    }
+    .drawer-overlay.show{opacity:1;pointer-events:all;}
+
+    .drawer{
+      position:fixed;right:0;top:0;bottom:0;
+      width:min(900px,96vw);
+      background:#fff;
+      box-shadow:-8px 0 40px rgba(0,0,0,.15);
+      z-index:101;
+      display:flex;flex-direction:column;
+      transform:translateX(100%);
+      transition:transform .28s cubic-bezier(.4,0,.2,1);
+    }
+    .drawer.open{transform:translateX(0);}
+
+    .drawer-head{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:14px 20px;
+      border-bottom:1px solid var(--border);
+      background:#faf8f5;flex-shrink:0;
+    }
+    .drawer-head h3{font-size:1rem;font-weight:500;display:flex;align-items:center;gap:8px;}
+    .drawer-close{
+      width:32px;height:32px;border-radius:8px;border:1px solid var(--border);
+      background:#fff;cursor:pointer;font-size:.9rem;
+      display:flex;align-items:center;justify-content:center;
+      transition:all .15s;
+    }
+    .drawer-close:hover{background:#fee2e2;border-color:#fca5a5;}
+
+    .drawer-body{
+      flex:1;overflow-y:auto;
+    }
+
+    /* Two-column form inside drawer */
+    .drawer-cols{
+      display:grid;grid-template-columns:1fr 1fr;
+      min-height:100%;
+    }
+    .drawer-col{
+      display:flex;flex-direction:column;
+    }
+    .drawer-col-tr{border-right:2px solid rgba(138,106,26,.15);}
+    .drawer-col-head{
+      position:sticky;top:0;z-index:5;
+      padding:10px 16px 9px;
+      display:flex;align-items:center;gap:8px;
+      border-bottom:1px solid var(--border);
+    }
+    .drawer-col-tr .drawer-col-head{background:var(--tr-bg);}
+    .drawer-col-en .drawer-col-head{background:var(--en-bg);}
+    .drawer-col-body{padding:16px;flex:1;}
+    .drawer-col-tr .drawer-col-body{background:var(--tr-bg);}
+    .drawer-col-en .drawer-col-body{background:var(--en-bg);}
+
+    /* Rich editor */
+    .rte-wrap{border:1.5px solid var(--border);border-radius:6px;overflow:hidden;}
+    .rte-toolbar{display:flex;flex-wrap:wrap;gap:2px;padding:5px 7px;background:#f7f4ef;border-bottom:1px solid var(--border);align-items:center;}
+    .rte-toolbar button{border:none;background:transparent;border-radius:4px;cursor:pointer;font-size:.76rem;font-family:var(--font);color:var(--text);padding:3px 7px;transition:background .12s;line-height:1.2;min-width:26px;}.rte-toolbar button:hover{background:rgba(138,106,26,.12);}
+    .rte-sep{width:1px;height:18px;background:var(--border);margin:0 3px;flex-shrink:0;}
+    .rte-sel{border:1px solid var(--border);background:#faf8f5;border-radius:4px;font-family:var(--font);font-size:.72rem;color:var(--text);padding:2px 5px;cursor:pointer;outline:none;max-width:105px;}
+    .rich-editor{min-height:240px;max-height:480px;overflow-y:auto;padding:12px 14px;outline:none;font-family:var(--font);font-size:.92rem;line-height:1.8;color:var(--text);background:#fff;}
+    .rich-editor:focus{box-shadow:inset 0 0 0 2px rgba(138,106,26,.18);}
+    .rich-editor h1{font-family:var(--serif);font-size:1.9rem;font-weight:400;margin:16px 0 8px;}
+    .rich-editor h2{font-family:var(--serif);font-size:1.45rem;font-weight:400;margin:14px 0 6px;}
+    .rich-editor h3{font-family:var(--serif);font-size:1.15rem;font-weight:500;margin:12px 0 5px;}
+    .rich-editor p{margin:0 0 10px;}
+    .rich-editor blockquote{border-left:3px solid var(--gold);padding:8px 16px;margin:12px 0;background:rgba(138,106,26,.05);font-style:italic;}
+    .rich-editor ul,.rich-editor ol{padding-left:22px;margin:8px 0;}
+    .rich-editor a{color:var(--gold);text-decoration:underline;}
+    .rich-editor img{max-width:100%;border-radius:6px;margin:8px 0;}
+
+    /* Toast */
+    .toast{position:fixed;bottom:22px;right:22px;background:#1a1628;color:#f0ece4;padding:10px 20px;border-radius:8px;font-size:.76rem;z-index:999;opacity:0;transform:translateY(8px);transition:all .22s;pointer-events:none;}
+    .toast.show{opacity:1;transform:none;}.toast.err{background:#c53030;}
+
+    @media(max-width:760px){
+      .drawer-cols{grid-template-columns:1fr;}
+      .drawer-col-tr{border-right:none;border-bottom:2px solid rgba(138,106,26,.15);}
+      .cm-pair-card{grid-template-columns:1fr;}
+      .cm-side-tr{border-right:none;border-bottom:1px solid var(--border);}
+    }
+    @media(max-width:640px){
+      #app{grid-template-columns:1fr;}
+      .sb{display:none;}
+      .g2,.g3{grid-template-columns:1fr;}
+    }
   </style>
 </head>
 <body>
 
+<!-- ── DRAWER OVERLAY ── -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+
+<!-- ══════════════ BLOG DRAWER ══════════════ -->
+<div class="drawer" id="bothPostDrawer">
+  <div class="drawer-head">
+    <h3>✍️ <span id="bothPostFormTitle">Yeni Yazı</span></h3>
+    <button class="drawer-close" onclick="cancelBothPost()">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-cols">
+      <div class="drawer-col drawer-col-tr">
+        <div class="drawer-col-head"><span class="cm-lang-tag tr-tag">🇹🇷 Türkçe — blogPosts</span></div>
+        <div class="drawer-col-body">
+          <div class="fg"><label>Başlık *</label><input type="text" id="tr_bp_title" /></div>
+          <div class="fg"><label>Slug</label><input type="text" id="tr_bp_slug" /><p class="slug-preview">blog.html#/<span id="tr_slugPreview">…</span></p></div>
+          <div class="g2"><div class="fg"><label>Kategori</label><input type="text" id="tr_bp_category" list="trCatList" /><datalist id="trCatList"><option value="Astroloji" /><option value="QHHT" /><option value="Karmik Astroloji" /><option value="Bilinçaltı" /></datalist></div><div class="fg"><label>Emoji</label><input type="text" id="tr_bp_emoji" maxlength="4" /></div></div>
+          <div class="fg"><label>Özet</label><textarea id="tr_bp_excerpt"></textarea></div>
+          <div class="fg"><label>Kapak Görseli</label><div class="irow"><img id="tr_prev_bpCover" class="iprev rect" alt="" /><input type="file" id="tr_f_bpCover" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('tr_f_bpCover','tr_prev_bpCover','tr_bp_coverUrl',this)">Yükle</button></div><input type="url" id="tr_bp_coverUrl" /></div>
+          <div class="fg"><label>İçerik</label>
+            <div class="rte-wrap">
+              <div class="rte-toolbar">
+                <select class="rte-sel" onchange="rte('formatBlock',this.value,'tr_richEditor');this.value=''"><option value="">¶ Para</option><option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option><option value="blockquote">Alıntı</option></select>
+                <div class="rte-sep"></div>
+                <button onclick="rte('bold',null,'tr_richEditor')"><b>B</b></button>
+                <button onclick="rte('italic',null,'tr_richEditor')"><i>i</i></button>
+                <button onclick="rte('underline',null,'tr_richEditor')"><u>U</u></button>
+                <div class="rte-sep"></div>
+                <button onclick="rte('insertUnorderedList',null,'tr_richEditor')">•</button>
+                <button onclick="rte('insertOrderedList',null,'tr_richEditor')">1.</button>
+                <div class="rte-sep"></div>
+                <button onclick="rteLink('tr_richEditor')">🔗</button>
+                <button onclick="rteImage('tr_richEditor')">🖼</button>
+                <button onclick="document.getElementById('tr_rteFile').click()">📤</button>
+                <button onclick="rte('removeFormat',null,'tr_richEditor')" style="color:#e53e3e;">✕</button>
+                <input type="file" id="tr_rteFile" accept="image/*" style="display:none" onchange="rteUpload(this,'tr_richEditor')" />
+              </div>
+              <div id="tr_richEditor" class="rich-editor" contenteditable="true" spellcheck="false"></div>
+            </div>
+          </div>
+          <div class="g2"><div class="fg"><label>Etiketler (virgülle)</label><input type="text" id="tr_bp_tags" /></div><div class="fg"><label>Okuma (dk)</label><input type="number" id="tr_bp_readingTime" min="1" /></div></div>
+          <div class="g2"><div class="fg"><label>Yazar</label><input type="text" id="tr_bp_authorName" /></div><div class="fg"><label>SEO Meta</label><input type="text" id="tr_bp_metaDesc" maxlength="160" /></div></div>
+          <div class="toggle-row"><input type="checkbox" id="tr_bp_published" checked /><label class="toggle-label" for="tr_bp_published">Hemen yayınla</label></div>
+          <button class="btn-save" id="tr_savePostBtn" style="width:100%;" onclick="_savePost()">✦ Türkçe Kaydet</button>
+        </div>
+      </div>
+      <div class="drawer-col drawer-col-en">
+        <div class="drawer-col-head"><span class="cm-lang-tag en-tag">🇬🇧 English — blogPostsEN</span></div>
+        <div class="drawer-col-body">
+          <div class="fg"><label>Title *</label><input type="text" id="en_bp_title" /></div>
+          <div class="fg"><label>Slug</label><input type="text" id="en_bp_slug" /><p class="slug-preview">blog-en.html#/<span id="en_slugPreview">…</span></p></div>
+          <div class="g2"><div class="fg"><label>Category</label><input type="text" id="en_bp_category" list="enCatList" /><datalist id="enCatList"><option value="Astrology" /><option value="QHHT" /><option value="Karmic Astrology" /><option value="Spiritual Growth" /></datalist></div><div class="fg"><label>Emoji</label><input type="text" id="en_bp_emoji" maxlength="4" /></div></div>
+          <div class="fg"><label>Excerpt</label><textarea id="en_bp_excerpt"></textarea></div>
+          <div class="fg"><label>Cover Image</label><div class="irow"><img id="en_prev_bpCover" class="iprev rect" alt="" /><input type="file" id="en_f_bpCover" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('en_f_bpCover','en_prev_bpCover','en_bp_coverUrl',this)">Upload</button></div><input type="url" id="en_bp_coverUrl" /></div>
+          <div class="fg"><label>Content</label>
+            <div class="rte-wrap">
+              <div class="rte-toolbar">
+                <select class="rte-sel" onchange="rte('formatBlock',this.value,'en_richEditor');this.value=''"><option value="">¶ Para</option><option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option><option value="blockquote">Quote</option></select>
+                <div class="rte-sep"></div>
+                <button onclick="rte('bold',null,'en_richEditor')"><b>B</b></button>
+                <button onclick="rte('italic',null,'en_richEditor')"><i>i</i></button>
+                <button onclick="rte('underline',null,'en_richEditor')"><u>U</u></button>
+                <div class="rte-sep"></div>
+                <button onclick="rte('insertUnorderedList',null,'en_richEditor')">•</button>
+                <button onclick="rte('insertOrderedList',null,'en_richEditor')">1.</button>
+                <div class="rte-sep"></div>
+                <button onclick="rteLink('en_richEditor')">🔗</button>
+                <button onclick="rteImage('en_richEditor')">🖼</button>
+                <button onclick="document.getElementById('en_rteFile').click()">📤</button>
+                <button onclick="rte('removeFormat',null,'en_richEditor')" style="color:#e53e3e;">✕</button>
+                <input type="file" id="en_rteFile" accept="image/*" style="display:none" onchange="rteUpload(this,'en_richEditor')" />
+              </div>
+              <div id="en_richEditor" class="rich-editor" contenteditable="true" spellcheck="false"></div>
+            </div>
+          </div>
+          <div class="g2"><div class="fg"><label>Tags (comma separated)</label><input type="text" id="en_bp_tags" /></div><div class="fg"><label>Reading (min)</label><input type="number" id="en_bp_readingTime" min="1" /></div></div>
+          <div class="g2"><div class="fg"><label>Author</label><input type="text" id="en_bp_authorName" /></div><div class="fg"><label>SEO Meta</label><input type="text" id="en_bp_metaDesc" maxlength="160" /></div></div>
+          <div class="toggle-row"><input type="checkbox" id="en_bp_published" checked /><label class="toggle-label" for="en_bp_published">Publish immediately</label></div>
+          <button class="btn-save-en" id="en_savePostBtn" style="width:100%;" onclick="_savePostEN()">✦ English Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ INSTAGRAM DRAWER ══════════════ -->
+<div class="drawer" id="igDrawer">
+  <div class="drawer-head">
+    <h3>📸 <span id="igDrawerTitle">Yeni Gönderi</span></h3>
+    <button class="drawer-close" onclick="cancelIgPost()">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-cols">
+      <div class="drawer-col drawer-col-tr">
+        <div class="drawer-col-head"><span class="cm-lang-tag tr-tag">🇹🇷 TR — instagramPosts</span></div>
+        <div class="drawer-col-body">
+          <div class="fg"><label>Görsel</label><div class="irow"><img id="ig_tr_prev" class="iprev rect" alt="" /><input type="file" id="ig_tr_file" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('ig_tr_file','ig_tr_prev','ig_tr_imgUrl',this)">Yükle</button></div><input type="url" id="ig_tr_imgUrl" placeholder="https://…" /></div>
+          <div class="g2"><div class="fg"><label>Emoji (görsel yoksa)</label><input type="text" id="ig_tr_emoji" maxlength="4" /></div><div class="fg"><label>Kategori</label><input type="text" id="ig_tr_category" /></div></div>
+          <div class="fg"><label>Başlık / Açıklama</label><textarea id="ig_tr_caption"></textarea></div>
+          <div class="fg"><label>SEO Slug</label><input type="text" id="ig_tr_slug" /><p class="slug-preview"><span id="ig_tr_slugPreview">…</span></p></div>
+          <div class="g2"><div class="fg"><label>Instagram URL</label><input type="url" id="ig_tr_url" /></div><div class="fg"><label>Beğeni</label><input type="text" id="ig_tr_likes" /></div></div>
+          <div class="g2"><div class="fg"><label>Sıra</label><input type="number" id="ig_tr_order" value="0" min="0" /></div><div class="toggle-row" style="margin-top:20px;"><input type="checkbox" id="ig_tr_visible" checked /><label class="toggle-label" for="ig_tr_visible">Görünür</label></div></div>
+          <button class="btn-save" id="ig_tr_saveBtn" style="width:100%;" onclick="_saveIgTR()">✦ Türkçe Kaydet</button>
+        </div>
+      </div>
+      <div class="drawer-col drawer-col-en">
+        <div class="drawer-col-head"><span class="cm-lang-tag en-tag">🇬🇧 EN — instagramPostsEN</span></div>
+        <div class="drawer-col-body">
+          <div class="fg"><label>Image</label><div class="irow"><img id="ig_en_prev" class="iprev rect" alt="" /><input type="file" id="ig_en_file" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('ig_en_file','ig_en_prev','ig_en_imgUrl',this)">Upload</button></div><input type="url" id="ig_en_imgUrl" placeholder="https://…" /></div>
+          <div class="g2"><div class="fg"><label>Emoji (if no image)</label><input type="text" id="ig_en_emoji" maxlength="4" /></div><div class="fg"><label>Category</label><input type="text" id="ig_en_category" /></div></div>
+          <div class="fg"><label>Caption / Description</label><textarea id="ig_en_caption"></textarea></div>
+          <div class="fg"><label>SEO Slug</label><input type="text" id="ig_en_slug" /><p class="slug-preview"><span id="ig_en_slugPreview">…</span></p></div>
+          <div class="g2"><div class="fg"><label>Instagram Post URL</label><input type="url" id="ig_en_url" /></div><div class="fg"><label>Likes</label><input type="text" id="ig_en_likes" /></div></div>
+          <div class="g2"><div class="fg"><label>Order</label><input type="number" id="ig_en_order" value="0" min="0" /></div><div class="toggle-row" style="margin-top:20px;"><input type="checkbox" id="ig_en_visible" checked /><label class="toggle-label" for="ig_en_visible">Visible</label></div></div>
+          <button class="btn-save-en" id="ig_en_saveBtn" style="width:100%;" onclick="_saveIgEN()">✦ English Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ YOUTUBE DRAWER ══════════════ -->
+<div class="drawer" id="ytDrawer">
+  <div class="drawer-head">
+    <h3>▶️ <span id="ytDrawerTitle">Yeni Video</span></h3>
+    <button class="drawer-close" onclick="cancelYtPost()">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-cols">
+      <div class="drawer-col drawer-col-tr">
+        <div class="drawer-col-head"><span class="cm-lang-tag tr-tag">🇹🇷 TR — youtubePosts</span></div>
+        <div class="drawer-col-body">
+          <div class="fg"><label>YouTube Video URL *</label><input type="url" id="yt_tr_videoUrl" /><p class="help-text">URL girin ve alandan çıkın — thumbnail otomatik yüklenir.</p></div>
+          <div class="fg"><label>Thumbnail</label><div class="irow"><img id="yt_tr_thumbPrev" class="iprev" style="width:120px;height:68px;border-radius:5px;" alt="" /><input type="url" id="yt_tr_thumbnail" /></div></div>
+          <div class="g2"><div class="fg"><label>Başlık *</label><input type="text" id="yt_tr_title" /></div><div class="fg"><label>Kategori</label><input type="text" id="yt_tr_category" /></div></div>
+          <div class="fg"><label>SEO Slug</label><input type="text" id="yt_tr_slug" /><p class="slug-preview"><span id="yt_tr_slugPreview">…</span></p></div>
+          <div class="fg"><label>Açıklama</label><textarea id="yt_tr_description"></textarea></div>
+          <div class="g2"><div class="fg"><label>Tarih Etiketi</label><input type="text" id="yt_tr_dateLabel" /></div><div class="fg"><label>Sıra</label><input type="number" id="yt_tr_order" value="0" min="0" /></div></div>
+          <div class="toggle-row"><input type="checkbox" id="yt_tr_visible" checked /><label class="toggle-label" for="yt_tr_visible">Görünür</label></div>
+          <button class="btn-save" id="yt_tr_saveBtn" style="width:100%;" onclick="_saveYtTR()">✦ Türkçe Kaydet</button>
+        </div>
+      </div>
+      <div class="drawer-col drawer-col-en">
+        <div class="drawer-col-head"><span class="cm-lang-tag en-tag">🇬🇧 EN — youtubePostsEN</span></div>
+        <div class="drawer-col-body">
+          <div class="fg"><label>YouTube Video URL *</label><input type="url" id="yt_en_videoUrl" /><p class="help-text">Enter URL and blur — thumbnail auto-fills.</p></div>
+          <div class="fg"><label>Thumbnail</label><div class="irow"><img id="yt_en_thumbPrev" class="iprev" style="width:120px;height:68px;border-radius:5px;" alt="" /><input type="url" id="yt_en_thumbnail" /></div></div>
+          <div class="g2"><div class="fg"><label>Title *</label><input type="text" id="yt_en_title" /></div><div class="fg"><label>Category</label><input type="text" id="yt_en_category" /></div></div>
+          <div class="fg"><label>SEO Slug</label><input type="text" id="yt_en_slug" /><p class="slug-preview"><span id="yt_en_slugPreview">…</span></p></div>
+          <div class="fg"><label>Description</label><textarea id="yt_en_description"></textarea></div>
+          <div class="g2"><div class="fg"><label>Date Label</label><input type="text" id="yt_en_dateLabel" /></div><div class="fg"><label>Order</label><input type="number" id="yt_en_order" value="0" min="0" /></div></div>
+          <div class="toggle-row"><input type="checkbox" id="yt_en_visible" checked /><label class="toggle-label" for="yt_en_visible">Visible</label></div>
+          <button class="btn-save-en" id="yt_en_saveBtn" style="width:100%;" onclick="_saveYtEN()">✦ English Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ LOGIN ══════════════ -->
 <div id="loginWrap">
   <div class="lcard">
     <h1>✦ <span>Admin</span></h1>
@@ -803,6 +1050,7 @@
   </div>
 </div>
 
+<!-- ══════════════ APP ══════════════ -->
 <div id="app">
   <aside class="sb">
     <div class="sb-brand">
@@ -836,276 +1084,86 @@
     <div class="content">
       <span class="load-status" id="loadStatus" style="color:var(--muted)">Yükleniyor…</span>
 
-      <!-- ══════════════ HERO ══════════════ -->
+      <!-- ══════════ HERO ══════════ -->
       <div class="panel on" id="p_hero">
         <div class="card"><div class="ch" onclick="tog(this)"><h3><span>🖼</span>Arka Plan Görseli</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'hero_bg','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'hero_bg','en')">🇬🇧 English</button></div><div id="hero_bg_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="irow"><img id="tr_prev_heroBg" class="iprev wide" alt="" /><input type="file" id="tr_f_heroBg" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('tr_f_heroBg','tr_prev_heroBg','tr_heroBg',this)">Yükle</button></div><div class="fg"><label>URL</label><input type="text" id="tr_heroBg" placeholder="https://..." /></div></div><div id="hero_bg_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="irow"><img id="en_prev_heroBg" class="iprev wide" alt="" /><input type="file" id="en_f_heroBg" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('en_f_heroBg','en_prev_heroBg','en_heroBg',this)">Upload</button></div><div class="fg"><label>URL</label><input type="text" id="en_heroBg" placeholder="https://..." /></div></div></div></div>
         <div class="card"><div class="ch" onclick="tog(this)"><h3><span>✏️</span>Hero Metinleri</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'hero_text','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'hero_text','en')">🇬🇧 English</button></div><div id="hero_text_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="fg"><label>Üst Etiket</label><input type="text" id="tr_heroEyebrow" /></div><div class="fg"><label>Başlık (HTML)</label><textarea id="tr_heroTitle"></textarea></div><div class="fg"><label>Alt Başlık</label><textarea id="tr_heroSubtitle"></textarea></div><button class="btn-save" id="tr_saveHeroBtn" onclick="_saveTR('tr_saveHeroBtn')">✦ TR Kaydet</button></div><div id="hero_text_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="fg"><label>Eyebrow Label</label><input type="text" id="en_heroEyebrow" /></div><div class="fg"><label>Title (HTML)</label><textarea id="en_heroTitle"></textarea></div><div class="fg"><label>Subtitle</label><textarea id="en_heroSubtitle"></textarea></div><button class="btn-save-en" id="en_saveHeroBtn" onclick="_saveEN('en_saveHeroBtn')">✦ EN Save</button></div></div></div>
       </div>
 
-      <!-- ══════════════ HAKKIMDA ══════════════ -->
+      <!-- ══════════ HAKKIMDA ══════════ -->
       <div class="panel" id="p_hakkimda">
         <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📷</span>Profil Fotoğrafı</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'pp','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'pp','en')">🇬🇧 English</button></div><div id="pp_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="irow"><img id="tr_prev_pp" class="iprev circ" alt="" /><input type="file" id="tr_f_pp" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('tr_f_pp','tr_prev_pp','tr_profilePhoto',this)">Yükle</button></div><div class="fg"><label>URL</label><input type="text" id="tr_profilePhoto" /></div></div><div id="pp_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="irow"><img id="en_prev_pp" class="iprev circ" alt="" /><input type="file" id="en_f_pp" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('en_f_pp','en_prev_pp','en_profilePhoto',this)">Upload</button></div><div class="fg"><label>URL</label><input type="text" id="en_profilePhoto" /></div></div></div></div>
         <div class="card"><div class="ch" onclick="tog(this)"><h3><span>👤</span>Profil Bilgileri</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'about_info','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'about_info','en')">🇬🇧 English</button></div><div id="about_info_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="g2"><div class="fg"><label>İsim / Unvan</label><input type="text" id="tr_aboutName" /></div><div class="fg"><label>Konum</label><input type="text" id="tr_aboutTitle" /></div></div><div class="fg"><label>Alıntı</label><textarea id="tr_aboutQuote"></textarea></div><div class="fg"><label>1. Paragraf (HTML)</label><textarea id="tr_aboutText1"></textarea></div><div class="fg"><label>2. Paragraf (HTML)</label><textarea id="tr_aboutText2"></textarea></div><button class="btn-save" id="tr_saveAboutBtn" onclick="_saveTR('tr_saveAboutBtn')">✦ TR Kaydet</button></div><div id="about_info_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="g2"><div class="fg"><label>Name / Title</label><input type="text" id="en_aboutName" /></div><div class="fg"><label>Location</label><input type="text" id="en_aboutTitle" /></div></div><div class="fg"><label>Quote</label><textarea id="en_aboutQuote"></textarea></div><div class="fg"><label>1st Paragraph (HTML)</label><textarea id="en_aboutText1"></textarea></div><div class="fg"><label>2nd Paragraph (HTML)</label><textarea id="en_aboutText2"></textarea></div><button class="btn-save-en" id="en_saveAboutBtn" onclick="_saveEN('en_saveAboutBtn')">✦ EN Save</button></div></div></div>
         <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📊</span>İstatistikler</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'stats','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'stats','en')">🇬🇧 English</button></div><div id="stats_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="g3"><div><div class="fg"><label>1. Sayı</label><input type="text" id="tr_stat1Number" /></div><div class="fg"><label>1. Etiket</label><input type="text" id="tr_stat1Label" /></div></div><div><div class="fg"><label>2. Sayı</label><input type="text" id="tr_stat2Number" /></div><div class="fg"><label>2. Etiket</label><input type="text" id="tr_stat2Label" /></div></div><div><div class="fg"><label>3. Sayı</label><input type="text" id="tr_stat3Number" /></div><div class="fg"><label>3. Etiket</label><input type="text" id="tr_stat3Label" /></div></div></div><button class="btn-save" id="tr_saveStatsBtn" onclick="_saveTR('tr_saveStatsBtn')">✦ TR Kaydet</button></div><div id="stats_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="g3"><div><div class="fg"><label>Stat 1 #</label><input type="text" id="en_stat1Number" /></div><div class="fg"><label>Stat 1 Label</label><input type="text" id="en_stat1Label" /></div></div><div><div class="fg"><label>Stat 2 #</label><input type="text" id="en_stat2Number" /></div><div class="fg"><label>Stat 2 Label</label><input type="text" id="en_stat2Label" /></div></div><div><div class="fg"><label>Stat 3 #</label><input type="text" id="en_stat3Number" /></div><div class="fg"><label>Stat 3 Label</label><input type="text" id="en_stat3Label" /></div></div></div><button class="btn-save-en" id="en_saveStatsBtn" onclick="_saveEN('en_saveStatsBtn')">✦ EN Save</button></div></div></div>
-        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>🎓</span>Sertifikalar & Eğitimler</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'certs','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'certs','en')">🇬🇧 English</button></div><div id="certs_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main (certItems)</span><div class="fg"><textarea id="tr_certItems" style="min-height:140px;font-family:monospace;font-size:.82rem;" placeholder="🎓|QHHT Level II Sertifikası — Dolores Cannon&#10;⭐|Karmik Astroloji Uzmanlığı"></textarea><p class="help-text">Her satır: <code>emoji|metin</code></p></div><button class="btn-save" id="tr_saveCertBtn" onclick="_saveTR('tr_saveCertBtn')">✦ TR Kaydet</button></div><div id="certs_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main (certItems)</span><div class="fg"><textarea id="en_certItems" style="min-height:140px;font-family:monospace;font-size:.82rem;" placeholder="🎓|QHHT Level II Certification — Dolores Cannon&#10;⭐|Karmic Astrology Specialisation"></textarea><p class="help-text">Each line: <code>emoji|text</code></p></div><button class="btn-save-en" id="en_saveCertBtn" onclick="_saveEN('en_saveCertBtn')">✦ EN Save</button></div></div></div>
+        <div class="card"><div class="ch" onclick="tog(this)"><h3><span>🎓</span>Sertifikalar & Eğitimler</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'certs','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'certs','en')">🇬🇧 English</button></div><div id="certs_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main (certItems)</span><div class="fg"><textarea id="tr_certItems" style="min-height:130px;font-family:monospace;font-size:.8rem;" placeholder="🎓|QHHT Level II Sertifikası — Dolores Cannon&#10;⭐|Karmik Astroloji Uzmanlığı"></textarea><p class="help-text">Her satır: <code>emoji|metin</code></p></div><button class="btn-save" id="tr_saveCertBtn" onclick="_saveTR('tr_saveCertBtn')">✦ TR Kaydet</button></div><div id="certs_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main (certItems)</span><div class="fg"><textarea id="en_certItems" style="min-height:130px;font-family:monospace;font-size:.8rem;" placeholder="🎓|QHHT Level II Certification — Dolores Cannon&#10;⭐|Karmic Astrology Specialisation"></textarea><p class="help-text">Each line: <code>emoji|text</code></p></div><button class="btn-save-en" id="en_saveCertBtn" onclick="_saveEN('en_saveCertBtn')">✦ EN Save</button></div></div></div>
       </div>
 
-      <!-- ══════════════ İLETİŞİM ══════════════ -->
+      <!-- ══════════ İLETİŞİM ══════════ -->
       <div class="panel" id="p_iletisim">
         <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📬</span>İletişim & Sosyal Medya</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'contact','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'contact','en')">🇬🇧 English</button></div><div id="contact_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="g2"><div class="fg"><label>E-posta</label><input type="email" id="tr_email" /></div><div class="fg"><label>WhatsApp</label><input type="text" id="tr_whatsapp" /></div></div><div class="fg"><label>Telefon</label><input type="tel" id="tr_phone" /></div><div class="fg"><label>Konum</label><input type="text" id="tr_location" /></div><div class="g2"><div class="fg"><label>Instagram Kullanıcı Adı</label><input type="text" id="tr_instagramHandle" placeholder="@kullanici_adi" /></div><div class="fg"><label>Instagram URL</label><input type="url" id="tr_instagramUrl" /></div></div><div class="g2"><div class="fg"><label>YouTube Kanal Adı</label><input type="text" id="tr_youtubeHandle" /></div><div class="fg"><label>YouTube URL</label><input type="url" id="tr_youtubeUrl" /></div></div><button class="btn-save" id="tr_saveContactBtn" onclick="_saveTR('tr_saveContactBtn')">✦ TR Kaydet</button></div><div id="contact_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="g2"><div class="fg"><label>Email</label><input type="email" id="en_email" /></div><div class="fg"><label>WhatsApp</label><input type="text" id="en_whatsapp" /></div></div><div class="fg"><label>Phone</label><input type="tel" id="en_phone" /></div><div class="fg"><label>Location (HTML)</label><textarea id="en_location"></textarea></div><div class="g2"><div class="fg"><label>Instagram Handle</label><input type="text" id="en_instagramHandle" placeholder="@username" /></div><div class="fg"><label>Instagram URL</label><input type="url" id="en_instagramUrl" /></div></div><div class="g2"><div class="fg"><label>YouTube Channel Name</label><input type="text" id="en_youtubeHandle" /></div><div class="fg"><label>YouTube URL</label><input type="url" id="en_youtubeUrl" /></div></div><button class="btn-save-en" id="en_saveContactBtn" onclick="_saveEN('en_saveContactBtn')">✦ EN Save</button></div></div></div>
       </div>
 
-      <!-- ══════════════ GENEL ══════════════ -->
+      <!-- ══════════ GENEL ══════════ -->
       <div class="panel" id="p_genel">
         <div class="card"><div class="ch" onclick="tog(this)"><h3><span>⚙️</span>Navigasyon & Footer</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'genel','tr')">🇹🇷 Türkçe</button><button class="lang-tab" onclick="switchTab(this,'genel','en')">🇬🇧 English</button></div><div id="genel_tr" class="lang-pane show"><span class="tr-badge">TR → siteContent/main</span><div class="fg"><label>Logo Metni</label><input type="text" id="tr_navLogo" /></div><div class="fg"><label>Footer Telif</label><input type="text" id="tr_footerCopy" /></div><button class="btn-save" id="tr_saveGenelBtn" onclick="_saveTR('tr_saveGenelBtn')">✦ TR Kaydet</button></div><div id="genel_en" class="lang-pane"><span class="en-badge">EN → siteContentEN/main</span><div class="fg"><label>Nav Logo Text</label><input type="text" id="en_navLogo" /></div><div class="fg"><label>Footer Copyright</label><input type="text" id="en_footerCopy" /></div><button class="btn-save-en" id="en_saveGenelBtn" onclick="_saveEN('en_saveGenelBtn')">✦ EN Save</button></div></div></div>
       </div>
 
-      <!-- ══════════════ BLOG — BİRLEŞİK PANEL ══════════════ -->
+      <!-- ══════════ BLOG ══════════ -->
       <div class="panel" id="p_blog">
-        <div class="card">
-          <div class="ch" onclick="tog(this)"><h3><span>✍️</span>Blog Yazıları — TR 🇹🇷 &amp; EN 🇬🇧</h3><span class="arr">▾</span></div>
-          <div class="cb">
-            <p class="help-text" style="margin-bottom:12px;">Her kart sol tarafta Türkçe (<code>blogPosts</code>), sağ tarafta İngilizce (<code>blogPostsEN</code>) içeriği gösterir. Slug'lar eşleştiğinde yazılar otomatik olarak eşlenir.</p>
-            <div class="action-bar">
-              <button class="btn-new" onclick="newPostBoth()">+ Yeni Yazı</button>
-              <a class="abtn abtn-b" href="blog.html" target="_blank" style="text-decoration:none;">👁 TR Blog</a>
-              <a class="abtn abtn-b" href="blog-en.html" target="_blank" style="text-decoration:none;background:#3182ce;">👁 EN Blog</a>
-            </div>
-            <div id="blogPostList"></div>
-          </div>
-        </div>
-
-        <!-- Unified TR + EN Post Form -->
-        <div id="bothPostFormWrap" style="display:none;">
-          <div class="card" style="border:2px solid rgba(138,106,26,.25);">
-            <div class="ch" onclick="tog(this)">
-              <h3 id="bothPostFormTitle"><span>✏</span>Yeni Yazı</h3>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <button class="btn-cancel" style="margin-top:0;font-size:.65rem;" onclick="cancelBothPost()">✕ Kapat</button>
-                <span class="arr">▾</span>
-              </div>
-            </div>
-            <div class="cb" style="padding:0;">
-              <div class="both-form-grid">
-
-                <!-- ── SOL: TÜRKÇE ── -->
-                <div class="both-col both-col-tr">
-                  <div class="both-col-head">
-                    <span class="tr-badge" style="margin:0;">🇹🇷 Türkçe — blogPosts</span>
-                  </div>
-                  <div class="both-col-body">
-                    <div class="fg"><label>Başlık *</label><input type="text" id="tr_bp_title" /></div>
-                    <div class="fg"><label>Slug</label><input type="text" id="tr_bp_slug" /><p class="slug-preview">blog.html#/<span id="tr_slugPreview">…</span></p></div>
-                    <div class="g2"><div class="fg"><label>Kategori</label><input type="text" id="tr_bp_category" list="trCatList" /><datalist id="trCatList"><option value="Astroloji" /><option value="QHHT" /><option value="Karmik Astroloji" /><option value="Bilinçaltı" /></datalist></div><div class="fg"><label>Emoji</label><input type="text" id="tr_bp_emoji" maxlength="4" /></div></div>
-                    <div class="fg"><label>Özet</label><textarea id="tr_bp_excerpt"></textarea></div>
-                    <div class="fg"><label>Kapak Görseli</label><div class="irow"><img id="tr_prev_bpCover" class="iprev rect" alt="" /><input type="file" id="tr_f_bpCover" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('tr_f_bpCover','tr_prev_bpCover','tr_bp_coverUrl',this)">Yükle</button></div><input type="url" id="tr_bp_coverUrl" /></div>
-                    <div class="fg"><label>İçerik</label>
-                      <div class="rte-wrap">
-                        <div class="rte-toolbar">
-                          <select class="rte-sel" onchange="rte('formatBlock',this.value,'tr_richEditor');this.value=''"><option value="">¶ Para</option><option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option><option value="blockquote">Alıntı</option></select>
-                          <div class="rte-sep"></div>
-                          <button onclick="rte('bold',null,'tr_richEditor')"><b>B</b></button>
-                          <button onclick="rte('italic',null,'tr_richEditor')"><i>i</i></button>
-                          <button onclick="rte('underline',null,'tr_richEditor')"><u>U</u></button>
-                          <div class="rte-sep"></div>
-                          <button onclick="rte('insertUnorderedList',null,'tr_richEditor')">• —</button>
-                          <button onclick="rte('insertOrderedList',null,'tr_richEditor')">1.</button>
-                          <div class="rte-sep"></div>
-                          <button onclick="rteLink('tr_richEditor')">🔗</button>
-                          <button onclick="rteImage('tr_richEditor')">🖼</button>
-                          <button onclick="document.getElementById('tr_rteFile').click()">📤</button>
-                          <button onclick="rte('removeFormat',null,'tr_richEditor')" style="color:#e53e3e;">✕</button>
-                          <input type="file" id="tr_rteFile" accept="image/*" style="display:none" onchange="rteUpload(this,'tr_richEditor')" />
-                        </div>
-                        <div id="tr_richEditor" class="rich-editor" contenteditable="true" spellcheck="false"></div>
-                      </div>
-                    </div>
-                    <div class="g2"><div class="fg"><label>Etiketler (virgülle)</label><input type="text" id="tr_bp_tags" /></div><div class="fg"><label>Okuma Süresi (dk)</label><input type="number" id="tr_bp_readingTime" min="1" /></div></div>
-                    <div class="g2"><div class="fg"><label>Yazar</label><input type="text" id="tr_bp_authorName" /></div><div class="fg"><label>SEO Meta</label><input type="text" id="tr_bp_metaDesc" maxlength="160" /></div></div>
-                    <div class="toggle-row"><input type="checkbox" id="tr_bp_published" checked /><label class="toggle-label" for="tr_bp_published">Hemen yayınla</label></div>
-                    <button class="btn-save" id="tr_savePostBtn" style="width:100%;" onclick="_savePost()">✦ Türkçe Kaydet</button>
-                  </div>
-                </div>
-
-                <!-- ── SAĞ: İNGİLİZCE ── -->
-                <div class="both-col both-col-en">
-                  <div class="both-col-head">
-                    <span class="en-badge" style="margin:0;">🇬🇧 English — blogPostsEN</span>
-                  </div>
-                  <div class="both-col-body">
-                    <div class="fg"><label>Title *</label><input type="text" id="en_bp_title" /></div>
-                    <div class="fg"><label>Slug</label><input type="text" id="en_bp_slug" /><p class="slug-preview">blog-en.html#/<span id="en_slugPreview">…</span></p></div>
-                    <div class="g2"><div class="fg"><label>Category</label><input type="text" id="en_bp_category" list="enCatList" /><datalist id="enCatList"><option value="Astrology" /><option value="QHHT" /><option value="Karmic Astrology" /><option value="Spiritual Growth" /></datalist></div><div class="fg"><label>Emoji</label><input type="text" id="en_bp_emoji" maxlength="4" /></div></div>
-                    <div class="fg"><label>Excerpt</label><textarea id="en_bp_excerpt"></textarea></div>
-                    <div class="fg"><label>Cover Image</label><div class="irow"><img id="en_prev_bpCover" class="iprev rect" alt="" /><input type="file" id="en_f_bpCover" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('en_f_bpCover','en_prev_bpCover','en_bp_coverUrl',this)">Upload</button></div><input type="url" id="en_bp_coverUrl" /></div>
-                    <div class="fg"><label>Content</label>
-                      <div class="rte-wrap">
-                        <div class="rte-toolbar">
-                          <select class="rte-sel" onchange="rte('formatBlock',this.value,'en_richEditor');this.value=''"><option value="">¶ Para</option><option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option><option value="blockquote">Quote</option></select>
-                          <div class="rte-sep"></div>
-                          <button onclick="rte('bold',null,'en_richEditor')"><b>B</b></button>
-                          <button onclick="rte('italic',null,'en_richEditor')"><i>i</i></button>
-                          <button onclick="rte('underline',null,'en_richEditor')"><u>U</u></button>
-                          <div class="rte-sep"></div>
-                          <button onclick="rte('insertUnorderedList',null,'en_richEditor')">• —</button>
-                          <button onclick="rte('insertOrderedList',null,'en_richEditor')">1.</button>
-                          <div class="rte-sep"></div>
-                          <button onclick="rteLink('en_richEditor')">🔗</button>
-                          <button onclick="rteImage('en_richEditor')">🖼</button>
-                          <button onclick="document.getElementById('en_rteFile').click()">📤</button>
-                          <button onclick="rte('removeFormat',null,'en_richEditor')" style="color:#e53e3e;">✕</button>
-                          <input type="file" id="en_rteFile" accept="image/*" style="display:none" onchange="rteUpload(this,'en_richEditor')" />
-                        </div>
-                        <div id="en_richEditor" class="rich-editor" contenteditable="true" spellcheck="false"></div>
-                      </div>
-                    </div>
-                    <div class="g2"><div class="fg"><label>Tags (comma separated)</label><input type="text" id="en_bp_tags" /></div><div class="fg"><label>Reading Time (min)</label><input type="number" id="en_bp_readingTime" min="1" /></div></div>
-                    <div class="g2"><div class="fg"><label>Author</label><input type="text" id="en_bp_authorName" /></div><div class="fg"><label>SEO Meta</label><input type="text" id="en_bp_metaDesc" maxlength="160" /></div></div>
-                    <div class="toggle-row"><input type="checkbox" id="en_bp_published" checked /><label class="toggle-label" for="en_bp_published">Publish immediately</label></div>
-                    <button class="btn-save-en" id="en_savePostBtn" style="width:100%;" onclick="_savePostEN()">✦ English Save</button>
-                  </div>
-                </div>
-
-              </div><!-- /both-form-grid -->
+        <div class="cm-section-bar">
+          <div class="cm-section-title">
+            <div>
+              <h3>✍️ Blog Yazıları</h3>
+              <p class="cm-section-subtitle">TR + EN — Slug eşleşmesiyle otomatik çift dil desteği</p>
             </div>
           </div>
+          <div class="cm-section-actions">
+            <a class="cm-btn-secondary" href="blog.html" target="_blank">👁 TR</a>
+            <a class="cm-btn-secondary" href="blog-en.html" target="_blank">👁 EN</a>
+            <button class="cm-btn-primary" onclick="newPostBoth()">+ Yeni Yazı</button>
+          </div>
         </div>
+        <div class="cm-grid" id="blogPostList"></div>
       </div>
 
-      <!-- ══════════════ INSTAGRAM ══════════════ -->
+      <!-- ══════════ INSTAGRAM ══════════ -->
       <div class="panel" id="p_instagram">
-        <div class="card">
-          <div class="ch" onclick="tog(this)"><h3><span>📸</span>Instagram Gönderileri — TR 🇹🇷 &amp; EN 🇬🇧</h3><span class="arr">▾</span></div>
-          <div class="cb">
-            <p class="help-text" style="margin-bottom:12px;">TR: <code>instagramPosts</code> · EN: <code>instagramPostsEN</code> · Slug eşleşmesiyle otomatik eşlenir.</p>
-            <div class="action-bar"><button class="btn-new" onclick="newIgBoth()">+ Yeni Gönderi</button></div>
-            <div id="igPostList"></div>
-          </div>
-        </div>
-
-        <!-- Unified IG Form -->
-        <div id="igBothFormWrap" style="display:none;">
-          <div class="card" style="border:2px solid rgba(238,42,123,.2);">
-            <div class="ch" onclick="tog(this)">
-              <h3 id="igBothFormTitle"><span>📸</span>Yeni Gönderi</h3>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <button class="btn-cancel" style="margin-top:0;font-size:.65rem;" onclick="cancelIgPost()">✕ Kapat</button>
-                <span class="arr">▾</span>
-              </div>
-            </div>
-            <div class="cb" style="padding:0;">
-              <div class="both-form-grid">
-
-                <!-- SOL: TR -->
-                <div class="both-col both-col-tr">
-                  <div class="both-col-head"><span class="tr-badge" style="margin:0;">🇹🇷 TR — instagramPosts</span></div>
-                  <div class="both-col-body">
-                    <div class="fg"><label>Görsel</label>
-                      <div class="irow"><img id="ig_tr_prev" class="iprev rect" alt="" /><input type="file" id="ig_tr_file" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('ig_tr_file','ig_tr_prev','ig_tr_imgUrl',this)">Yükle</button></div>
-                      <input type="url" id="ig_tr_imgUrl" placeholder="https://…" />
-                    </div>
-                    <div class="g2"><div class="fg"><label>Emoji (görsel yoksa)</label><input type="text" id="ig_tr_emoji" maxlength="4" /></div><div class="fg"><label>Kategori</label><input type="text" id="ig_tr_category" /></div></div>
-                    <div class="fg"><label>Başlık / Açıklama</label><textarea id="ig_tr_caption"></textarea></div>
-                    <div class="fg"><label>SEO Slug</label><input type="text" id="ig_tr_slug" /><p class="slug-preview"><span id="ig_tr_slugPreview">…</span></p></div>
-                    <div class="g2"><div class="fg"><label>Instagram Gönderi URL</label><input type="url" id="ig_tr_url" /></div><div class="fg"><label>Beğeni Sayısı</label><input type="text" id="ig_tr_likes" /></div></div>
-                    <div class="g2"><div class="fg"><label>Sıra</label><input type="number" id="ig_tr_order" value="0" min="0" /></div><div class="toggle-row" style="margin-top:20px;"><input type="checkbox" id="ig_tr_visible" checked /><label class="toggle-label" for="ig_tr_visible">Görünür</label></div></div>
-                    <button class="btn-save" id="ig_tr_saveBtn" style="width:100%;" onclick="_saveIgTR()">✦ Türkçe Kaydet</button>
-                  </div>
-                </div>
-
-                <!-- SAĞ: EN -->
-                <div class="both-col both-col-en">
-                  <div class="both-col-head"><span class="en-badge" style="margin:0;">🇬🇧 EN — instagramPostsEN</span></div>
-                  <div class="both-col-body">
-                    <div class="fg"><label>Image</label>
-                      <div class="irow"><img id="ig_en_prev" class="iprev rect" alt="" /><input type="file" id="ig_en_file" accept="image/*" class="fpick" /><button class="btn-up" onclick="_uploadImg('ig_en_file','ig_en_prev','ig_en_imgUrl',this)">Upload</button></div>
-                      <input type="url" id="ig_en_imgUrl" placeholder="https://…" />
-                    </div>
-                    <div class="g2"><div class="fg"><label>Emoji (if no image)</label><input type="text" id="ig_en_emoji" maxlength="4" /></div><div class="fg"><label>Category</label><input type="text" id="ig_en_category" /></div></div>
-                    <div class="fg"><label>Caption / Description</label><textarea id="ig_en_caption"></textarea></div>
-                    <div class="fg"><label>SEO Slug</label><input type="text" id="ig_en_slug" /><p class="slug-preview"><span id="ig_en_slugPreview">…</span></p></div>
-                    <div class="g2"><div class="fg"><label>Instagram Post URL</label><input type="url" id="ig_en_url" /></div><div class="fg"><label>Likes</label><input type="text" id="ig_en_likes" /></div></div>
-                    <div class="g2"><div class="fg"><label>Order</label><input type="number" id="ig_en_order" value="0" min="0" /></div><div class="toggle-row" style="margin-top:20px;"><input type="checkbox" id="ig_en_visible" checked /><label class="toggle-label" for="ig_en_visible">Visible</label></div></div>
-                    <button class="btn-save-en" id="ig_en_saveBtn" style="width:100%;" onclick="_saveIgEN()">✦ English Save</button>
-                  </div>
-                </div>
-
-              </div>
+        <div class="cm-section-bar">
+          <div class="cm-section-title">
+            <div>
+              <h3>📸 Instagram Gönderileri</h3>
+              <p class="cm-section-subtitle">TR: instagramPosts · EN: instagramPostsEN</p>
             </div>
           </div>
+          <div class="cm-section-actions">
+            <button class="cm-btn-primary" onclick="newIgBoth()">+ Yeni Gönderi</button>
+          </div>
         </div>
+        <div class="cm-grid" id="igPostList"></div>
       </div>
 
-      <!-- ══════════════ YOUTUBE ══════════════ -->
+      <!-- ══════════ YOUTUBE ══════════ -->
       <div class="panel" id="p_youtube">
-        <div class="card">
-          <div class="ch" onclick="tog(this)"><h3><span>▶️</span>YouTube Videoları — TR 🇹🇷 &amp; EN 🇬🇧</h3><span class="arr">▾</span></div>
-          <div class="cb">
-            <p class="help-text" style="margin-bottom:12px;">TR: <code>youtubePosts</code> · EN: <code>youtubePostsEN</code> · Slug eşleşmesiyle otomatik eşlenir.</p>
-            <div class="action-bar"><button class="btn-new" onclick="newYtBoth()">+ Yeni Video</button></div>
-            <div id="ytPostList"></div>
-          </div>
-        </div>
-
-        <!-- Unified YT Form -->
-        <div id="ytBothFormWrap" style="display:none;">
-          <div class="card" style="border:2px solid rgba(255,0,0,.2);">
-            <div class="ch" onclick="tog(this)">
-              <h3 id="ytBothFormTitle"><span>▶️</span>Yeni Video</h3>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <button class="btn-cancel" style="margin-top:0;font-size:.65rem;" onclick="cancelYtPost()">✕ Kapat</button>
-                <span class="arr">▾</span>
-              </div>
-            </div>
-            <div class="cb" style="padding:0;">
-              <div class="both-form-grid">
-
-                <!-- SOL: TR -->
-                <div class="both-col both-col-tr">
-                  <div class="both-col-head"><span class="tr-badge" style="margin:0;">🇹🇷 TR — youtubePosts</span></div>
-                  <div class="both-col-body">
-                    <div class="fg"><label>YouTube Video URL *</label><input type="url" id="yt_tr_videoUrl" /><p class="help-text">URL'yi girin ve alandan çıkın — thumbnail otomatik yüklenir.</p></div>
-                    <div class="fg"><label>Thumbnail</label>
-                      <div class="irow"><img id="yt_tr_thumbPrev" class="iprev" style="width:120px;height:68px;border-radius:5px;" alt="" /><input type="url" id="yt_tr_thumbnail" /></div>
-                    </div>
-                    <div class="g2"><div class="fg"><label>Başlık *</label><input type="text" id="yt_tr_title" /></div><div class="fg"><label>Kategori</label><input type="text" id="yt_tr_category" /></div></div>
-                    <div class="fg"><label>SEO Slug</label><input type="text" id="yt_tr_slug" /><p class="slug-preview"><span id="yt_tr_slugPreview">…</span></p></div>
-                    <div class="fg"><label>Açıklama</label><textarea id="yt_tr_description"></textarea></div>
-                    <div class="g2"><div class="fg"><label>Tarih Etiketi</label><input type="text" id="yt_tr_dateLabel" /></div><div class="fg"><label>Sıra</label><input type="number" id="yt_tr_order" value="0" min="0" /></div></div>
-                    <div class="toggle-row"><input type="checkbox" id="yt_tr_visible" checked /><label class="toggle-label" for="yt_tr_visible">Görünür</label></div>
-                    <button class="btn-save" id="yt_tr_saveBtn" style="width:100%;" onclick="_saveYtTR()">✦ Türkçe Kaydet</button>
-                  </div>
-                </div>
-
-                <!-- SAĞ: EN -->
-                <div class="both-col both-col-en">
-                  <div class="both-col-head"><span class="en-badge" style="margin:0;">🇬🇧 EN — youtubePostsEN</span></div>
-                  <div class="both-col-body">
-                    <div class="fg"><label>YouTube Video URL *</label><input type="url" id="yt_en_videoUrl" /><p class="help-text">Enter URL and blur — thumbnail auto-fills.</p></div>
-                    <div class="fg"><label>Thumbnail</label>
-                      <div class="irow"><img id="yt_en_thumbPrev" class="iprev" style="width:120px;height:68px;border-radius:5px;" alt="" /><input type="url" id="yt_en_thumbnail" /></div>
-                    </div>
-                    <div class="g2"><div class="fg"><label>Title *</label><input type="text" id="yt_en_title" /></div><div class="fg"><label>Category</label><input type="text" id="yt_en_category" /></div></div>
-                    <div class="fg"><label>SEO Slug</label><input type="text" id="yt_en_slug" /><p class="slug-preview"><span id="yt_en_slugPreview">…</span></p></div>
-                    <div class="fg"><label>Description</label><textarea id="yt_en_description"></textarea></div>
-                    <div class="g2"><div class="fg"><label>Date Label</label><input type="text" id="yt_en_dateLabel" /></div><div class="fg"><label>Order</label><input type="number" id="yt_en_order" value="0" min="0" /></div></div>
-                    <div class="toggle-row"><input type="checkbox" id="yt_en_visible" checked /><label class="toggle-label" for="yt_en_visible">Visible</label></div>
-                    <button class="btn-save-en" id="yt_en_saveBtn" style="width:100%;" onclick="_saveYtEN()">✦ English Save</button>
-                  </div>
-                </div>
-
-              </div>
+        <div class="cm-section-bar">
+          <div class="cm-section-title">
+            <div>
+              <h3>▶️ YouTube Videoları</h3>
+              <p class="cm-section-subtitle">TR: youtubePosts · EN: youtubePostsEN</p>
             </div>
           </div>
+          <div class="cm-section-actions">
+            <button class="cm-btn-primary" onclick="newYtBoth()">+ Yeni Video</button>
+          </div>
         </div>
+        <div class="cm-grid" id="ytPostList"></div>
       </div>
 
-      <!-- ══════════════ YORUMLAR ══════════════ -->
+      <!-- ══════════ YORUMLAR ══════════ -->
       <div class="panel" id="p_yorumlar">
         <div class="card"><div class="ch" onclick="tog(this)"><h3><span>💬</span>Yorumlar</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'reviews','tr')">🇹🇷 Türkçe — reviews</button><button class="lang-tab" onclick="switchTab(this,'reviews','en')">🇬🇧 English — reviewsEN</button></div><div id="reviews_tr" class="lang-pane show" style="margin-top:10px;"><p style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">Onayladığınız yorumlar Türkçe sitede görünür.</p><div id="reviewList"></div></div><div id="reviews_en" class="lang-pane" style="margin-top:10px;"><p style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">Approved reviews appear on the English site.</p><div id="reviewListEN"></div></div></div></div>
       </div>
 
-      <!-- ══════════════ RANDEVULAR ══════════════ -->
+      <!-- ══════════ RANDEVULAR ══════════ -->
       <div class="panel" id="p_randevular">
         <div class="card"><div class="ch" onclick="tog(this)"><h3><span>📅</span>Randevu Talepleri</h3><span class="arr">▾</span></div><div class="cb"><div class="lang-tabs"><button class="lang-tab active-tr" onclick="switchTab(this,'appts','tr')">🇹🇷 Türkçe — appointments</button><button class="lang-tab" onclick="switchTab(this,'appts','en')">🇬🇧 English — appointmentsEN</button></div><div id="appts_tr" class="lang-pane show" style="margin-top:10px;"><div id="apptList"></div></div><div id="appts_en" class="lang-pane" style="margin-top:10px;"><div id="apptListEN"></div></div></div></div>
       </div>
@@ -1117,19 +1175,18 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  /* ── PANEL NAVİGASYON ── */
   const PAGES={hero:'Hero & Arkaplan',hakkimda:'Hakkımda',iletisim:'İletişim & Sosyal',genel:'Genel Ayarlar',blog:'Blog (TR + EN)',instagram:'Instagram',youtube:'YouTube',yorumlar:'Yorumlar',randevular:'Randevular'};
   function go(key){
     document.querySelectorAll('.nb').forEach(b=>b.classList.toggle('on',b.dataset.p===key));
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
     document.getElementById('p_'+key).classList.add('on');
     document.getElementById('tbTitle').textContent=PAGES[key]||key;
-    const badge=key==='blog'?'TR & EN Blog':key==='instagram'?'TR & EN Instagram':key==='youtube'?'TR & EN YouTube':'Site İçeriği';
+    const cm=['blog','instagram','youtube'];
+    const badge=cm.includes(key)?'İçerik Yönetimi':['yorumlar','randevular'].includes(key)?'Gelen Kutusu':'Site İçeriği';
     document.getElementById('tbBadge').textContent=badge;
   }
   function tog(head){head.closest('.card').classList.toggle('cl');}
 
-  /* ── DİL SEKME ── */
   function switchTab(btn,group,lang){
     const card=btn.closest('.cb');
     card.querySelectorAll('.lang-tab').forEach(t=>{t.classList.remove('active-tr','active-en');});
@@ -1139,7 +1196,6 @@
     if(pane)pane.classList.add('show');
   }
 
-  /* ── RTE ── */
   function rte(cmd,val,edId){const ed=document.getElementById(edId);if(!ed)return;ed.focus();document.execCommand(cmd,false,val||null);}
   function rteLink(edId){const u=prompt('URL:','https://');if(u)rte('createLink',u,edId);}
   function rteImage(edId){const u=prompt('Image URL:','https://');if(u)rte('insertImage',u,edId);}
