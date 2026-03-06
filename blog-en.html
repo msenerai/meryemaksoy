@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title id="metaTitle">Blog — QHHT & Astrology</title>
+  <meta name="description" id="metaDesc" content="In-depth articles on Astrology, QHHT and spiritual transformation." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" id="metaCanonical" href="https://www.elifyildiz.com/blog-en.html" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        id="ogType"  content="website" />
+  <meta property="og:title"       id="ogTitle" content="Blog — QHHT & Astrology" />
+  <meta property="og:description" id="ogDesc"  content="In-depth articles on Astrology, QHHT and spiritual transformation." />
+  <meta property="og:image"       id="ogImage" content="https://via.placeholder.com/1200x630/0a0e27/c9a84c?text=Blog" />
+  <meta property="og:url"         id="ogUrl"   content="https://www.elifyildiz.com/blog-en.html" />
+  <meta property="og:locale"      content="en_US" />
+
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       id="twTitle" content="Blog — QHHT & Astrology" />
+  <meta name="twitter:description" id="twDesc"  content="In-depth articles on Astrology, QHHT and spiritual transformation." />
+  <meta name="twitter:image"       id="twImage" content="https://via.placeholder.com/1200x630/0a0e27/c9a84c?text=Blog" />
+
+  <script type="application/ld+json" id="structuredData">{}</script>
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, query, orderBy, where }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const db = getFirestore(initializeApp({
+      apiKey:            "AIzaSyBsAZj0Swtn77HvsGxpsgispuluvIEIcvU",
+      authDomain:        "meryemaksoy1-45ce5.firebaseapp.com",
+      projectId:         "meryemaksoy1-45ce5",
+      storageBucket:     "meryemaksoy1-45ce5.firebasestorage.app",
+      messagingSenderId: "212318615377",
+      appId:             "1:212318615377:web:b28387f101a4c42ad34570"
+    }));
+
+    /* ─── SLUG helper ─────────────────────────────────────────── */
+    window._makeSlug = function(title) {
+      return title.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim().replace(/\s+/g, '-');
+    };
+
+    /* ─── LOAD ALL PUBLISHED POSTS (EN) ──────────────────────── */
+    window._loadPosts = async function() {
+      const snap = await getDocs(
+        query(collection(db,'blogPostsEN'), orderBy('publishedAt','desc'))
+      );
+      const posts = [];
+      snap.forEach(d => {
+        const p = { id: d.id, ...d.data() };
+        if (p.published !== false) posts.push(p);
+      });
+      return posts;
+    };
+
+    /* ─── LOAD SINGLE POST BY SLUG (EN) ──────────────────────── */
+    window._loadPostBySlug = async function(slug) {
+      const snap = await getDocs(
+        query(collection(db,'blogPostsEN'), where('slug','==', slug))
+      );
+      if (snap.empty) return null;
+      const d = snap.docs[0];
+      return { id: d.id, ...d.data() };
+    };
+
+    /* ─── ROUTER ───────────────────────────────────────────────── */
+    function getSlug() {
+      const hash = location.hash;
+      if (hash.startsWith('#/') && hash.length > 2) return hash.slice(2);
+      return null;
+    }
+
+    async function render() {
+      const slug = getSlug();
+      if (slug) {
+        await renderPost(slug);
+      } else {
+        await renderList();
+      }
+    }
+
+    async function renderList() {
+      document.getElementById('viewList').style.display = 'block';
+      document.getElementById('viewPost').style.display = 'none';
+
+      setMeta({
+        title:  'Blog — QHHT & Astrology',
+        desc:   'In-depth articles on Astrology, QHHT and spiritual transformation.',
+        url:    location.href.split('#')[0],
+        image:  'https://via.placeholder.com/1200x630/0a0e27/c9a84c?text=Blog',
+        type:   'website'
+      });
+
+      const grid = document.getElementById('blogGrid');
+      grid.innerHTML = '<p class="loading-msg">Loading posts…</p>';
+
+      try {
+        const posts = await window._loadPosts();
+
+        if (posts.length === 0) {
+          grid.innerHTML = '<p class="empty-msg">No blog posts published yet.</p>';
+          return;
+        }
+
+        const cats = ['All', ...new Set(posts.map(p => p.category).filter(Boolean))];
+        const filterBar = document.getElementById('filterBar');
+        filterBar.innerHTML = cats.map((c,i) =>
+          `<button class="filter-btn${i===0?' active':''}" data-cat="${c}" onclick="filterPosts('${c}', this)">${c}</button>`
+        ).join('');
+
+        window._allPosts = posts;
+        renderCards(posts, grid);
+      } catch(e) {
+        grid.innerHTML = `<p class="empty-msg">Error loading posts: ${e.message}</p>`;
+      }
+    }
+
+    window.filterPosts = function(cat, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const posts = cat === 'All'
+        ? window._allPosts
+        : window._allPosts.filter(p => p.category === cat);
+      renderCards(posts, document.getElementById('blogGrid'));
+    };
+
+    function renderCards(posts, grid) {
+      grid.innerHTML = '';
+      posts.forEach(p => {
+        const slug = p.slug || window._makeSlug(p.title);
+        const date = p.publishedAt?.toDate
+          ? p.publishedAt.toDate().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})
+          : '—';
+        const card = document.createElement('a');
+        card.href = '#/' + slug;
+        card.className = 'blog-card';
+        card.setAttribute('aria-label', p.title);
+        card.innerHTML = `
+          <div class="blog-card-thumb" style="${p.coverImage ? 'background:none;padding:0;' : ''}">
+            ${p.coverImage
+              ? `<img src="${p.coverImage}" alt="${p.title}" loading="lazy" />`
+              : `<span>${p.emoji || '✦'}</span>`}
+          </div>
+          <div class="blog-card-body">
+            <span class="blog-card-cat">${p.category || 'Blog'}</span>
+            <h2 class="blog-card-title">${p.title}</h2>
+            <p class="blog-card-excerpt">${p.excerpt || (p.content||'').replace(/<[^>]+>/g,'').slice(0,140)}…</p>
+            <div class="blog-card-footer">
+              <span class="blog-card-date">${date}</span>
+              <span class="blog-card-read">Read More →</span>
+            </div>
+          </div>`;
+        grid.appendChild(card);
+      });
+    }
+
+    async function renderPost(slug) {
+      document.getElementById('viewList').style.display = 'none';
+      document.getElementById('viewPost').style.display = 'block';
+
+      const body = document.getElementById('postBody');
+      body.innerHTML = '<p class="loading-msg">Loading post…</p>';
+
+      try {
+        const post = await window._loadPostBySlug(slug);
+        if (!post || post.published === false) {
+          body.innerHTML = '<p class="empty-msg">Post not found. <a href="blog-en.html">← Go back</a></p>';
+          return;
+        }
+
+        const date = post.publishedAt?.toDate
+          ? post.publishedAt.toDate().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})
+          : '';
+
+        const canonical = `https://www.elifyildiz.com/blog-en.html#/${slug}`;
+        setMeta({
+          title:       post.title + ' — QHHT & Astrology',
+          desc:        post.excerpt || (post.content||'').replace(/<[^>]+>/g,'').slice(0,160),
+          url:         canonical,
+          image:       post.coverImage || 'https://via.placeholder.com/1200x630/0a0e27/c9a84c?text=Blog',
+          type:        'article',
+          slug:        slug,
+          publishedAt: post.publishedAt?.toDate ? post.publishedAt.toDate().toISOString() : null,
+          authorName:  post.authorName || 'QHHT & Astrology',
+        });
+
+        document.getElementById('metaCanonical').href = canonical;
+
+        body.innerHTML = `
+          <div class="post-header">
+            ${post.coverImage ? `<div class="post-cover"><img src="${post.coverImage}" alt="${post.title}" /></div>` : ''}
+            <div class="post-meta-row">
+              <span class="post-cat">${post.category || 'Blog'}</span>
+              ${date ? `<span class="post-date">${date}</span>` : ''}
+              ${post.readingTime ? `<span class="post-read">${post.readingTime} min read</span>` : ''}
+            </div>
+            <h1 class="post-title">${post.title}</h1>
+            ${post.excerpt ? `<p class="post-lead">${post.excerpt}</p>` : ''}
+            <div class="post-divider"></div>
+          </div>
+          <div class="post-content">${post.content || ''}</div>
+          ${post.tags && post.tags.length ? `
+            <div class="post-tags">
+              ${post.tags.map(t => `<span class="post-tag">#${t}</span>`).join('')}
+            </div>` : ''}
+          <div class="post-share">
+            <span>Share:</span>
+            <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(canonical)}" target="_blank" rel="noopener" class="share-btn">Twitter/X</a>
+            <a href="https://wa.me/?text=${encodeURIComponent(post.title+' '+canonical)}" target="_blank" rel="noopener" class="share-btn">WhatsApp</a>
+          </div>`;
+
+        // Related posts
+        try {
+          const all = await window._loadPosts();
+          const related = all.filter(p => p.slug !== slug && p.category === post.category).slice(0,3);
+          if (related.length) {
+            const relEl = document.getElementById('relatedPosts');
+            relEl.style.display = 'block';
+            const rGrid = document.getElementById('relatedGrid');
+            renderCards(related, rGrid);
+          }
+        } catch(_) {}
+
+      } catch(e) {
+        body.innerHTML = `<p class="empty-msg">Error: ${e.message}</p>`;
+      }
+    }
+
+    /* ─── META ─────────────────────────────────────────────────── */
+    function setMeta({ title, desc, url, image, type, slug, publishedAt, authorName }) {
+      document.title = title;
+      document.getElementById('metaTitle').textContent   = title;
+      document.getElementById('metaDesc').content        = desc;
+      document.getElementById('metaCanonical').href      = url;
+      document.getElementById('ogType').content          = type;
+      document.getElementById('ogTitle').content         = title;
+      document.getElementById('ogDesc').content          = desc;
+      document.getElementById('ogImage').content         = image;
+      document.getElementById('ogUrl').content           = url;
+      document.getElementById('twTitle').content         = title;
+      document.getElementById('twDesc').content          = desc;
+      document.getElementById('twImage').content         = image;
+
+      if (type === 'article' && publishedAt) {
+        document.getElementById('structuredData').textContent = JSON.stringify({
+          "@context":      "https://schema.org",
+          "@type":         "BlogPosting",
+          "headline":      title,
+          "description":   desc,
+          "image":         image,
+          "url":           url,
+          "datePublished": publishedAt,
+          "author": { "@type": "Person", "name": authorName || "QHHT & Astrology" },
+          "publisher": {
+            "@type": "Organization",
+            "name":  "QHHT & Astrology",
+            "logo":  { "@type": "ImageObject", "url": "https://www.elifyildiz.com/logo.png" }
+          }
+        });
+      } else {
+        document.getElementById('structuredData').textContent = JSON.stringify({
+          "@context":    "https://schema.org",
+          "@type":       "Blog",
+          "name":        "QHHT & Astrology Blog",
+          "description": desc,
+          "url":         url
+        });
+      }
+    }
+
+    /* ─── INIT ─────────────────────────────────────────────────── */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', render);
+    } else { render(); }
+
+    window.addEventListener('hashchange', render);
+  </script>
+
+  <style>
+    :root {
+      --navy-deep:   #f0ece4;
+      --navy-mid:    #ede8df;
+      --navy-light:  #e6e0d6;
+      --gold:        #8a6a1a;
+      --gold-light:  #9e7b22;
+      --gold-pale:   #b8922e;
+      --white:       #2c2535;
+      --white-dim:   rgba(44,37,53,0.65);
+      --white-faint: rgba(44,37,53,0.07);
+      --purple-glow: #7c5cbf;
+      --font-serif:  'Cormorant Garamond', Georgia, serif;
+      --font-sans:   'Jost', sans-serif;
+      --transition:  all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      --glow-gold:   0 0 20px rgba(138,106,26,0.2), 0 0 40px rgba(138,106,26,0.1);
+      --radius-lg:   16px;
+      --radius-md:   10px;
+      --max-width:   1200px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--navy-light); }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--gold), var(--purple-glow)); border-radius: 3px; }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--navy-deep);
+      color: var(--white);
+      line-height: 1.7;
+      overflow-x: hidden;
+      animation: fadeInPage .8s ease forwards;
+    }
+    @keyframes fadeInPage { from { opacity:0; } to { opacity:1; } }
+
+    .galaxy-overlay {
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 30%, rgba(180,160,210,0.10) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 80% at 80% 70%, rgba(200,185,165,0.12) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+    nav, main, footer { position: relative; z-index: 1; }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      padding: 14px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(240,236,228,0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(184,146,46,0.15);
+    }
+    .nav-logo {
+      font-family: var(--font-serif); font-size: 1.4rem; font-weight: 400;
+      color: var(--white); text-decoration: none;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .nav-links { display: flex; gap: 30px; list-style: none; }
+    .nav-links a {
+      font-family: var(--font-sans); font-size: .8rem; font-weight: 300;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--white-dim); text-decoration: none; transition: color .3s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--gold-light); }
+    .nav-cta {
+      font-family: var(--font-sans); font-size: .75rem; font-weight: 400;
+      letter-spacing: .15em; text-transform: uppercase;
+      color: var(--gold) !important; border: 1px solid var(--gold);
+      padding: 7px 20px; border-radius: 40px; text-decoration: none;
+      transition: var(--transition);
+    }
+    .nav-cta:hover { background: var(--gold); color: #faf8f5 !important; }
+
+    /* Lang switcher */
+    .lang-switch {
+      display: flex; align-items: center; gap: 6px;
+      font-family: var(--font-sans); font-size: .7rem; font-weight: 400;
+      letter-spacing: .12em; text-transform: uppercase;
+    }
+    .lang-switch a {
+      color: var(--white-dim); text-decoration: none; padding: 4px 8px;
+      border-radius: 4px; transition: color .2s;
+    }
+    .lang-switch a.current { color: var(--gold); font-weight: 500; }
+    .lang-switch a:hover { color: var(--gold-light); }
+    .lang-switch span { color: var(--white-dim); opacity: .4; }
+
+    .hamburger { display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;background:none;border:none; }
+    .hamburger span { display:block;width:24px;height:1.5px;background:var(--gold);transition:var(--transition); }
+    .hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity:0; }
+    .hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+    .mobile-menu { display:none;position:fixed;inset:0;background:rgba(240,236,228,0.98);backdrop-filter:blur(24px);z-index:99;flex-direction:column;align-items:center;justify-content:center;gap:36px; }
+    .mobile-menu.open { display:flex; }
+    .mobile-menu a { font-family:var(--font-serif);font-size:1.8rem;font-weight:300;color:var(--white);text-decoration:none;transition:color .3s; }
+    .mobile-menu a:hover { color:var(--gold); }
+
+    /* ── BLOG HEADER ── */
+    .blog-hero {
+      padding: 70px 40px 50px;
+      text-align: center;
+      background: linear-gradient(180deg, transparent 0%, rgba(180,160,200,0.06) 100%);
+    }
+    .section-label {
+      font-family: var(--font-sans); font-size: .7rem; font-weight: 400;
+      letter-spacing: .35em; text-transform: uppercase; color: var(--gold);
+      margin-bottom: 14px; display: block;
+    }
+    .page-title {
+      font-family: var(--font-serif); font-size: clamp(2.2rem,5vw,3.5rem);
+      font-weight: 300; color: var(--white); margin-bottom: 16px;
+    }
+    .page-title span { color: var(--gold-light); font-style: italic; }
+    .page-desc {
+      font-family: var(--font-sans); font-size: 1rem; font-weight: 300;
+      color: var(--white-dim); max-width: 540px; margin: 0 auto;
+    }
+    .divider {
+      width: 60px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 24px auto;
+    }
+
+    /* ── FILTER BAR ── */
+    #filterBar {
+      display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+      padding: 0 24px 40px;
+    }
+    .filter-btn {
+      font-family: var(--font-sans); font-size: .72rem; font-weight: 400;
+      letter-spacing: .15em; text-transform: uppercase;
+      color: var(--white-dim); background: transparent;
+      border: 1px solid rgba(44,37,53,0.15);
+      padding: 8px 20px; border-radius: 40px;
+      cursor: pointer; transition: var(--transition);
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: rgba(138,106,26,0.08); border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    /* ── BLOG GRID ── */
+    main { min-height: 70vh; }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+
+    #blogGrid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 28px;
+      padding-bottom: 80px;
+    }
+    .blog-card {
+      background: linear-gradient(160deg, rgba(232,226,216,0.8), rgba(245,241,234,0.95));
+      border: 1px solid rgba(138,106,26,0.12); border-radius: var(--radius-lg);
+      overflow: hidden; transition: var(--transition);
+      text-decoration: none; display: flex; flex-direction: column;
+    }
+    .blog-card:hover { transform: translateY(-6px); border-color: rgba(138,106,26,0.3); box-shadow: 0 20px 48px rgba(0,0,0,0.08); }
+    .blog-card-thumb {
+      width: 100%; aspect-ratio: 16/9; overflow: hidden;
+      background: linear-gradient(135deg, rgba(200,185,165,0.6), rgba(220,205,185,0.8));
+      display: flex; align-items: center; justify-content: center; font-size: 3.5rem;
+    }
+    .blog-card-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+    .blog-card-body { padding: 22px 24px 24px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .blog-card-cat { font-family: var(--font-sans); font-size: .65rem; font-weight: 400; letter-spacing: .25em; text-transform: uppercase; color: var(--gold); }
+    .blog-card-title { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 400; color: var(--white); line-height: 1.35; }
+    .blog-card-excerpt { font-family: var(--font-sans); font-size: .83rem; font-weight: 300; color: var(--white-dim); line-height: 1.7; flex: 1; }
+    .blog-card-footer { display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:12px;border-top:1px solid rgba(138,106,26,0.1); }
+    .blog-card-date { font-family:var(--font-sans);font-size:.72rem;font-weight:300;color:var(--white-dim); }
+    .blog-card-read { font-family:var(--font-sans);font-size:.72rem;font-weight:400;color:var(--gold); }
+
+    /* ── SINGLE POST ── */
+    #viewPost { display:none; padding-bottom: 80px; }
+    .post-back {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-sans); font-size: .78rem; font-weight: 300;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--gold);
+      text-decoration: none; padding: 28px 0 0;
+      transition: gap .3s;
+    }
+    .post-back:hover { gap: 12px; }
+    .post-header { margin-bottom: 40px; }
+    .post-cover { width:100%; border-radius: var(--radius-lg); overflow:hidden; margin-bottom: 32px; aspect-ratio: 16/6; }
+    .post-cover img { width:100%; height:100%; object-fit:cover; }
+    .post-meta-row { display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-bottom: 16px; }
+    .post-cat { font-family:var(--font-sans);font-size:.65rem;font-weight:400;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(138,106,26,0.3);padding:4px 12px;border-radius:20px; }
+    .post-date,.post-read { font-family:var(--font-sans);font-size:.78rem;font-weight:300;color:var(--white-dim); }
+    .post-title { font-family:var(--font-serif);font-size:clamp(2rem,4vw,3.2rem);font-weight:300;color:var(--white);line-height:1.1;margin-bottom:18px; }
+    .post-lead { font-family:var(--font-serif);font-size:1.25rem;font-weight:300;font-style:italic;color:var(--white-dim);line-height:1.8; }
+    .post-divider { width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:28px 0; }
+
+    .post-content {
+      font-family: var(--font-serif); font-size: 1.15rem; font-weight: 300;
+      color: var(--white-dim); line-height: 2; max-width: 720px;
+    }
+    .post-content h2 { font-family:var(--font-serif);font-size:1.7rem;font-weight:400;color:var(--white);margin:36px 0 14px;line-height:1.2; }
+    .post-content h3 { font-family:var(--font-serif);font-size:1.3rem;font-weight:400;color:var(--gold-light);margin:28px 0 10px; }
+    .post-content p { margin-bottom:1.4em; }
+    .post-content strong { color:var(--gold-light);font-weight:400; }
+    .post-content em { font-style:italic; }
+    .post-content a { color:var(--gold);text-decoration:underline;text-underline-offset:3px; }
+    .post-content ul, .post-content ol { margin: 0 0 1.4em 1.6em; }
+    .post-content li { margin-bottom:.5em; }
+    .post-content blockquote {
+      border-left:3px solid var(--gold);padding:18px 24px;
+      background:rgba(138,106,26,0.05);border-radius:0 var(--radius-md) var(--radius-md) 0;
+      font-style:italic;color:var(--gold-light);margin:24px 0;
+    }
+    .post-content img { max-width:100%;border-radius:var(--radius-md);margin:16px 0; }
+    .post-content hr { border:none;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:32px 0; }
+
+    .post-tags { display:flex;gap:10px;flex-wrap:wrap;margin-top:32px; }
+    .post-tag { font-family:var(--font-sans);font-size:.72rem;font-weight:300;color:var(--white-dim);border:1px solid rgba(44,37,53,0.12);padding:5px 12px;border-radius:20px; }
+
+    .post-share { display:flex;align-items:center;gap:12px;margin-top:32px;padding-top:24px;border-top:1px solid rgba(138,106,26,0.12);font-family:var(--font-sans);font-size:.75rem;font-weight:300;color:var(--white-dim); }
+    .share-btn { font-family:var(--font-sans);font-size:.72rem;font-weight:400;letter-spacing:.1em;color:var(--gold);border:1px solid rgba(138,106,26,0.3);padding:6px 14px;border-radius:20px;text-decoration:none;transition:var(--transition); }
+    .share-btn:hover { background:rgba(138,106,26,0.08);border-color:var(--gold); }
+
+    /* ── RELATED ── */
+    #relatedPosts { display:none; padding: 60px 0 0; }
+    #relatedPosts h3 { font-family:var(--font-serif);font-size:1.7rem;font-weight:300;color:var(--white);margin-bottom:28px; }
+    #relatedGrid { display:grid;grid-template-columns:repeat(3,1fr);gap:24px; }
+
+    /* ── MESSAGES ── */
+    .loading-msg, .empty-msg {
+      text-align:center; font-family:var(--font-serif);
+      font-style:italic; color:var(--white-dim); padding:60px 20px;
+      font-size:1.1rem; grid-column:1/-1;
+    }
+    .empty-msg a { color:var(--gold); }
+
+    /* ── FOOTER ── */
+    footer { background:rgba(232,226,216,0.95);border-top:1px solid rgba(160,120,40,0.15);padding:50px 40px 36px; }
+    .footer-inner { max-width:var(--max-width);margin:0 auto; }
+    .footer-top { display:flex;justify-content:space-between;align-items:center;padding-bottom:32px;border-bottom:1px solid rgba(44,37,53,0.08);flex-wrap:wrap;gap:20px; }
+    .footer-logo { font-family:var(--font-serif);font-size:1.5rem;font-weight:400;color:var(--white);text-decoration:none; }
+    .footer-logo span { color:var(--gold); }
+    .footer-bottom { padding-top:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px; }
+    .footer-copy { font-family:var(--font-sans);font-size:.78rem;font-weight:300;color:rgba(44,37,53,0.45);letter-spacing:.05em; }
+    .footer-links { display:flex;gap:20px;list-style:none; }
+    .footer-links a { font-family:var(--font-sans);font-size:.75rem;font-weight:300;color:rgba(44,37,53,0.45);text-decoration:none;transition:color .3s; }
+    .footer-links a:hover { color:var(--gold); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width:1024px) { #blogGrid,#relatedGrid { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:768px) {
+      nav { padding:14px 20px; }
+      .nav-links { display:none; }
+      .hamburger { display:flex; }
+      .blog-hero { padding:50px 20px 36px; }
+      #blogGrid,#relatedGrid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="galaxy-overlay" aria-hidden="true"></div>
+
+<nav id="navbar" role="navigation" aria-label="Main menu">
+  <a href="index-en.html" class="nav-logo" aria-label="Home">
+    <span>✦</span> QHHT & Astrology
+  </a>
+  <ul class="nav-links" role="list">
+    <li><a href="index-en.html#about">About</a></li>
+    <li><a href="index-en.html#qhht">QHHT</a></li>
+    <li><a href="index-en.html#astrology">Astrology</a></li>
+    <li><a href="blog-en.html" class="active">Blog</a></li>
+    <li><a href="index-en.html#faq">FAQ</a></li>
+    <li><a href="index-en.html#contact" class="nav-cta">Book a Session</a></li>
+  </ul>
+  <div class="lang-switch" style="margin-left:8px;">
+    <a href="blog.html">TR</a>
+    <span>|</span>
+    <a href="blog-en.html" class="current">EN</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index-en.html#about" onclick="closeMM()">About</a>
+  <a href="index-en.html#qhht" onclick="closeMM()">QHHT</a>
+  <a href="index-en.html#astrology" onclick="closeMM()">Astrology</a>
+  <a href="blog-en.html" onclick="closeMM()">Blog</a>
+  <a href="index-en.html#contact" onclick="closeMM()">Book a Session</a>
+  <div style="display:flex;gap:16px;margin-top:8px;">
+    <a href="blog.html" style="font-size:1rem!important;">TR</a>
+    <a href="blog-en.html" style="font-size:1rem!important;color:var(--gold)!important;">EN</a>
+  </div>
+</div>
+
+<main>
+  <!-- LIST VIEW -->
+  <div id="viewList">
+    <div class="blog-hero">
+      <span class="section-label">Articles</span>
+      <h1 class="page-title">Spiritual <span>Blog</span></h1>
+      <div class="divider"></div>
+      <p class="page-desc">In-depth articles on Astrology, QHHT and spiritual transformation.</p>
+    </div>
+
+    <div id="filterBar" role="toolbar" aria-label="Category filter"></div>
+
+    <div class="container">
+      <div id="blogGrid" role="list"></div>
+    </div>
+  </div>
+
+  <!-- POST VIEW -->
+  <div id="viewPost">
+    <div class="container">
+      <a href="blog-en.html" class="post-back" id="backBtn">← All Posts</a>
+      <div id="postBody"></div>
+      <div id="relatedPosts">
+        <h3>Related <span style="color:var(--gold-light);font-style:italic;">Posts</span></h3>
+        <div id="relatedGrid"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer role="contentinfo">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <a href="index-en.html" class="footer-logo">QHHT <span>✦</span> Astrology</a>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2025 All rights reserved. ✦ QHHT & Astrology</p>
+      <ul class="footer-links">
+        <li><a href="index-en.html">Home</a></li>
+        <li><a href="index-en.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* HAMBURGER */
+  const hamburger  = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => {
+    const o = mobileMenu.classList.toggle('open');
+    hamburger.classList.toggle('open', o);
+    hamburger.setAttribute('aria-expanded', o);
+    document.body.style.overflow = o ? 'hidden' : '';
+  });
+  function closeMM() {
+    mobileMenu.classList.remove('open');
+    hamburger.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', false);
+    document.body.style.overflow = '';
+  }
+
+  /* BACK BUTTON */
+  document.getElementById('backBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    location.hash = '';
+    window.scrollTo(0,0);
+  });
+</script>
+</body>
+</html>
