@@ -249,7 +249,7 @@
       const feed = document.getElementById('igDynamicFeed');
       if (!feed) return;
       try {
-        const snap = await getDocs(query(collection(db, 'instagramPosts'), orderBy('order', 'asc')));
+        const snap = await getDocs(query(collection(db, 'instagramPostsEN'), orderBy('order', 'asc')));
         const posts = [];
         if (!snap.empty) snap.forEach(d => { const p = { id: d.id, ...d.data() }; if (p.visible !== false) posts.push(p); });
         if (posts.length === 0) {
@@ -285,7 +285,7 @@
         return m ? m[1] : null;
       }
       try {
-        const snap = await getDocs(query(collection(db, 'youtubePosts'), orderBy('order', 'asc')));
+        const snap = await getDocs(query(collection(db, 'youtubePostsEN'), orderBy('order', 'asc')));
         const posts = [];
         if (!snap.empty) snap.forEach(d => { const p = { id: d.id, ...d.data() }; if (p.visible !== false) posts.push(p); });
         if (posts.length === 0) {
